@@ -1,9 +1,9 @@
 {
-  "id": "underling-obsidian",
-  "name": "Underling",
-  "version": "0.12.0-SNAPSHOT",
+  "id": "obsidian-minion",
+  "name": "Minion",
+  "version": "0.13.0-SNAPSHOT",
   "minAppVersion": "0.12.17",
-  "description": "Underling Personal Assistant",
+  "description": "Your own personal Minion",
   "author": "darthmachina",
   "authorUrl": "https://obsidian.md",
   "isDesktopOnly": false
