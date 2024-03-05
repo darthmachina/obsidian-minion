@@ -12,9 +12,11 @@ import app.minion.core.model.Tag
 import app.minion.core.model.Task
 import app.minion.core.store.State
 import arrow.core.Either
+import arrow.core.flatMap
 import arrow.core.getOrElse
 import arrow.core.raise.either
 import arrow.core.toOption
+import kotlinx.coroutines.await
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {  }
@@ -62,6 +64,26 @@ interface VaultReadFunctions { companion object {
                 this@addBacklinks.copy(outLinks = it)
             }
     }
+
+    suspend fun FileData.processFileContents(vault: Vault, metadataCache: MetadataCache) : Either<MinionError.VaultReadError, FileData> = either {
+        metadataCache
+            .getFirstLinkpathDest(this@processFileContents.path.v, "")
+            .toOption()
+            .toEither {
+                MinionError.VaultReadError("Error reading ${this@processFileContents.path.v}")
+            }
+            .map {
+                vault
+                    .read(it)
+                    .then { contents ->
+                        // Process Dataview Fields
+                        // Process Tasks
+                        this@processFileContents
+                    }
+                    .await()
+            }.bind()
+
+   }
 
     fun FileData.addToState(acc: StateAccumulator) : Either<MinionError.VaultReadError, StateAccumulator> = either {
         acc.addFileData(this@addToState).bind()
