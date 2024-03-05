@@ -2,6 +2,6 @@ package app.minion.core.model
 
 data class FileData(
     val path: Filename,
-    val title: PageTitle,
-    val tags: List<Tag> = emptyList()
+    val tags: List<Tag> = emptyList(),
+    val outLinks: List<Filename> = emptyList()
 )

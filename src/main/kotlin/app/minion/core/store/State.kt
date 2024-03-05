@@ -16,5 +16,6 @@ data class State(
     val tasks: List<Task>,
     val files: Map<Filename, FileData>,
     val tagCache: Map<Tag, List<Filename>>,
-    val dataviewCache: Map<Pair<DataviewField, DataviewValue>, List<Filename>>
+    val dataviewCache: Map<Pair<DataviewField, DataviewValue>, List<Filename>>,
+    val backlinkCache: Map<Filename, List<Filename>>
 )

@@ -25,6 +25,7 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
             emptyList(),
             emptyMap(),
             emptyMap(),
+            emptyMap(),
             emptyMap()
         )
     )
