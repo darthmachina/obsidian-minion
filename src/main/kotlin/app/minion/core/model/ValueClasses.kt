@@ -1,8 +1,8 @@
 package app.minion.core.model
 
-value class Filename(val s: String)
-value class Content(val s: String)
-value class PageTitle(val s: String)
-value class Tag(val s: String)
-value class DataviewField(val s: String)
-value class DataviewValue(val s: String)
+value class Filename(val v: String)
+value class Content(val v: String)
+value class PageTitle(val v: String)
+value class Tag(val v: String)
+value class DataviewField(val v: String)
+value class DataviewValue(val v: String)

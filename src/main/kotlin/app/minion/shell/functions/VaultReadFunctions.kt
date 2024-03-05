@@ -2,7 +2,6 @@ package app.minion.shell.functions
 
 import MetadataCache
 import MinionPlugin
-import TFile
 import Vault
 import app.minion.core.MinionError
 import app.minion.core.model.DataviewField
@@ -19,32 +18,41 @@ import arrow.core.raise.either
 import arrow.core.toOption
 
 interface VaultReadFunctions { companion object {
-    suspend fun processIntoState(plugin: MinionPlugin) : Either<MinionError.VaultReadError, State> = either {
-        plugin.app.vault
+    suspend fun Vault.processIntoState(plugin: MinionPlugin) : Either<MinionError.VaultReadError, State> = either {
+        this@processIntoState
             .getFiles()
             .fold(StateAccumulator(plugin)) { acc, file ->
-                acc
-                    .addFile(file)
-                    .map {
-                        plugin.app.metadataCache
-                            .getCache(file.path)
-                            .tags
-                            .toOption()
-                            .map { it.toList() }
-                            .getOrElse { emptyList() }
-                            .map { Tag(it.tag.drop(1)) }
-                            .let {
-                                acc.addTags(it, Filename(file.path)).bind()
-                            }
-                    }
-                    .bind()
-            }
+                FileData(Filename(file.path), PageTitle(file.basename))
+                    .addTags(plugin.app.metadataCache).bind()
+                    .addToState(acc).bind()
+           }
             .toState()
+    }
+
+    fun FileData.addTags(metadataCache: MetadataCache) : Either<MinionError.VaultReadError, FileData> = either {
+        metadataCache
+            .getCache(this@addTags.path.v)
+            .tags
+            .toOption()
+            .map { it.toList() }
+            .getOrElse { emptyList() }
+            .map { Tag(it.tag.drop(1)) }
+            .let {
+                this@addTags.copy(tags = it)
+            }
+    }
+
+    fun FileData.addToState(acc: StateAccumulator) : Either<MinionError.VaultReadError, StateAccumulator> = either {
+        acc.addFileData(this@addToState).bind()
     }
 }}
 
+
+
+
+
 /**
- * Intermediate data class to be used internally to vault processing
+ * Intermediate data class to be used internally to vault processing.
  */
 data class StateAccumulator(
     val plugin: MinionPlugin,
@@ -53,8 +61,9 @@ data class StateAccumulator(
     val tagCache: MutableMap<Tag, MutableList<Filename>> = mutableMapOf(),
     val dataviewCache: MutableMap<Pair<DataviewField,DataviewValue>, MutableList<Filename>> = mutableMapOf()
 ) {
-    fun addFile(file: TFile) : Either<MinionError.VaultReadError, StateAccumulator> = either {
-        files[Filename(file.path)] = FileData(PageTitle(file.basename))
+    fun addFileData(fileData: FileData) : Either<MinionError.VaultReadError, StateAccumulator> = either {
+        files[fileData.path] = fileData
+        addTags(fileData.tags, fileData.path)
         this@StateAccumulator
     }
 

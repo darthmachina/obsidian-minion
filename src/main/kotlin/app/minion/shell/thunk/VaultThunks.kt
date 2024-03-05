@@ -3,7 +3,7 @@ package app.minion.shell.thunk
 import MinionPlugin
 import app.minion.core.store.Action
 import app.minion.core.store.State
-import app.minion.shell.functions.VaultReadFunctions
+import app.minion.shell.functions.VaultReadFunctions.Companion.processIntoState
 import io.kvision.redux.ActionCreator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +18,7 @@ interface VaultThunks { companion object {
 
         return { dispatch, _ ->
             CoroutineScope(Dispatchers.Unconfined).launch {
-                VaultReadFunctions
+                plugin.app.vault
                     .processIntoState(plugin)
                     .map { dispatch(Action.LoadInitialState(it)) }
                     .mapLeft {
