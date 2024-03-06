@@ -12,7 +12,6 @@ import app.minion.core.model.Tag
 import app.minion.core.model.Task
 import app.minion.core.store.State
 import arrow.core.Either
-import arrow.core.flatMap
 import arrow.core.getOrElse
 import arrow.core.raise.either
 import arrow.core.toOption
@@ -30,6 +29,7 @@ interface VaultReadFunctions { companion object {
                 FileData(Filename(file.basename))
                     .addTags(plugin.app.metadataCache).bind()
                     .addBacklinks(plugin.app.metadataCache).bind()
+                    .processFileContents(this@processIntoState, plugin.app.metadataCache).bind()
                     .addToState(acc).bind()
            }
             .toState()
@@ -77,13 +77,20 @@ interface VaultReadFunctions { companion object {
                     .read(it)
                     .then { contents ->
                         // Process Dataview Fields
+
                         // Process Tasks
-                        this@processFileContents
+                        this@processFileContents.copy(
+                            dataview = contents.pullOutDataviewFields().bind()
+                        )
                     }
                     .await()
             }.bind()
+    }
 
-   }
+    fun String.pullOutDataviewFields() : Either<MinionError.VaultReadError, Map<DataviewField, DataviewValue>> = either {
+        dataviewRegex.findAll(this@pullOutDataviewFields)
+            .associate { DataviewField(it.groupValues[1]) to DataviewValue(it.groupValues[2]) }
+    }
 
     fun FileData.addToState(acc: StateAccumulator) : Either<MinionError.VaultReadError, StateAccumulator> = either {
         acc.addFileData(this@addToState).bind()
@@ -105,6 +112,7 @@ data class StateAccumulator(
         files[fileData.path] = fileData
         addTags(fileData.tags, fileData.path)
         addBacklinks(fileData.outLinks, fileData.path)
+        addDataview(fileData.dataview, fileData.path)
         this@StateAccumulator
     }
 
@@ -140,6 +148,21 @@ data class StateAccumulator(
             backlinkCache[link]
                 ?.add(filename)
                 ?: MinionError.VaultReadError("Error adding $filename to backlinksCache")
+        }
+        this@StateAccumulator
+    }
+
+    fun addDataview(dataview: Map<DataviewField, DataviewValue>, filename: Filename) : Either<MinionError.VaultReadError, StateAccumulator> = either {
+        logger.debug { "addDataview()" }
+        dataview.entries.forEach { entry ->
+            val dataviewPair = entry.key to entry.value
+            if (!dataviewCache.containsKey(dataviewPair)) {
+                dataviewCache[dataviewPair] = mutableListOf()
+            }
+
+            dataviewCache[dataviewPair]
+                ?.add(filename)
+                ?: MinionError.VaultReadError("Error adding $filename to dataviewCache")
         }
         this@StateAccumulator
     }
