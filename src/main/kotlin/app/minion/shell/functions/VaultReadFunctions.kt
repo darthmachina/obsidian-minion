@@ -76,8 +76,6 @@ interface VaultReadFunctions { companion object {
                 vault
                     .read(it)
                     .then { contents ->
-                        // Process Dataview Fields
-
                         // Process Tasks
                         this@processFileContents.copy(
                             dataview = contents.pullOutDataviewFields().bind()
@@ -88,6 +86,7 @@ interface VaultReadFunctions { companion object {
     }
 
     fun String.pullOutDataviewFields() : Either<MinionError.VaultReadError, Map<DataviewField, DataviewValue>> = either {
+        logger.debug { "pullOutDataviewFields()" }
         dataviewRegex.findAll(this@pullOutDataviewFields)
             .associate { DataviewField(it.groupValues[1]) to DataviewValue(it.groupValues[2]) }
     }
