@@ -1,0 +1,54 @@
+package app.minion.shell.view.codeblock
+
+import kotlinx.serialization.Serializable
+
+// NOTE: Enums are lowercase so they can be deserialized easily
+
+@Serializable
+data class CodeBlockConfig(
+    val display: CodeBlockDisplay,
+    val due: List<DueOptions> = emptyList(),
+    val include: IncludeExcludeOptions = IncludeExcludeOptions(),
+    val exclude: IncludeExcludeOptions = IncludeExcludeOptions(),
+    val properties: List<String> = emptyList(),
+    val limit: Int = 0,
+    val groupByOptions: GroupByOptions = GroupByOptions.NONE,
+    val options: List<CodeBlockOptions> = emptyList()
+)
+
+@Serializable
+enum class CodeBlockDisplay {
+    list,
+    gallery,
+    kanban,
+    table
+}
+
+@Serializable
+enum class DueOptions {
+    today,
+    overdue,
+    upcoming
+}
+
+@Serializable
+data class IncludeExcludeOptions(
+    val tags: List<String> = emptyList(),
+    val parentTags: List<String> = emptyList(),
+    val links: List<String> = emptyList(),
+    val dateCreated: String = "",
+    val dateModified: String = "",
+    val dataview: List<String> = emptyList()
+)
+
+@Serializable
+enum class GroupByOptions {
+    NONE,
+    parent_tag,
+    due
+}
+
+@Serializable
+enum class CodeBlockOptions {
+    notes_on_cover
+}

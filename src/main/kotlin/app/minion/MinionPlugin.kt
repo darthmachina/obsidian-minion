@@ -2,11 +2,13 @@ import app.minion.core.JsJodaTimeZoneModule
 import app.minion.core.store.State
 import app.minion.core.store.reducer
 import app.minion.shell.thunk.VaultThunks
+import app.minion.shell.view.codeblock.CodeBlockConfig
 import arrow.core.None
 import io.kvision.redux.createTypedReduxStore
 import mu.KotlinLogging
 import mu.KotlinLoggingConfiguration
 import mu.KotlinLoggingLevel
+import net.mamoe.yamlkt.Yaml
 
 private val logger = KotlinLogging.logger {  }
 
@@ -37,7 +39,7 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
 
         app.workspace.onLayoutReady {
             logger.debug { "onLayoutReady()" }
-
+            testYaml()
             store.dispatch(VaultThunks.loadInitialState(this))
 
             registerEvent(
@@ -46,5 +48,15 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
                 }
             )
         }
+    }
+
+    fun testYaml() {
+        val source = """
+            display: table
+            due:
+                - today
+            
+        """.trimIndent()
+        val config = Yaml.decodeFromString(CodeBlockConfig.serializer(), source)
     }
 }
