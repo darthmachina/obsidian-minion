@@ -2,6 +2,7 @@ package app.minion.shell.functions
 
 import MetadataCache
 import MinionPlugin
+import TFile
 import Vault
 import app.minion.core.MinionError
 import app.minion.core.model.DataviewField
@@ -16,27 +17,36 @@ import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.raise.either
 import arrow.core.toOption
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.await
+import kotlinx.coroutines.launch
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger("VaultReadFunctions")
 
 interface VaultReadFunctions { companion object {
-    suspend fun Vault.processIntoState(plugin: MinionPlugin) : Either<MinionError.VaultReadError, State> = either {
+
+    suspend fun Vault.processIntoState(plugin: MinionPlugin) : Either<MinionError, State> = either {
         this@processIntoState
             .getFiles()
             .fold(StateAccumulator(plugin)) { acc, file ->
                 logger.debug { "Processing ${file.path}" }
-                FileData(Filename(file.basename))
-                    .addTags(plugin.app.metadataCache).bind()
-                    .addBacklinks(plugin.app.metadataCache).bind()
-                    .processFileContents(this@processIntoState, plugin.app.metadataCache).bind()
+                this@processIntoState
+                    .processFile(file, plugin.app.metadataCache).bind()
                     .addToState(acc).bind()
            }
             .toState()
     }
 
-    fun FileData.addTags(metadataCache: MetadataCache) : Either<MinionError.VaultReadError, FileData> = either {
+    suspend fun Vault.processFile(file: TFile, metadataCache: MetadataCache) : Either<MinionError, FileData> = either {
+        FileData(Filename(file.basename))
+            .addTags(metadataCache).bind()
+            .addBacklinks(metadataCache).bind()
+            .processFileContents(this@processFile, metadataCache).bind()
+    }
+
+    fun FileData.addTags(metadataCache: MetadataCache) : Either<MinionError, FileData> = either {
         logger.debug { "FileData.addTags()" }
         metadataCache
             .getCache(this@addTags.path.fullName())
@@ -51,7 +61,7 @@ interface VaultReadFunctions { companion object {
             }
     }
 
-    fun FileData.addBacklinks(metadataCache: MetadataCache) : Either<MinionError.VaultReadError, FileData> = either {
+    fun FileData.addBacklinks(metadataCache: MetadataCache) : Either<MinionError, FileData> = either {
         logger.debug { "FileData.addBacklinks()" }
         metadataCache
             .getCache(this@addBacklinks.path.fullName())
@@ -66,7 +76,7 @@ interface VaultReadFunctions { companion object {
             }
     }
 
-    suspend fun FileData.processFileContents(vault: Vault, metadataCache: MetadataCache) : Either<MinionError.VaultReadError, FileData> = either {
+    suspend fun FileData.processFileContents(vault: Vault, metadataCache: MetadataCache) : Either<MinionError, FileData> = either {
         metadataCache
             .getFirstLinkpathDest(this@processFileContents.path.v, "")
             .toOption()
@@ -83,19 +93,20 @@ interface VaultReadFunctions { companion object {
                             tasks = contents.processFileTasks(this@processFileContents.path, metadataCache)
                                 .mapLeft { MinionError.VaultReadError(it.message, it.throwable, parent = it.toOption()) }
                                 .bind()
+                                .filter { !it.completed }
                         )
                     }
                     .await()
             }.bind()
     }
 
-    fun String.pullOutDataviewFields() : Either<MinionError.VaultReadError, Map<DataviewField, DataviewValue>> = either {
+    fun String.pullOutDataviewFields() : Either<MinionError, Map<DataviewField, DataviewValue>> = either {
         logger.debug { "pullOutDataviewFields()" }
         dataviewRegex.findAll(this@pullOutDataviewFields)
             .associate { DataviewField(it.groupValues[1]) to DataviewValue(it.groupValues[2]) }
     }
 
-    fun FileData.addToState(acc: StateAccumulator) : Either<MinionError.VaultReadError, StateAccumulator> = either {
+    fun FileData.addToState(acc: StateAccumulator) : Either<MinionError, StateAccumulator> = either {
         acc.addFileData(this@addToState).bind()
     }
 }}
@@ -107,11 +118,11 @@ data class StateAccumulator(
     val plugin: MinionPlugin,
     val tasks: MutableList<Task> = mutableListOf(),
     val files: MutableMap<Filename, FileData> = mutableMapOf(),
-    val tagCache: MutableMap<Tag, MutableList<Filename>> = mutableMapOf(),
-    val dataviewCache: MutableMap<Pair<DataviewField,DataviewValue>, MutableList<Filename>> = mutableMapOf(),
-    val backlinkCache: MutableMap<Filename, MutableList<Filename>> = mutableMapOf()
+    val tagCache: MutableMap<Tag, MutableSet<Filename>> = mutableMapOf(),
+    val dataviewCache: MutableMap<Pair<DataviewField,DataviewValue>, MutableSet<Filename>> = mutableMapOf(),
+    val backlinkCache: MutableMap<Filename, MutableSet<Filename>> = mutableMapOf()
 ) {
-    fun addFileData(fileData: FileData) : Either<MinionError.VaultReadError, StateAccumulator> = either {
+    fun addFileData(fileData: FileData) : Either<MinionError, StateAccumulator> = either {
         files[fileData.path] = fileData
         addTags(fileData.tags, fileData.path)
         addBacklinks(fileData.outLinks, fileData.path)
@@ -120,16 +131,16 @@ data class StateAccumulator(
         this@StateAccumulator
     }
 
-    fun addTags(tags: List<Tag>, filename: Filename) : Either<MinionError.VaultReadError, StateAccumulator> = either {
+    fun addTags(tags: List<Tag>, filename: Filename) : Either<MinionError, StateAccumulator> = either {
         logger.debug { "addTags()" }
         tags.forEach { addTag(it, filename).bind() }
         this@StateAccumulator
     }
 
-    fun addTag(tag: Tag, filename: Filename) : Either<MinionError.VaultReadError, StateAccumulator> = either {
+    fun addTag(tag: Tag, filename: Filename) : Either<MinionError, StateAccumulator> = either {
         logger.debug { "addTag()" }
         if (!tagCache.containsKey(tag)) {
-            tagCache[tag] = mutableListOf()
+            tagCache[tag] = mutableSetOf()
         }
         tagCache[tag]
             ?.add(filename)
@@ -142,11 +153,11 @@ data class StateAccumulator(
      *
      * Each entry in outlinks is a key in backlinksCache and the file being processed is added to the target list
      */
-    fun addBacklinks(outlinks: List<Filename>, filename: Filename) : Either<MinionError.VaultReadError, StateAccumulator> = either {
+    fun addBacklinks(outlinks: List<Filename>, filename: Filename) : Either<MinionError, StateAccumulator> = either {
         logger.debug { "addBacklinks()" }
         outlinks.forEach { link ->
             if (!backlinkCache.containsKey(link)) {
-                backlinkCache[link] = mutableListOf()
+                backlinkCache[link] = mutableSetOf()
             }
 
             backlinkCache[link]
@@ -156,12 +167,12 @@ data class StateAccumulator(
         this@StateAccumulator
     }
 
-    fun addDataview(dataview: Map<DataviewField, DataviewValue>, filename: Filename) : Either<MinionError.VaultReadError, StateAccumulator> = either {
+    fun addDataview(dataview: Map<DataviewField, DataviewValue>, filename: Filename) : Either<MinionError, StateAccumulator> = either {
         logger.debug { "addDataview()" }
         dataview.entries.forEach { entry ->
             val dataviewPair = entry.key to entry.value
             if (!dataviewCache.containsKey(dataviewPair)) {
-                dataviewCache[dataviewPair] = mutableListOf()
+                dataviewCache[dataviewPair] = mutableSetOf()
             }
 
             dataviewCache[dataviewPair]
@@ -171,7 +182,7 @@ data class StateAccumulator(
         this@StateAccumulator
     }
 
-    fun addTasks(tasks: List<Task>) : Either<MinionError.VaultReadError, StateAccumulator> = either {
+    fun addTasks(tasks: List<Task>) : Either<MinionError, StateAccumulator> = either {
         logger.debug { "addTasks()" }
         this@StateAccumulator.tasks.addAll(tasks)
         this@StateAccumulator

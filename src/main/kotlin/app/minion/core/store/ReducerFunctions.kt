@@ -1,11 +1,21 @@
 package app.minion.core.store
 
+import app.minion.core.MinionError
+import app.minion.core.model.FileData
 import app.minion.core.model.Task
+import arrow.core.Either
+import arrow.core.raise.either
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger("ReducerFunctions")
 
 interface ReducerFunctions { companion object {
+    fun State.replaceDataForFile(fileData: FileData) : Either<MinionError, State> = either {
+
+
+        this@replaceDataForFile
+    }
+
     /**
      * Replaces a Task within the Task list, based on the Tasks UUID.
      *

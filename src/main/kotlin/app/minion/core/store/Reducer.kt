@@ -11,4 +11,5 @@ fun reducer(state: State, action: Action) : State =
             logger.debug { "LoadInitialState: ${action.state}" }
             action.state
         }
+        is Action.LoadDataForFile -> { state }
     }
