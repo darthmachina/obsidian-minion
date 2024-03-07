@@ -2,6 +2,7 @@ package app.minion.core.functions
 
 import app.minion.core.MinionError
 import app.minion.core.functions.MarkdownConversionFunctions.Companion.completeAsMarkdown
+import app.minion.core.functions.RepeatingTaskFunctions.Companion.maybeRepeat
 import app.minion.core.model.Task
 import app.minion.core.store.ReducerFunctions.Companion.replaceTask
 import arrow.core.Either
@@ -22,7 +23,7 @@ interface TaskFunctions { companion object {
             this@complete.copy(
                 completedOn = Clock.System.now().toOption()
             ),
-            None
+            this@complete.maybeRepeat()
         )
     }
 
