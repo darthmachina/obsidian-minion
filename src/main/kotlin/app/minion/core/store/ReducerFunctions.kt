@@ -3,6 +3,10 @@ package app.minion.core.store
 import app.minion.core.MinionError
 import app.minion.core.model.FileData
 import app.minion.core.model.Task
+import app.minion.core.store.StateFunctions.Companion.addToBacklinkCache
+import app.minion.core.store.StateFunctions.Companion.addToDataviewCache
+import app.minion.core.store.StateFunctions.Companion.addToTagCache
+import app.minion.core.store.StateFunctions.Companion.replaceData
 import arrow.core.Either
 import arrow.core.raise.either
 import mu.KotlinLogging
@@ -11,9 +15,12 @@ private val logger = KotlinLogging.logger("ReducerFunctions")
 
 interface ReducerFunctions { companion object {
     fun State.replaceDataForFile(fileData: FileData) : Either<MinionError, State> = either {
-
-
-        this@replaceDataForFile
+        this@replaceDataForFile.copy(
+            files = this@replaceDataForFile.files.replaceData(fileData),
+            tagCache = fileData.addToTagCache(this@replaceDataForFile.tagCache),
+            dataviewCache = fileData.addToDataviewCache(this@replaceDataForFile.dataviewCache),
+            backlinkCache = fileData.addToBacklinkCache(this@replaceDataForFile.backlinkCache)
+        )
     }
 
     /**

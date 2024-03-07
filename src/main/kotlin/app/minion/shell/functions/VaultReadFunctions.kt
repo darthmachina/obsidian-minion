@@ -14,13 +14,11 @@ import app.minion.core.model.Task
 import app.minion.core.store.State
 import app.minion.shell.functions.TaskReadFunctions.Companion.processFileTasks
 import arrow.core.Either
+import arrow.core.None
 import arrow.core.getOrElse
 import arrow.core.raise.either
 import arrow.core.toOption
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.await
-import kotlinx.coroutines.launch
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger("VaultReadFunctions")
@@ -189,6 +187,6 @@ data class StateAccumulator(
     }
 
     fun toState() : State {
-        return State(plugin, tasks, files, tagCache, dataviewCache, backlinkCache)
+        return State(plugin, None, tasks, files, tagCache, dataviewCache, backlinkCache)
     }
 }

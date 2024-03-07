@@ -2,6 +2,7 @@ import app.minion.core.JsJodaTimeZoneModule
 import app.minion.core.store.State
 import app.minion.core.store.reducer
 import app.minion.shell.thunk.VaultThunks
+import arrow.core.None
 import io.kvision.redux.createTypedReduxStore
 import mu.KotlinLogging
 import mu.KotlinLoggingConfiguration
@@ -22,6 +23,7 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
         ::reducer,
         State(
             this,
+            None,
             emptyList(),
             emptyMap(),
             emptyMap(),
@@ -37,6 +39,12 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
             logger.debug { "onLayoutReady()" }
 
             store.dispatch(VaultThunks.loadInitialState(this))
+
+            registerEvent(
+                app.metadataCache.on("changed") { file ->
+                    store.dispatch(VaultThunks.fileModified(app.vault, app.metadataCache, file))
+                }
+            )
         }
     }
 }
