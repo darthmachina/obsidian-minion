@@ -8,6 +8,7 @@ import app.minion.core.store.StateFunctions.Companion.addToBacklinkCache
 import app.minion.core.store.StateFunctions.Companion.addToDataviewCache
 import app.minion.core.store.StateFunctions.Companion.addToTagCache
 import app.minion.core.store.StateFunctions.Companion.replaceData
+import app.minion.core.store.StateFunctions.Companion.replaceTasks
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.raise.either
@@ -22,6 +23,7 @@ interface ReducerFunctions { companion object {
             tagCache = fileData.addToTagCache(this@replaceDataForFile.tagCache),
             dataviewCache = fileData.addToDataviewCache(this@replaceDataForFile.dataviewCache),
             backlinkCache = fileData.addToBacklinkCache(this@replaceDataForFile.backlinkCache),
+            tasks = fileData.replaceTasks(this@replaceDataForFile.tasks),
             error = None
         )
     }
