@@ -71,4 +71,17 @@ interface DateTimeFunctions { companion object {
         return hoursDifference > 0
     }
 
+    fun DateTime.isTodayOrOverdue() : Boolean {
+        val hoursDifference = Clock.System.now().minus(this.toLocalDateTime().toInstant(TimeZone.currentSystemDefault()), DateTimeUnit.HOUR)
+        return hoursDifference > -24
+    }
+
+
+    fun DateTime.isToday() : Boolean {
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        return today.year == this.date.year
+                && today.monthNumber == this.date.monthNumber
+                && today.dayOfMonth == this.date.dayOfMonth
+    }
+
 }}
