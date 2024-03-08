@@ -1,98 +1,98 @@
-.ul-wikilink {
+.mi-wikilink {
     color: deepskyblue;
     text-decoration: underline;
     cursor: pointer;
 }
 
-.ul-wikilink-none {
+.mi-wikilink-none {
     color: gray;
     text-decoration: underline;
 }
 
-.ul-bold {
+.mi-bold {
     font-weight: bolder;
 }
 
-.ul-italic {
+.mi-italic {
     font-style: italic;
 }
 
-.ul-inline-code {
+.mi-inline-code {
     font-family: monospace;
     background-color: black;
 }
 
-.ul-icon {
+.mi-icon {
     color: gray;
     margin-left: 5px;
 }
 
-.ul-button {
+.mi-button {
     cursor: pointer;
 }
 
-.ul-codeblock {
+.mi-codeblock {
 
 }
 
-.ul-codeblock-heading {
+.mi-codeblock-heading {
     font-size: 1.5em;
     font-weight: bold;
     margin-bottom: 5px;
 }
 
-.ul-codeblock-task {
+.mi-codeblock-task {
 
 }
 
-.ul-codeblock-task hr {
+.mi-codeblock-task hr {
     margin-bottom: 4px;
 }
 
-.ul-codeblock-task-content {
+.mi-codeblock-task-content {
 
 }
 
-.ul-codeblock-task-content-tags {
+.mi-codeblock-task-content-tags {
 
 }
 
-.ul-codeblock-task-content-tags-tag {
+.mi-codeblock-task-content-tags-tag {
     margin-left: 7px;
     font-size: 0.75em;
     color: silver;
 }
 
-.ul-codeblock-task-content-due {
+.mi-codeblock-task-content-due {
     margin-right: 7px;
     font-family: monospace;
     font-size: 0.75em;
     color: green;
 }
 
-.ul-codeblock-task-source {
+.mi-codeblock-task-source {
     margin-left: 7px;
     font-size: 0.75em;
     color: silver;
 }
 
-.ul-codeblock-task-source-link {
+.mi-codeblock-task-source-link {
     color: deepskyblue;
     text-decoration: underline;
     cursor: pointer;
 }
 
-.ul-codeblock-task-subtask-percentage {
+.mi-codeblock-task-subtask-percentage {
     margin-left: 5px;
     font-size: 0.75em;
     color: white;
 }
 
-.ul-codeblock-task-menu-link {
+.mi-codeblock-task-menu-link {
     cursor: pointer;
 }
 
-.ul-codeblock-task-menu {
+.mi-codeblock-task-menu {
     visibility: hidden;
     position: absolute;
     bottom: 125%;
@@ -101,37 +101,37 @@
     border: 1px solid white;
 }
 
-.ul-codeblock-task-menu-show {
+.mi-codeblock-task-menu-show {
     visibility: visible;
 }
 
-.ul-codeblock-task-menu-item {
+.mi-codeblock-task-menu-item {
     padding: 3px;
     color: silver
 }
 
-.ul-codeblock-task-subtask {
+.mi-codeblock-task-subtask {
     margin-left: 30px;
 }
 
-.ul-codeblock-task-subtask-content {
+.mi-codeblock-task-subtask-content {
 
 }
 
-.ul-codeblock-task-notes {
+.mi-codeblock-task-notes {
     margin: 0 0 0 15px !important;
 }
 
-.ul-codeblock-task-notes-note {
+.mi-codeblock-task-notes-note {
     margin: 0 !important;
 }
 
-.ul-codeblock-task-count {
+.mi-codeblock-task-count {
     margin-top: 6px;
     margin-left: 15px;
     color: grey;
 }
 
-.ul-codeblock-stats {
+.mi-codeblock-stats {
     color: silver;
 }

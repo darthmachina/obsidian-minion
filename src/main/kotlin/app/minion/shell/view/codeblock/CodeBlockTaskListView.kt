@@ -81,8 +81,8 @@ interface CodeBlockTaskListView { companion object {
             }
         }
         outputContent(task, store, config)
-        outputSubtasks(task, store, config)
-        outputNotes(task, store, config)
+        outputSubtasks(task, store)
+        outputNotes(task, store)
         hr {}
     }
 
@@ -145,10 +145,10 @@ interface CodeBlockTaskListView { companion object {
         }
     }
 
-    fun FlowContent.outputSubtasks(task: Task, store: MinionStore, config: CodeBlockConfig) {
+    fun FlowContent.outputSubtasks(task: Task, store: MinionStore) {
         task.subtasks.forEach { subtask ->
             if (!subtask.completed) {
-                div(classes = "ul-codeblock-task-subtask") {
+                div(classes = "mi-codeblock-task-subtask") {
                     checkBoxInput {
                         onClickFunction = {
                             store.dispatch(
@@ -160,7 +160,7 @@ interface CodeBlockTaskListView { companion object {
                             )
                         }
                     }
-                    span(classes = "ul-codeblock-task-subtask-content") {
+                    span(classes = "mi-codeblock-task-subtask-content") {
                         outputStyledContent(subtask.content, store)
                     }
                 }
@@ -168,11 +168,11 @@ interface CodeBlockTaskListView { companion object {
         }
     }
 
-    fun FlowContent.outputNotes(task: Task, store: MinionStore, config: CodeBlockConfig) {
+    fun FlowContent.outputNotes(task: Task, store: MinionStore) {
         if (task.notes.isNotEmpty()) {
-            ul(classes = "ul-codeblock-task-notes") {
+            ul(classes = "mi-codeblock-task-notes") {
                 task.notes.forEach { note ->
-                    li(classes = "ul-codeblock-task-notes-note") {
+                    li(classes = "mi-codeblock-task-notes-note") {
                         outputStyledContent(note.content, store)
                     }
                 }
@@ -181,7 +181,7 @@ interface CodeBlockTaskListView { companion object {
     }
 
     fun HTMLElement.outputStats(tasks: List<Task>) {
-        this.append.div(classes = "ul-codeblock-task-count") {
+        this.append.div(classes = "mi-codeblock-task-count") {
             +"Task Count: ${tasks.size}"
         }
     }
