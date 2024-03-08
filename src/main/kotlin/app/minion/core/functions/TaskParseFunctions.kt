@@ -29,7 +29,8 @@ interface TaskParseFunctions { companion object {
             ListItemFileInfo(source, line, this@toTask),
             tags = tags,
             dueDate = dueDate,
-            completedOn = completedOn
+            completedOn = completedOn,
+            completed = completed
         )
     }
 

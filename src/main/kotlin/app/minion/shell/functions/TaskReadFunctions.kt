@@ -4,6 +4,7 @@ import ListItemCache
 import MetadataCache
 import app.minion.core.MinionError
 import app.minion.core.functions.TaskParseFunctions.Companion.toTask
+import app.minion.core.model.Content
 import app.minion.core.model.Filename
 import app.minion.core.model.ListItemFileInfo
 import app.minion.core.model.Note
@@ -79,7 +80,7 @@ interface TaskReadFunctions { companion object {
             line,
             None,
             Note(
-                contents.replace(noteSyntaxRegex, ""),
+                Content(contents.replace(noteSyntaxRegex, "")),
                 ListItemFileInfo(filename, line, contents)
             ).toOption(),
             parent

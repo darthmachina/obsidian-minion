@@ -5,6 +5,7 @@ import app.minion.core.store.MinionStore
 import app.minion.shell.view.codeblock.CodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockDisplay
 import app.minion.shell.view.codeblock.CodeBlockQuery
+import app.minion.shell.view.codeblock.CodeBlockTaskListView.Companion.addTaskListView
 import net.mamoe.yamlkt.Yaml
 import org.w3c.dom.HTMLElement
 
@@ -39,6 +40,6 @@ interface CodeBlockView { companion object {
     }
 
     fun processTaskListView(config: CodeBlockConfig, store: MinionStore, element: HTMLElement) {
-
+        element.addTaskListView(config, store)
     }
 }}

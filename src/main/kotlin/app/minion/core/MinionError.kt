@@ -20,4 +20,10 @@ sealed class MinionError(
                               override val parent: Option<MinionError> = None) : MinionError(message, throwable, parent)
     data class RepeatDateError(override val message: String, override val throwable: Option<Throwable> = None,
                                      override val parent: Option<MinionError> = None) : MinionError(message, throwable, parent)
+    data class NoSubtasksError(override val message: String, override val throwable: Option<Throwable> = None,
+                               override val parent: Option<MinionError> = None) : MinionError(message, throwable, parent)
+    data class TagNotFoundError(override val message: String, override val throwable: Option<Throwable> = None,
+                               override val parent: Option<MinionError> = None) : MinionError(message, throwable, parent)
+    data class TagPrefixNotFoundError(override val message: String, override val throwable: Option<Throwable> = None,
+                                override val parent: Option<MinionError> = None) : MinionError(message, throwable, parent)
 }

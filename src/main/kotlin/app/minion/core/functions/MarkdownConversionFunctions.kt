@@ -28,6 +28,18 @@ interface MarkdownConversionFunctions { companion object {
         return markdownElements.joinToString(" ")
     }
 
+    /**
+     * Converts a Pair that might contain a repeated Task into a one or two line Markdown string.
+     */
+    fun Pair<Task, Option<Task>>.toMarkdown() : String {
+        logger.info { "Pair<Task, Option<Task>>.toMarkdown()" }
+        return this.second
+            .map { repeatedTask ->
+                "${this.first.toMarkdown()}\n${repeatedTask.toMarkdown()}"
+            }
+            .getOrElse { this.first.toMarkdown() }
+    }
+
     fun DateTime.toMarkdown(label: String) : String {
         return "[$label:: ${this.date.year}-${this.date.monthNumber}-${this.date.dayOfMonth}${this.time.toMarkdown()}]"
     }

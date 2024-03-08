@@ -29,7 +29,7 @@ interface VaultThunks { companion object {
                     .map { dispatch(Action.LoadInitialState(it)) }
                     .mapLeft {
                         logger.error { "Error loading initial state: $it" }
-                        dispatch(Action.DisplayError(it.message))
+                        dispatch(Action.DisplayError(it))
                     }
             }
         }
@@ -45,7 +45,7 @@ interface VaultThunks { companion object {
                         dispatch(Action.LoadDataForFile(fileData))
                     }
                     .mapLeft {
-                        dispatch(Action.DisplayError(it.message))
+                        dispatch(Action.DisplayError(it))
                     }
                 // Process habits from full task list
                 //state().tasks.dispatchHabitStats(dispatch)

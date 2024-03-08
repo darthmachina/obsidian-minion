@@ -5,6 +5,7 @@ import app.minion.core.functions.TaskFilterFunctions.Companion.filterByOverdue
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByTags
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByToday
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByTodayOrOverdue
+import app.minion.core.model.Tag
 import app.minion.core.model.Task
 
 interface CodeBlockFunctions { companion object {
@@ -34,5 +35,11 @@ interface CodeBlockFunctions { companion object {
         } else {
             this
         }
+    }
+
+    fun Set<Tag>.removeConfigTags(config: CodeBlockConfig) : Set<Tag> {
+        return filter { tag ->
+            !(tag.v == "task" || config.include.tags.contains(tag))
+        }.toSet()
     }
 }}

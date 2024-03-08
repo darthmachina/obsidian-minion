@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CodeBlockConfig(
+    val heading: String = "",
     val query: CodeBlockQuery,
     val display: CodeBlockDisplay,
     val due: List<DueOptions> = emptyList(),
