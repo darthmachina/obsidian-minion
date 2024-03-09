@@ -18,14 +18,15 @@ dependencies {
     val kotlinVersion = "1.9.22"
     val kotlinxHtmlVersion = "0.11.0"
     val kvisionVersion = "7.3.1"
-    val arrowVersion = "1.2.0"
+    val arrowVersion = "1.2.1"
     val serializationVersion = "1.6.3"
     val loggingVersion = "3.0.5"
-    val datetimeVersion = "0.4.0"
+    val datetimeVersion = "0.5.0"
     val coroutinesCoreVersion = "1.8.0"
     val kotestVersion = "5.8.0"
     val kotestAssertionsArrowVersion = "1.4.0"
     val yamlktVersion = "0.13.0"
+    val uuidVersion = "0.0.22"
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesCoreVersion")
@@ -36,7 +37,7 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging:$loggingVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:$datetimeVersion")
     implementation(npm("@js-joda/timezone", "2.3.0"))
-    implementation("app.softwork:kotlinx-uuid-core:0.0.19")
+    implementation("app.softwork:kotlinx-uuid-core:$uuidVersion")
 
     implementation("io.kvision:kvision:$kvisionVersion")
     implementation("io.kvision:kvision-fontawesome:$kvisionVersion")

@@ -11,9 +11,12 @@ private val logger = KotlinLogging.logger("DateTimeFunctions")
 
 interface DateTimeFunctions { companion object {
     fun parseDateTime(value: String) : Either<MinionError, DateTime> = either {
+        logger.debug { "parseDateTime(): $value" }
         val dateTimeSplit = value.split(" ")
         val dateSplit = dateTimeSplit[0].split("-").map { it.toInt() }
-        val maybeTimeSplit = if (dateTimeSplit.size == 2) { dateTimeSplit[1].split(":").map { it.toInt() }.toOption() } else { None }
+        val maybeTimeSplit = if (dateTimeSplit.size == 2) {
+            dateTimeSplit[1].split(":").map { it.toInt() }.toOption()
+        } else { None }
 
         maybeTimeSplit
             .map {

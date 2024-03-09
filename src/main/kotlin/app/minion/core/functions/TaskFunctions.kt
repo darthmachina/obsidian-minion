@@ -6,6 +6,7 @@ import app.minion.core.functions.RepeatingTaskFunctions.Companion.maybeRepeat
 import app.minion.core.model.Task
 import app.minion.core.store.ReducerFunctions.Companion.replaceTask
 import arrow.core.Either
+import arrow.core.None
 import arrow.core.Option
 import arrow.core.raise.either
 import arrow.core.toOption
@@ -20,7 +21,9 @@ interface TaskFunctions { companion object {
 
         Pair(
             this@complete.copy(
-                completedOn = Clock.System.now().toOption()
+                completedOn = Clock.System.now().toOption(),
+                completed = true,
+                repeatInfo = None
             ),
             this@complete.maybeRepeat()
         )

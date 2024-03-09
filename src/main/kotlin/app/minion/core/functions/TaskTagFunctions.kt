@@ -11,7 +11,7 @@ import arrow.core.toOption
 interface TaskTagFunctions { companion object {
     fun Task.findTagWithPrefix(prefix: String) : Either<MinionError, Tag> = either {
         this@findTagWithPrefix.tags
-            .find { it.v.startsWith("kanban/") }
+            .find { it.v.startsWith("$prefix/") }
             .toOption()
             .getOrElse { raise(MinionError.TagPrefixNotFoundError("Tag with prefix '$prefix' not found")) }
     }
@@ -19,7 +19,7 @@ interface TaskTagFunctions { companion object {
     fun Task.replaceTag(old: Tag, updated: Tag) : Either<MinionError, Task> = either {
         this@replaceTag.tags
             .map { tag ->
-                if (tag.equals(old)) {
+                if (tag == old) {
                     updated
                 } else {
                     tag
@@ -30,7 +30,6 @@ interface TaskTagFunctions { companion object {
                 this@replaceTag.copy(tags = tags)
             }
     }
-
 
     fun Task.collectTags() : Set<Tag> {
         return this.subtasks

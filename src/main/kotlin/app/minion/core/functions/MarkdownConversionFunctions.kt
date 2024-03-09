@@ -1,5 +1,6 @@
 package app.minion.core.functions
 
+import app.minion.core.functions.DateTimeFunctions.Companion.asString
 import app.minion.core.model.DateTime
 import app.minion.core.model.RepeatInfo
 import app.minion.core.model.Task
@@ -15,7 +16,7 @@ interface MarkdownConversionFunctions { companion object {
     fun Task.toMarkdown() : String {
         val markdownElements = mutableListOf<String>()
 
-        markdownElements.add(if (completedOn.isSome()) "- [x]" else "- [ ] ")
+        markdownElements.add(if (completedOn.isSome()) "- [x]" else "- [ ]")
         markdownElements.add(content.v)
         if (tags.isNotEmpty()) {
             markdownElements.add(tags.joinToString(" ") { tag -> "#${tag.v}"})
@@ -25,7 +26,7 @@ interface MarkdownConversionFunctions { companion object {
         repeatInfo.map { markdownElements.add("${it.toMarkdown()} ") }
         completedOn.map { markdownElements.add("${it.asMarkdown()} ") }
 
-        return markdownElements.joinToString(" ")
+        return markdownElements.joinToString(" ").trim()
     }
 
     /**
@@ -41,15 +42,7 @@ interface MarkdownConversionFunctions { companion object {
     }
 
     fun DateTime.toMarkdown(label: String) : String {
-        return "[$label:: ${this.date.year}-${this.date.monthNumber}-${this.date.dayOfMonth}${this.time.toMarkdown()}]"
-    }
-
-    fun Option<LocalTime>.toMarkdown() : String {
-        return this
-            .map {
-                " ${it.hour}:${it.minute}"
-            }
-            .getOrElse { "" }
+        return "[$label:: ${this.asString()}]"
     }
 
     fun RepeatInfo.toMarkdown() : String {
