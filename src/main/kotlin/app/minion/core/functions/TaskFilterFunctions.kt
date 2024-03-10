@@ -7,9 +7,13 @@ import app.minion.core.functions.DateTimeFunctions.Companion.toLocalDateTime
 import app.minion.core.model.Tag
 import app.minion.core.model.Task
 import arrow.core.getOrElse
+import mu.KotlinLogging
+
+private val logger = KotlinLogging.logger("TaskFilterFunctions")
 
 interface TaskFilterFunctions { companion object {
     fun List<Task>.filterByTodayOrOverdue() : List<Task> {
+        logger.debug { "filterByTodayOrOverdue()" }
         return this
             .filter { task ->
                 task.dueDate
@@ -22,6 +26,7 @@ interface TaskFilterFunctions { companion object {
     }
 
     fun List<Task>.filterByToday() : List<Task> {
+        logger.debug { "filterByToday()" }
         return this
             .filter { task ->
                 task.dueDate
@@ -34,6 +39,7 @@ interface TaskFilterFunctions { companion object {
     }
 
     fun List<Task>.filterByOverdue() : List<Task> {
+        logger.debug { "filterByOverdue()" }
         return this
             .filter { task ->
                 task.dueDate
