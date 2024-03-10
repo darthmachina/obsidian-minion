@@ -213,7 +213,7 @@ open external class Setting(containerEl: HTMLElement) {
 open external class MetadataCache : Events {
     open fun getFirstLinkpathDest(linkpath: String, sourcePath: String): TFile?
     open fun getFileCache(file: TFile): CachedMetadata?
-    open fun getCache(path: String): CachedMetadata
+    open fun getCache(path: String): CachedMetadata?
     open fun fileToLinktext(file: TFile, sourcePath: String, omitMdExtension: Boolean = definedExternally): String
     open var resolvedLinks: Record<String, Record<String, Number>>
     open var unresolvedLinks: Record<String, Record<String, Number>>

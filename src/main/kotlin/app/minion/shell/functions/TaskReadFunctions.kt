@@ -27,18 +27,22 @@ interface TaskReadFunctions { companion object {
             .let { contents ->
                 metadataCache
                     .getCache(filename.fullName())
-                    .listItems
-                    ?.mapNotNull { listItem ->
-                        contents[listItem.position.start.line.toInt()]
-                            .processLine(listItem, filename)
-                            .logLeft(logger)
-                            .getOrElse { None }
-                            .getOrNull()
+                    .toOption()
+                    .map { it.listItems?.toList() ?: emptyList() }
+                    .map { listItemCache ->
+                        listItemCache
+                            .mapNotNull { listItem ->
+                                contents[listItem.position.start.line.toInt()]
+                                    .processLine(listItem, filename)
+                                    .logLeft(logger)
+                                    .getOrElse { None }
+                                    .getOrNull()
+                            }
+                            .buildTaskTree()
+                            .bind()
                     }
-                    ?.buildTaskTree()
-                    ?.bind()
-                    ?: emptyList()
-            }
+                    .getOrElse { emptyList() }
+           }
     }
 
     fun String.processLine(item: ListItemCache, filename: Filename) : Either<MinionError.VaultTaskReadError, Option<ItemTuple>> = either {

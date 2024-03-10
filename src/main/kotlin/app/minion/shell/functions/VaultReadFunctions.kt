@@ -28,6 +28,7 @@ interface VaultReadFunctions { companion object {
     suspend fun Vault.processIntoState(plugin: MinionPlugin) : Either<MinionError, State> = either {
         this@processIntoState
             .getFiles()
+            .filter { it.path.endsWith(".md") }
             .fold(StateAccumulator(plugin)) { acc, file ->
                 logger.debug { "Processing ${file.path}" }
                 this@processIntoState
@@ -48,33 +49,44 @@ interface VaultReadFunctions { companion object {
         logger.debug { "FileData.addTags()" }
         metadataCache
             .getCache(this@addTags.path.fullName())
-            .tags
             .toOption()
-            .map { it.toList() }
-            .getOrElse { emptyList() }
-            .map { Tag(it.tag.drop(1)) }
-            .distinct()
-            .let {
-                this@addTags.copy(tags = it)
+            .map {
+                it.tags?.toList() ?: emptyList()
             }
+            .map {tagCache ->
+                tagCache
+                    .map {
+                        Tag(it.tag.drop(1))
+                    }
+                    .distinct()
+                    .let {
+                        this@addTags.copy(tags = it)
+                    }
+            }
+            .getOrElse { this@addTags }// No tags in the file, just return
     }
 
     fun FileData.addBacklinks(metadataCache: MetadataCache) : Either<MinionError, FileData> = either {
         logger.debug { "FileData.addBacklinks()" }
         metadataCache
             .getCache(this@addBacklinks.path.fullName())
-            .links
             .toOption()
-            .map { it.toList() }
-            .getOrElse { emptyList() }
-            .map { Filename(it.link) }
-            .distinct()
-            .let {
-                this@addBacklinks.copy(outLinks = it)
+            .map { it.links?.toList() ?: emptyList() }
+            .map { linkCache ->
+                linkCache
+                    .map {
+                        Filename(it.link)
+                    }
+                    .distinct()
+                    .let {
+                        this@addBacklinks.copy(outLinks = it)
+                    }
             }
+            .getOrElse { this@addBacklinks }
     }
 
     suspend fun FileData.processFileContents(vault: Vault, metadataCache: MetadataCache) : Either<MinionError, FileData> = either {
+        logger.debug { "processFileContents: ${this@processFileContents.path.v}" }
         metadataCache
             .getFirstLinkpathDest(this@processFileContents.path.v, "")
             .toOption()
