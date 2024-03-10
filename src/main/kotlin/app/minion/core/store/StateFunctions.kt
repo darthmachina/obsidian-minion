@@ -8,7 +8,7 @@ import arrow.core.raise.either
 interface StateFunctions { companion object {
     fun Map<Filename, FileData>.replaceData(fileData: FileData) : Map<Filename, FileData> {
         return mapValues { entry ->
-            if (entry.key == fileData.path) {
+            if (entry.key == fileData.name) {
                 fileData
             } else {
                 entry.value
@@ -18,13 +18,13 @@ interface StateFunctions { companion object {
 
     fun FileData.replaceTasks(tasks: List<Task>) : List<Task> {
         return tasks
-            .filter { task -> task.fileInfo.file != this.path }
+            .filter { task -> task.fileInfo.file != this.name }
             .plus(this.tasks)
     }
 
     fun FileData.addToTagCache(tagCache: Map<Tag, Set<Filename>>) : Map<Tag, Set<Filename>> {
         return tagCache.plus(tags
-            .associateWith { path }
+            .associateWith { name }
             .mapValues { entry ->
                 setOf(entry.value).plus(tagCache[entry.key] ?: emptySet())
             }
@@ -35,7 +35,7 @@ interface StateFunctions { companion object {
     : Map<Pair<DataviewField, DataviewValue>, Set<Filename>> {
         return dataviewCache.plus(dataview
             .map { entry -> Pair(entry.key, entry.value) }
-            .associateWith { path }
+            .associateWith { name }
             .mapValues { entry ->
                 setOf(entry.value).plus(dataviewCache[entry.key] ?: emptySet())
             }
@@ -44,7 +44,7 @@ interface StateFunctions { companion object {
 
     fun FileData.addToBacklinkCache(backlinkCache: Map<Filename, Set<Filename>>) : Map<Filename, Set<Filename>> {
         return backlinkCache.plus(outLinks
-            .associateWith { path }
+            .associateWith { name }
             .mapValues { entry ->
                 setOf(entry.key).plus(backlinkCache[entry.value] ?: emptySet())
             }

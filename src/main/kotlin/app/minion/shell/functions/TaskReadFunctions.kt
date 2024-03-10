@@ -4,11 +4,7 @@ import ListItemCache
 import MetadataCache
 import app.minion.core.MinionError
 import app.minion.core.functions.TaskParseFunctions.Companion.toTask
-import app.minion.core.model.Content
-import app.minion.core.model.Filename
-import app.minion.core.model.ListItemFileInfo
-import app.minion.core.model.Note
-import app.minion.core.model.Task
+import app.minion.core.model.*
 import app.minion.shell.functions.LogFunctions.Companion.logLeft
 import arrow.core.Either
 import arrow.core.None
@@ -22,13 +18,17 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger("TaskReadFunctions")
 
 interface TaskReadFunctions { companion object {
-    fun String.processFileTasks(filename: Filename, metadataCache: MetadataCache) : Either<MinionError.VaultTaskReadError, List<Task>> = either {
+    fun String.processFileTasks(file: File, filename: Filename, metadataCache: MetadataCache) : Either<MinionError.VaultTaskReadError, List<Task>> = either {
+        logger.debug { "processFileTasks()" }
         this@processFileTasks.split("\n")
             .let { contents ->
                 metadataCache
-                    .getCache(filename.fullName())
+                    .getCache(file.v)
                     .toOption()
-                    .map { it.listItems?.toList() ?: emptyList() }
+                    .map {
+                        logger.debug { "- converting listITems to list" }
+                        it.listItems?.toList() ?: emptyList()
+                    }
                     .map { listItemCache ->
                         listItemCache
                             .mapNotNull { listItem ->

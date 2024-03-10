@@ -91,9 +91,14 @@ interface TaskParseFunctions { companion object {
     }
 
     fun findDataviewCompletedOn(dataview: Map<DataviewField, DataviewValue>) : Either<MinionError, Option<Instant>> = either {
-        if (dataview.containsKey(COMPLETED_ON_PROPERTY)) {
-            Instant.fromEpochMilliseconds(dataview[COMPLETED_ON_PROPERTY]!!.v.toLong()).toOption()
-        } else {
+        runCatching {
+            if (dataview.containsKey(COMPLETED_ON_PROPERTY)) {
+                Instant.fromEpochMilliseconds(dataview[COMPLETED_ON_PROPERTY]!!.v.toLong()).toOption()
+            } else {
+                None
+            }
+        }.getOrElse {
+            logger.warn { "Error parsing Instant, returning no Date" }
             None
         }
     }

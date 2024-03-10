@@ -5,12 +5,7 @@ import MinionPlugin
 import TFile
 import Vault
 import app.minion.core.MinionError
-import app.minion.core.model.DataviewField
-import app.minion.core.model.DataviewValue
-import app.minion.core.model.FileData
-import app.minion.core.model.Filename
-import app.minion.core.model.Tag
-import app.minion.core.model.Task
+import app.minion.core.model.*
 import app.minion.core.store.State
 import app.minion.shell.functions.TaskReadFunctions.Companion.processFileTasks
 import arrow.core.Either
@@ -39,27 +34,30 @@ interface VaultReadFunctions { companion object {
     }
 
     suspend fun Vault.processFile(file: TFile, metadataCache: MetadataCache) : Either<MinionError, FileData> = either {
-        FileData(Filename(file.basename))
+        FileData(Filename(file.basename), File(file.path))
             .addTags(metadataCache).bind()
             .addBacklinks(metadataCache).bind()
             .processFileContents(this@processFile, metadataCache).bind()
     }
 
     fun FileData.addTags(metadataCache: MetadataCache) : Either<MinionError, FileData> = either {
-        logger.debug { "FileData.addTags()" }
+        logger.debug { "FileData.addTags(): ${this@addTags.path}" }
         metadataCache
-            .getCache(this@addTags.path.fullName())
+            .getCache(this@addTags.path.v)
             .toOption()
             .map {
+                logger.debug { "- pulling out tags from metadata" }
                 it.tags?.toList() ?: emptyList()
             }
             .map {tagCache ->
                 tagCache
                     .map {
+                        logger.debug { "- creating Tag from ${it.tag}" }
                         Tag(it.tag.drop(1))
                     }
                     .distinct()
                     .let {
+                        logger.debug { "- new tag list $it" }
                         this@addTags.copy(tags = it)
                     }
             }
@@ -69,7 +67,7 @@ interface VaultReadFunctions { companion object {
     fun FileData.addBacklinks(metadataCache: MetadataCache) : Either<MinionError, FileData> = either {
         logger.debug { "FileData.addBacklinks()" }
         metadataCache
-            .getCache(this@addBacklinks.path.fullName())
+            .getCache(this@addBacklinks.path.v)
             .toOption()
             .map { it.links?.toList() ?: emptyList() }
             .map { linkCache ->
@@ -100,7 +98,8 @@ interface VaultReadFunctions { companion object {
                         // Process Tasks
                         this@processFileContents.copy(
                             dataview = contents.pullOutDataviewFields().bind(),
-                            tasks = contents.processFileTasks(this@processFileContents.path, metadataCache)
+                            tasks = contents
+                                .processFileTasks(this@processFileContents.path, this@processFileContents.name, metadataCache)
                                 .mapLeft { MinionError.VaultReadError(it.message, it.throwable, parent = it.toOption()) }
                                 .bind()
                                 .filter { !it.completed }
@@ -133,10 +132,10 @@ data class StateAccumulator(
     val backlinkCache: MutableMap<Filename, MutableSet<Filename>> = mutableMapOf()
 ) {
     fun addFileData(fileData: FileData) : Either<MinionError, StateAccumulator> = either {
-        files[fileData.path] = fileData
-        addTags(fileData.tags, fileData.path)
-        addBacklinks(fileData.outLinks, fileData.path)
-        addDataview(fileData.dataview, fileData.path)
+        files[fileData.name] = fileData
+        addTags(fileData.tags, fileData.name)
+        addBacklinks(fileData.outLinks, fileData.name)
+        addDataview(fileData.dataview, fileData.name)
         addTasks(fileData.tasks)
         this@StateAccumulator
     }

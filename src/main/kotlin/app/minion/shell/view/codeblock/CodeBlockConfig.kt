@@ -16,7 +16,7 @@ data class CodeBlockConfig(
     val properties: List<String> = emptyList(),
     val sort: List<String> = emptyList(),
     val limit: Int = 0,
-    val groupByOptions: GroupByOptions = GroupByOptions.NONE,
+    val groupBy: GroupByOptions = GroupByOptions.NONE,
     val options: List<CodeBlockOptions> = emptyList()
 )
 
