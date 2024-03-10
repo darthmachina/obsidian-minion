@@ -105,7 +105,7 @@ interface CodeBlockTaskListView { companion object {
                         this@with
                             .removeConfigTags(config)
                             .forEach { tag ->
-                                span(classes = "mi-codeblock-task-content-tags-tag") { +"#$tag" }
+                                span(classes = "mi-codeblock-task-content-tags-tag") { +"#${tag.v}" }
                             }
                     }
                 }
