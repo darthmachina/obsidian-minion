@@ -22,9 +22,9 @@ interface CodeBlockPageListView { companion object {
             }
         store
             .sub { it }
-            .subscribe { tasks ->
-                logger.debug { "Task list updated, running updateTasks(): $tasks" }
-                CodeBlockTaskListView.updateTasks(tasks, this, store, config)
+            .subscribe { pages ->
+                logger.debug { "Page list updated, running updateTasks(): $pages" }
+                updatePages(pages, this, store, config)
             }
     }
 
