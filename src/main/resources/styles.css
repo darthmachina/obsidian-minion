@@ -76,7 +76,7 @@
     color: silver;
 }
 
-.mi-codeblock-task-source-link {
+.mi-codeblock-source-link {
     color: deepskyblue;
     text-decoration: underline;
     cursor: pointer;
@@ -126,7 +126,7 @@
     margin: 0 !important;
 }
 
-.mi-codeblock-task-count {
+.mi-codeblock-item-count {
     margin-top: 6px;
     margin-left: 15px;
     color: grey;

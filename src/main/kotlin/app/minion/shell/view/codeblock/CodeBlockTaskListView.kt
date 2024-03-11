@@ -118,7 +118,7 @@ interface CodeBlockTaskListView { companion object {
             }
             span(classes = "mi-codeblock-task-source") {
                 span { +"(" }
-                span(classes = "mi-codeblock-task-source-link") {
+                span(classes = "mi-codeblock-source-link") {
                     +task.fileInfo.file.v
                     onClickFunction = {
                         openSourceFile(task.fileInfo.file, store.store.state.plugin.app)
@@ -181,7 +181,7 @@ interface CodeBlockTaskListView { companion object {
     }
 
     fun HTMLElement.outputStats(tasks: List<Task>) {
-        this.append.div(classes = "mi-codeblock-task-count") {
+        this.append.div(classes = "mi-codeblock-item-count") {
             +"Task Count: ${tasks.size}"
         }
     }
