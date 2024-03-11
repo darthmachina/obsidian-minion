@@ -53,7 +53,7 @@ interface TaskReadFunctions { companion object {
             createNoteTuple(this@processLine, filename, item.position.start.line.toInt(), item.parent.toInt())
                 .bind()
                 .toOption()
-        } else if (this@processLine.contains("#task")) {
+        } else if (this@processLine.contains("#task") || item.parent.toInt() > 0) {
             logger.debug { "Create tuple for Task" }
             createTaskTuple(this@processLine, filename, item.position.start.line.toInt(), item.parent.toInt(), item.task?.isNotBlank() ?: false)
                 .bind()
