@@ -3,6 +3,7 @@ package app.minion.shell.view.codeblock
 import app.minion.core.MinionError
 import app.minion.core.model.FileData
 import app.minion.core.store.MinionStore
+import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.applyCodeBlockConfig
 import io.kvision.state.sub
 import kotlinx.dom.clear
 import kotlinx.html.div
@@ -18,13 +19,15 @@ interface CodeBlockPageListView { companion object {
         store
             .sub { it.error }
             .subscribe { error ->
-                error.map { CodeBlockTaskListView.showError(it, this) }
+                error.map { showError(it, this) }
             }
         store
-            .sub { it }
+            .sub { it.applyCodeBlockConfig(config) }
             .subscribe { pages ->
-                logger.debug { "Page list updated, running updateTasks(): $pages" }
-                updatePages(pages, this, store, config)
+                logger.debug { "Page list updated, running updatePages(): $pages" }
+                pages
+                    .map { updatePages(it, this, store, config) }
+                    .mapLeft { showError(it, this) }
             }
     }
 
