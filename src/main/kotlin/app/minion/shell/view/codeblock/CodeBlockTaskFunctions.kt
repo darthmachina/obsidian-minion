@@ -8,7 +8,7 @@ import app.minion.core.functions.TaskFilterFunctions.Companion.filterByTodayOrOv
 import app.minion.core.model.Tag
 import app.minion.core.model.Task
 
-interface CodeBlockFunctions { companion object {
+interface CodeBlockTaskFunctions { companion object {
     fun List<Task>.applyDue(config: CodeBlockConfig) : List<Task> {
         return if (config.due.contains(DueOptions.today) && config.due.contains(DueOptions.overdue)) {
             this.filterByTodayOrOverdue()

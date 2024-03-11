@@ -10,10 +10,10 @@ import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions.Companion.openSourceFile
 import app.minion.shell.thunk.TaskThunks
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
-import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.applyDue
-import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.applyExcludeTags
-import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.applyIncludeTags
-import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.removeConfigTags
+import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyDue
+import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyExcludeTags
+import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyIncludeTags
+import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.removeConfigTags
 import app.minion.shell.view.iconHash
 import app.minion.shell.view.iconRepeat
 import app.minion.shell.view.modal.KanbanStatusSelectModal
@@ -118,7 +118,7 @@ interface CodeBlockTaskListView { companion object {
             }
             span(classes = "mi-codeblock-task-source") {
                 span { +"(" }
-                span(classes = "mi-codeblock-task-source-link") {
+                span(classes = "mi-codeblock-source-link") {
                     +task.fileInfo.file.v
                     onClickFunction = {
                         openSourceFile(task.fileInfo.file, store.store.state.plugin.app)
@@ -181,7 +181,7 @@ interface CodeBlockTaskListView { companion object {
     }
 
     fun HTMLElement.outputStats(tasks: List<Task>) {
-        this.append.div(classes = "mi-codeblock-task-count") {
+        this.append.div(classes = "mi-codeblock-item-count") {
             +"Task Count: ${tasks.size}"
         }
     }
