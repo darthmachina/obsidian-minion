@@ -33,6 +33,19 @@ interface VaultReadFunctions { companion object {
             .toState().bind()
     }
 
+    suspend fun Vault.readFile(fileData: FileData, metadataCache: MetadataCache) : Either<MinionError, String> = either {
+        metadataCache
+            .getFirstLinkpathDest(fileData.path.v, "")
+            .toOption()
+            .toEither {
+                MinionError.VaultReadError("Error reading ${fileData.path.v}")
+            }
+            .map { tfile ->
+                this@readFile.read(tfile).await()
+            }
+            .bind()
+    }
+
     suspend fun Vault.processFile(file: TFile, metadataCache: MetadataCache) : Either<MinionError, FileData> = either {
         FileData(Filename(file.basename), File(file.path))
             .addTags(metadataCache).bind()
@@ -115,10 +128,10 @@ interface VaultReadFunctions { companion object {
             .associate { DataviewField(it.groupValues[1]) to DataviewValue(it.groupValues[2]) }
     }
 
-    fun Set<Pair<DataviewField, DataviewValue>>.mapToFieldCache() : Either<MinionError, Map<DataviewField, List<DataviewValue>>> = either {
+    fun Set<Pair<DataviewField, DataviewValue>>.mapToFieldCache() : Either<MinionError, Map<DataviewField, Set<DataviewValue>>> = either {
         this@mapToFieldCache
             .groupBy { it.first }
-            .mapValues { entry -> entry.value.map { it.second } }
+            .mapValues { entry -> entry.value.map { it.second }.toSet() }
     }
 
     fun FileData.addToState(acc: StateAccumulator) : Either<MinionError, StateAccumulator> = either {
