@@ -8,6 +8,7 @@ import app.minion.core.MinionError
 import app.minion.core.model.*
 import app.minion.core.store.State
 import app.minion.shell.functions.TaskReadFunctions.Companion.processFileTasks
+import app.minion.shell.functions.VaultReadFunctions.Companion.mapToFieldCache
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.getOrElse
@@ -30,7 +31,7 @@ interface VaultReadFunctions { companion object {
                     .processFile(file, plugin.app.metadataCache).bind()
                     .addToState(acc).bind()
            }
-            .toState()
+            .toState().bind()
     }
 
     suspend fun Vault.processFile(file: TFile, metadataCache: MetadataCache) : Either<MinionError, FileData> = either {
@@ -115,9 +116,16 @@ interface VaultReadFunctions { companion object {
             .associate { DataviewField(it.groupValues[1]) to DataviewValue(it.groupValues[2]) }
     }
 
+    fun Set<Pair<DataviewField, DataviewValue>>.mapToFieldCache() : Either<MinionError, Map<DataviewField, List<DataviewValue>>> = either {
+        this@mapToFieldCache
+            .groupBy { it.first }
+            .mapValues { entry -> entry.value.map { it.second } }
+    }
+
     fun FileData.addToState(acc: StateAccumulator) : Either<MinionError, StateAccumulator> = either {
         acc.addFileData(this@addToState).bind()
     }
+
 }}
 
 /**
@@ -197,7 +205,7 @@ data class StateAccumulator(
         this@StateAccumulator
     }
 
-    fun toState() : State {
-        return State(plugin, None, tasks, files, tagCache, dataviewCache, emptyMap(), backlinkCache)
+    fun toState() : Either<MinionError, State> = either {
+        State(plugin, None, tasks, files, tagCache, dataviewCache, dataviewCache.keys.mapToFieldCache().bind(), backlinkCache)
     }
 }
