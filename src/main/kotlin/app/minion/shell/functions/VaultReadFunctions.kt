@@ -20,7 +20,6 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger("VaultReadFunctions")
 
 interface VaultReadFunctions { companion object {
-
     suspend fun Vault.processIntoState(plugin: MinionPlugin) : Either<MinionError, State> = either {
         this@processIntoState
             .getFiles()

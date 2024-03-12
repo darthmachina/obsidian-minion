@@ -11,21 +11,22 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger("CodeBlockPageFunctions")
 
 interface CodeBlockPageFunctions { companion object {
-    fun State.applyCodeBlockConfig(config: CodeBlockConfig) : Either<MinionError, List<FileData>> = either {
+    fun State.applyCodeBlockConfig(config: CodeBlockConfig) : Either<MinionError, Map<String, Set<FileData>>> = either {
         this@applyCodeBlockConfig
             .files
             .keys
             .applyInclude(this@applyCodeBlockConfig.tagCache, config).bind()
             .getFileData(this@applyCodeBlockConfig.files).bind()
+            .applyGroupBy(config).bind()
     }
 
-    fun Set<Filename>.getFileData(fileData: Map<Filename, FileData>) : Either<MinionError, List<FileData>> = either {
+    fun Set<Filename>.getFileData(fileData: Map<Filename, FileData>) : Either<MinionError, Set<FileData>> = either {
         fileData
             .filterKeys {
                 this@getFileData.contains(it)
             }
             .values
-            .toList()
+            .toSet()
     }
 
     fun Set<Filename>.applyInclude(tagCache: Map<Tag, Set<Filename>>, config: CodeBlockConfig) : Either<MinionError, Set<Filename>> = either {
@@ -60,23 +61,35 @@ interface CodeBlockPageFunctions { companion object {
             .toSet()
     }
 
+    fun Set<FileData>.applyGroupBy(config: CodeBlockConfig) : Either<MinionError, Map<String, Set<FileData>>> = either {
+        if (config.groupBy == GroupByOptions.NONE) {
+            mapOf(GROUP_BY_SINGLE to this@applyGroupBy)
+        } else {
+            when(config.groupBy) {
+                GroupByOptions.dataview -> {
+                    this@applyGroupBy
+                        .applyGroupByForDataview(config).bind()
+                        .mapKeys { it.key.v }
+                }
+                else -> raise(MinionError.ConfigError("${config.groupBy} not implement yet"))
+            }
+        }
+    }
+
     /**
      * Groups a Set of FileData by the criteria specified in the config
      */
-    fun Set<FileData>.applyGroupBy(config: CodeBlockConfig, dataviewFieldCache: Map<DataviewField, List<DataviewValue>>) : Either<MinionError, Map<DataviewValue, Set<FileData>>> = either {
+    fun Set<FileData>.applyGroupByForDataview(config: CodeBlockConfig) : Either<MinionError, Map<DataviewValue, Set<FileData>>> = either {
         if (config.groupBy == GroupByOptions.NONE) {
             raise(MinionError.ConfigError("applyGroupBy called with no groupBy specified"))
         }
         if (config.groupBy == GroupByOptions.dataview && config.groupByField.isEmpty()) {
             raise(MinionError.ConfigError("groupBy.dataview specified with no groupByField"))
         }
-        if (dataviewFieldCache[DataviewField(config.groupByField)] == null) {
-            raise(MinionError.ConfigError("No values found for ${config.groupByField}"))
-        }
         // Collect valid group values
         // Group FileData into buckets by group values
         // Return map
-        this@applyGroupBy
+        this@applyGroupByForDataview
             .filter { fileData ->
                 fileData.dataview.containsKey(DataviewField(config.groupByField))
             }

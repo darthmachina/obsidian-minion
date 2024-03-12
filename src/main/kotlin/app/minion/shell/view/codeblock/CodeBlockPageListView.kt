@@ -1,6 +1,7 @@
 package app.minion.shell.view.codeblock
 
 import app.minion.core.MinionError
+import app.minion.core.functions.StatisticsFunctions.Companion.calculateTotalCount
 import app.minion.core.model.FileData
 import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions
@@ -42,7 +43,7 @@ interface CodeBlockPageListView { companion object {
         element.append.div { +error.message }
     }
 
-    fun updatePages(fileDataList: List<FileData>, element: HTMLElement, store: MinionStore, config: CodeBlockConfig) {
+    fun updatePages(fileDataMap: Map<String, Set<FileData>>, element: HTMLElement, store: MinionStore, config: CodeBlockConfig) {
         element.clear()
         if (config.heading.isNotEmpty()) {
             element.append.div(classes = "mi-codeblock-heading") {
@@ -50,17 +51,38 @@ interface CodeBlockPageListView { companion object {
             }
         }
 
-        if (fileDataList.isNotEmpty()) {
-            element.append.ul {
-                fileDataList.forEach { fileData ->
-                    li {
-                        outputFileData(fileData, store)
-                    }
+        if (fileDataMap.isNotEmpty()) {
+            element.append.div {
+                fileDataMap.forEach { entry ->
+                    outputToggle(entry.key, entry.value, store)
                 }
             }
         }
 
-        element.outputStats(fileDataList)
+        element.outputStats(fileDataMap)
+    }
+
+    fun FlowContent.outputToggle(label: String, fileDataSet: Set<FileData>, store: MinionStore) {
+        if (label == GROUP_BY_SINGLE) {
+            outputFileDataSet(fileDataSet, store)
+        } else {
+            ul {
+                li {
+                    +label
+                    outputFileDataSet(fileDataSet, store)
+                }
+            }
+        }
+    }
+
+    fun FlowContent.outputFileDataSet(fileDataSet: Set<FileData>, store: MinionStore) {
+        ul {
+            fileDataSet.forEach { fileData ->
+                li {
+                    outputFileData(fileData, store)
+                }
+            }
+        }
     }
 
     fun FlowContent.outputFileData(fileData: FileData, store: MinionStore) {
@@ -72,9 +94,9 @@ interface CodeBlockPageListView { companion object {
         }
     }
 
-    fun HTMLElement.outputStats(fileDataList: List<FileData>) {
+    fun HTMLElement.outputStats(fileDataList: Map<String, Set<FileData>>) {
         this.append.div(classes = "mi-codeblock-item-count") {
-            +"Page Count: ${fileDataList.size}"
+            +"Page Count: ${fileDataList.calculateTotalCount()}"
         }
     }
 }}

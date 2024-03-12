@@ -65,3 +65,5 @@ enum class GroupByOptions {
 enum class CodeBlockOptions {
     notes_on_cover
 }
+
+const val GROUP_BY_SINGLE = "!!single!!"
