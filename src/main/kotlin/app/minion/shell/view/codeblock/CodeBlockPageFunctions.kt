@@ -1,9 +1,7 @@
 package app.minion.shell.view.codeblock
 
 import app.minion.core.MinionError
-import app.minion.core.model.FileData
-import app.minion.core.model.Filename
-import app.minion.core.model.Tag
+import app.minion.core.model.*
 import app.minion.core.store.State
 import arrow.core.Either
 import arrow.core.flatten
@@ -65,13 +63,26 @@ interface CodeBlockPageFunctions { companion object {
     /**
      * Groups a Set of FileData by the criteria specified in the config
      */
-    fun Set<FileData>.applyGroupBy(config: CodeBlockConfig) : Either<MinionError, Map<String, Set<FileData>>> = either {
+    fun Set<FileData>.applyGroupBy(config: CodeBlockConfig, dataviewFieldCache: Map<DataviewField, List<DataviewValue>>) : Either<MinionError, Map<DataviewValue, Set<FileData>>> = either {
         if (config.groupBy == GroupByOptions.NONE) {
             raise(MinionError.ConfigError("applyGroupBy called with no groupBy specified"))
+        }
+        if (config.groupBy == GroupByOptions.dataview && config.groupByField.isEmpty()) {
+            raise(MinionError.ConfigError("groupBy.dataview specified with no groupByField"))
+        }
+        if (dataviewFieldCache[DataviewField(config.groupByField)] == null) {
+            raise(MinionError.ConfigError("No values found for ${config.groupByField}"))
         }
         // Collect valid group values
         // Group FileData into buckets by group values
         // Return map
-        emptyMap()
+        this@applyGroupBy
+            .filter { fileData ->
+                fileData.dataview.containsKey(DataviewField(config.groupByField))
+            }
+            .groupBy { fileData ->
+                fileData.dataview[DataviewField(config.groupByField)]!!
+            }
+            .mapValues { it.value.toSet() }
     }
 }}
