@@ -198,6 +198,6 @@ data class StateAccumulator(
     }
 
     fun toState() : State {
-        return State(plugin, None, tasks, files, tagCache, dataviewCache, backlinkCache)
+        return State(plugin, None, tasks, files, tagCache, dataviewCache, emptyMap(), backlinkCache)
     }
 }

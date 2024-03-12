@@ -61,4 +61,17 @@ interface CodeBlockPageFunctions { companion object {
             .flatten()
             .toSet()
     }
+
+    /**
+     * Groups a Set of FileData by the criteria specified in the config
+     */
+    fun Set<FileData>.applyGroupBy(config: CodeBlockConfig) : Either<MinionError, Map<String, Set<FileData>>> = either {
+        if (config.groupBy == GroupByOptions.NONE) {
+            raise(MinionError.ConfigError("applyGroupBy called with no groupBy specified"))
+        }
+        // Collect valid group values
+        // Group FileData into buckets by group values
+        // Return map
+        emptyMap()
+    }
 }}
