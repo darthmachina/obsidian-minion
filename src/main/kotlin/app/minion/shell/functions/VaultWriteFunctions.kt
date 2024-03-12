@@ -1,7 +1,13 @@
 package app.minion.shell.functions
 
+import MetadataCache
 import TFile
 import Vault
+import app.minion.core.MinionError
+import app.minion.core.model.FileData
+import arrow.core.Either
+import arrow.core.raise.either
+import arrow.core.toOption
 import kotlinx.coroutines.await
 import mu.KotlinLogging
 
@@ -16,6 +22,19 @@ interface VaultWriteFunctions { companion object {
                 it
             }
             .joinToString("\n")
+    }
+
+    suspend fun String.writeToVault(file: FileData, vault: Vault, metadataCache: MetadataCache)
+    : Either<MinionError, String> = either {
+        metadataCache
+            .getFirstLinkpathDest(file.path.v, "")
+            .toOption()
+            .toEither {
+                MinionError.VaultReadError("Error reading ${file.path.v}")
+            }
+            .map { tfile ->
+                this@writeToVault.writeToVault(vault, tfile)
+            }.bind()
     }
 
     /**

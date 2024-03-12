@@ -91,6 +91,7 @@ interface CodeBlockPageListView { companion object {
                             unsafe { +iconHash }
                             onClickFunction = {
                                 UpdateDataviewValue(
+                                    fileData,
                                     config.groupByField,
                                     fileData.dataview[DataviewField(config.groupByField)]!!,
                                     store.store.state.dataviewValueCache[DataviewField(config.groupByField)]!!,

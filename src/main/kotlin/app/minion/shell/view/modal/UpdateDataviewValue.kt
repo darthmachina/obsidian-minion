@@ -3,8 +3,11 @@ package app.minion.shell.view.modal
 import App
 import Modal
 import Setting
+import app.minion.core.model.DataviewField
 import app.minion.core.model.DataviewValue
+import app.minion.core.model.FileData
 import app.minion.core.store.MinionStore
+import app.minion.shell.thunk.PageThunks
 import mu.KotlinLogging
 
 const val NEW = "New"
@@ -12,6 +15,7 @@ const val NEW = "New"
 private val logger = KotlinLogging.logger("UpdateDataviewValue")
 
 class UpdateDataviewValue(
+    private val fileData: FileData,
     private val field: String,
     private val current: DataviewValue,
     private val dataviewValues: Set<DataviewValue>,
@@ -70,6 +74,14 @@ class UpdateDataviewValue(
                     .setCta()
                     .onClick {
                         logger.debug { "Updating $field value to $result" }
+                        store.dispatch(PageThunks.updateDataviewValue(
+                            fileData,
+                            DataviewField(field),
+                            current,
+                            DataviewValue(result),
+                            app.vault,
+                            app.metadataCache
+                        ))
                         close()
                     }
             }
