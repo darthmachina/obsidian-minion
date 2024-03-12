@@ -10,6 +10,8 @@ sealed class MinionError(
 ) {
     data class VaultReadError(override val message: String, override val throwable: Option<Throwable> = None,
                               override val parent: Option<MinionError> = None) : MinionError(message, throwable, parent)
+    data class VaultWriteError(override val message: String, override val throwable: Option<Throwable> = None,
+                              override val parent: Option<MinionError> = None) : MinionError(message, throwable, parent)
     data class VaultTaskReadError(override val message: String, override val throwable: Option<Throwable> = None,
                                   override val parent: Option<MinionError> = None) : MinionError(message, throwable, parent)
     data class TaskConversionError(override val message: String, override val throwable: Option<Throwable> = None,
@@ -28,6 +30,8 @@ sealed class MinionError(
                                 override val parent: Option<MinionError> = None) : MinionError(message, throwable, parent)
     data class RepeatInfoParseError(override val message: String, override val throwable: Option<Throwable> = None,
                                       override val parent: Option<MinionError> = None) : MinionError(message, throwable, parent)
+    data class ConfigError(override val message: String, override val throwable: Option<Throwable> = None,
+                                override val parent: Option<MinionError> = None) : MinionError(message, throwable, parent)
     data class ConfigParseError(override val message: String, override val throwable: Option<Throwable> = None,
                                     override val parent: Option<MinionError> = None) : MinionError(message, throwable, parent)
 }

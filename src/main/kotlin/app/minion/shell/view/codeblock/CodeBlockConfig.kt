@@ -17,6 +17,7 @@ data class CodeBlockConfig(
     val sort: List<String> = emptyList(),
     val limit: Int = 0,
     val groupBy: GroupByOptions = GroupByOptions.NONE,
+    val groupByField: String = "",
     val options: List<CodeBlockOptions> = emptyList()
 )
 
@@ -56,10 +57,13 @@ enum class GroupByOptions {
     NONE,
     source,
     parent_tag,
-    due
+    due,
+    dataview
 }
 
 @Serializable
 enum class CodeBlockOptions {
     notes_on_cover
 }
+
+const val GROUP_BY_SINGLE = "!!single!!"
