@@ -54,7 +54,7 @@ interface CodeBlockPageListView { companion object {
         if (fileDataMap.isNotEmpty()) {
             element.append.div {
                 fileDataMap.forEach { entry ->
-                    outputToggle(entry.key, entry.value, store)
+                    outputGroup(entry.key, entry.value, store)
                 }
             }
         }
@@ -62,7 +62,7 @@ interface CodeBlockPageListView { companion object {
         element.outputStats(fileDataMap)
     }
 
-    fun FlowContent.outputToggle(label: String, fileDataSet: Set<FileData>, store: MinionStore) {
+    fun FlowContent.outputGroup(label: String, fileDataSet: Set<FileData>, store: MinionStore) {
         if (label == GROUP_BY_SINGLE) {
             outputFileDataSet(fileDataSet, store)
         } else {
