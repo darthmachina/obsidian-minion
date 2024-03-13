@@ -6,6 +6,7 @@ import app.minion.core.store.MinionStore
 import app.minion.shell.view.codeblock.CodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockDisplay
 import app.minion.shell.view.codeblock.CodeBlockErrorView.Companion.addErrorView
+import app.minion.shell.view.codeblock.CodeBlockPageGalleryView.Companion.addPageGalleryView
 import app.minion.shell.view.codeblock.CodeBlockPageListView.Companion.addPageListView
 import app.minion.shell.view.codeblock.CodeBlockQuery
 import app.minion.shell.view.codeblock.CodeBlockTaskListView.Companion.addTaskListView
@@ -45,7 +46,7 @@ interface CodeBlockView { companion object {
     fun processPageCodeBlock(config: CodeBlockConfig, store: MinionStore, element: HTMLElement) {
         when(config.display) {
             CodeBlockDisplay.list -> processPageListView(config, store, element)
-            CodeBlockDisplay.gallery -> TODO()
+            CodeBlockDisplay.gallery -> element.addPageGalleryView(config, store)
             CodeBlockDisplay.kanban -> TODO()
             CodeBlockDisplay.table -> TODO()
         }
