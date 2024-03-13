@@ -66,4 +66,11 @@ enum class CodeBlockOptions {
     notes_on_cover
 }
 
+// Hard coded property values
+const val PROPERTY_CREATED = "created"
+const val PROPERTY_MODIFIED = "modified"
+const val PROPERTY_SOURCE = "source"
+const val PROPERTY_TAGS = "tags"
+const val PROPERTY_DUE = "due"
+
 const val GROUP_BY_SINGLE = "!!single!!"

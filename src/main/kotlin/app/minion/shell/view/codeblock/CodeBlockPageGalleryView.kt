@@ -2,10 +2,12 @@ package app.minion.shell.view.codeblock
 
 import app.minion.core.MinionError
 import app.minion.core.functions.StatisticsFunctions.Companion.calculateTotalCount
+import app.minion.core.model.Content
 import app.minion.core.model.DataviewField
 import app.minion.core.model.FileData
 import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions
+import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockPageListView.Companion.addPageListView
 import app.minion.shell.view.codeblock.CodeBlockPageListView.Companion.outputFileDataSet
@@ -13,6 +15,9 @@ import app.minion.shell.view.codeblock.CodeBlockPageListView.Companion.outputGro
 import app.minion.shell.view.codeblock.CodeBlockPageListView.Companion.outputStats
 import app.minion.shell.view.iconHash
 import app.minion.shell.view.modal.UpdateDataviewValue
+import arrow.core.None
+import arrow.core.Some
+import arrow.core.toOption
 import io.kvision.state.sub
 import kotlinx.dom.clear
 import kotlinx.html.FlowContent
@@ -113,6 +118,41 @@ interface CodeBlockPageGalleryView { companion object {
                             store.store.state.plugin.app
                         ).open()
                     }
+                }
+            }
+            if (config.properties.isNotEmpty()) {
+                outputProperties(fileData, config, store)
+            }
+        }
+    }
+
+    fun FlowContent.outputProperties(fileData: FileData, config: CodeBlockConfig, store: MinionStore) {
+        div(classes = "mi-codeblock-page-gallery-fields") {
+            config.properties.forEach { property ->
+                outputProperty(property, fileData, store)
+            }
+        }
+    }
+
+    fun FlowContent.outputProperty(label: String, fileData: FileData, store: MinionStore) {
+        when(label) {
+            PROPERTY_CREATED -> {}
+            PROPERTY_MODIFIED -> {}
+            PROPERTY_SOURCE -> {}
+            PROPERTY_DUE -> {}
+            PROPERTY_TAGS -> {}
+            else -> {
+                // Is a dataview field
+                when(val value = fileData.dataview[DataviewField(label)].toOption()) {
+                    is Some -> {
+                        div(classes = "mi-codeblock-page-gallery-fields-label") {
+                            +label
+                        }
+                        div(classes = "mi-codeblock-page-gallery-fields-value") {
+                            outputStyledContent(Content(value.value.v), store)
+                        }
+                    }
+                    is None -> {}
                 }
             }
         }

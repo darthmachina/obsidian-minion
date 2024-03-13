@@ -148,14 +148,30 @@
 
 .mi-codeblock-page-gallery > div {
     background-color: #303030;
-    padding: 10px;
     margin-bottom: 10px;
 }
 
 .mi-codeblock-page-gallery-title {
     display: flex;
+    padding: 10px;
 }
 
 .mi-codeblock-page-gallery-title > span:first-of-type {
     flex: 1;
+}
+
+.mi-codeblock-page-gallery-fields {
+    background-color: #252525;
+    display: grid;
+    row-gap: 3px;
+    grid-template-columns: 2fr 3fr;
+    padding: 5px 10px;
+}
+
+.mi-codeblock-page-gallery-fields-label {
+
+}
+
+.mi-codeblock-page-gallery-fields-value {
+
 }
