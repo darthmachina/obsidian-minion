@@ -1,0 +1,4 @@
+config.externals = {
+ obsidian: 'obsidian',
+};
+

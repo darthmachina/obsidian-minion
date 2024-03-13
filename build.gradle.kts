@@ -77,6 +77,30 @@ kotlin {
     }
 }
 
+val copyTest = tasks.register<Copy>("copyTestExternals") {
+    println("Copying test externals.js.test")
+    from("webpack.config.d/externals.js.test")
+    into("webpack.config.d")
+    rename { "externals.js" }
+}
+
+val copyBuild = tasks.register<Copy>("copyBuildExternals") {
+    println("Copying build externals.js.build")
+    from("webpack.config.d/externals.js.build")
+    into("webpack.config.d")
+    rename { "externals.js" }
+}
+
+tasks.named("test") {
+    dependsOn(":copyTestExternals")
+}
+tasks.named("browserDevelopmentWebpack") {
+    dependsOn(":copyBuildExternals")
+}
+tasks.named("browserProductionWebpack") {
+    dependsOn(":copyBuildExternals")
+}
+
 // OptIn to JsExport annotation
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.Kotlin2JsCompile>().configureEach {
     kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
