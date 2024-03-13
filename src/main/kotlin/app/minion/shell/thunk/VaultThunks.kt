@@ -4,6 +4,7 @@ import MetadataCache
 import MinionPlugin
 import TFile
 import Vault
+import app.minion.core.model.MinionSettings
 import app.minion.core.model.Task
 import app.minion.core.store.Action
 import app.minion.core.store.State
@@ -19,13 +20,13 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger("VaultThunks")
 
 interface VaultThunks { companion object {
-    fun loadInitialState(plugin: MinionPlugin) : ActionCreator<Action, State> {
+    fun loadInitialState(plugin: MinionPlugin, settings: MinionSettings) : ActionCreator<Action, State> {
         logger.debug { "loadVault()" }
 
         return { dispatch, _ ->
             CoroutineScope(Dispatchers.Unconfined).launch {
                 plugin.app.vault
-                    .processIntoState(plugin)
+                    .processIntoState(plugin, settings)
                     .map { dispatch(Action.LoadInitialState(it)) }
                     .mapLeft {
                         logger.error { "Error loading initial state: $it" }

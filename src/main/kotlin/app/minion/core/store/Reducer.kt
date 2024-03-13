@@ -1,6 +1,7 @@
 package app.minion.core.store
 
 import app.minion.core.MinionError
+import app.minion.core.functions.SettingsFunctions.Companion.toJson
 import app.minion.core.store.ReducerFunctions.Companion.replaceDataForFile
 import app.minion.core.store.ReducerFunctions.Companion.replaceTask
 import arrow.core.Either
@@ -13,6 +14,13 @@ private val logger = KotlinLogging.logger {  }
 fun reducer(state: State, action: Action) : State =
     when(action) {
         is Action.DisplayError -> { state.copy(error = action.error.toOption()) }
+        is Action.UpdateSettings -> {
+            val newSettings = state.settings.copy(
+                lifeAreas = action.lifeAreas.getOrElse { state.settings.lifeAreas }
+            )
+            state.plugin.saveData(newSettings.toJson())
+            state.copy(settings = newSettings)
+        }
         is Action.LoadInitialState -> {
             logger.debug { "LoadInitialState: ${action.state}" }
             action.state

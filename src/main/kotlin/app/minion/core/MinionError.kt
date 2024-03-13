@@ -8,6 +8,8 @@ sealed class MinionError(
     open val throwable: Option<Throwable> = None,
     open val parent: Option<MinionError> = None
 ) {
+    data class LoadSettingsError(override val message: String, override val throwable: Option<Throwable> = None,
+                              override val parent: Option<MinionError> = None) : MinionError(message, throwable, parent)
     data class VaultReadError(override val message: String, override val throwable: Option<Throwable> = None,
                               override val parent: Option<MinionError> = None) : MinionError(message, throwable, parent)
     data class VaultWriteError(override val message: String, override val throwable: Option<Throwable> = None,
