@@ -135,3 +135,27 @@
 .mi-codeblock-stats {
     color: silver;
 }
+
+.mi-codeblock-group-label {
+    font-weight: bolder;
+}
+
+.mi-codeblock-page-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-gap: 5px;
+}
+
+.mi-codeblock-page-gallery > div {
+    background-color: #303030;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.mi-codeblock-page-gallery-title {
+    display: flex;
+}
+
+.mi-codeblock-page-gallery-title > span:first-of-type {
+    flex: 1;
+}
