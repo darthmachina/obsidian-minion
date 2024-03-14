@@ -62,7 +62,6 @@ interface VaultWriteFunctions { companion object {
      * @return The updated file contents
      */
     suspend fun TFile.writeLine(vault: Vault, contents: String, line: Int) : String {
-        logger.info { "writeLine()" }
         return vault
             .read(this)
             .then { it.replaceLine(contents, line) }
