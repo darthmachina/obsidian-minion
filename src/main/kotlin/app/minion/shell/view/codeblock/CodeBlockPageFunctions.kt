@@ -52,10 +52,7 @@ interface CodeBlockPageFunctions { companion object {
 
     fun Map<Tag, Set<Filename>>.findFilesMatchingTags(tags: Set<Tag>) : Either<MinionError, Set<Filename>> = either {
         this@findFilesMatchingTags
-            .filterKeys { tag ->
-                logger.debug { "Checking $tag: ${tags.contains(tag)}" }
-                tags.contains(tag)
-            }
+            .filterKeys { tag -> tags.contains(tag) }
             .values
             .flatten()
             .toSet()

@@ -75,6 +75,7 @@ interface TaskThunks { companion object {
                         dispatch(Action.TaskUpdated(task))
                     }
                     .mapLeft {
+                        logger.debug { "Tag not found, adding the new one" }
                         task
                             .addTag(Tag("kanban/$updatedStatus"))
                             .map { task ->

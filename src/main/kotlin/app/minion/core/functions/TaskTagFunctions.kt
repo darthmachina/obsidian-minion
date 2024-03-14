@@ -7,11 +7,14 @@ import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.raise.either
 import arrow.core.toOption
+import mu.KotlinLogging
+
+private val logger = KotlinLogging.logger("TaskTagFunctions")
 
 interface TaskTagFunctions { companion object {
     fun Task.findTagWithPrefix(prefix: String) : Either<MinionError, Tag> = either {
         this@findTagWithPrefix.tags
-            .find { it.v.startsWith("$prefix/") }
+            .find { it.v.startsWith(prefix) }
             .toOption()
             .getOrElse { raise(MinionError.TagPrefixNotFoundError("Tag with prefix '$prefix' not found")) }
     }
