@@ -7,7 +7,7 @@ interface TaskFactory { companion object {
         return Task(
             content = Content("Test task"),
             tags = setOf(Tag("task")),
-            fileInfo = ListItemFileInfo(Filename("test"), 1, "- [ ] Test task #task")
+            fileInfo = ListItemFileInfo(Filename("test"), File("test.md"), 1, "- [ ] Test task #task")
         )
     }
 

@@ -1,6 +1,7 @@
 package app.minion.core.functions
 
 import app.minion.core.MinionError
+import app.minion.core.model.MinionSettings
 import app.minion.core.model.MinionSettings1
 import app.minion.core.model.MinionSettings2
 import app.minion.core.model.SettingsVersion
@@ -56,7 +57,7 @@ interface SettingsFunctions { companion object {
         )
     }
 
-    fun MinionSettings1.toJson() : String {
+    fun MinionSettings.toJson() : String {
         return jsonSerializer.encodeToString(this)
     }
 }}

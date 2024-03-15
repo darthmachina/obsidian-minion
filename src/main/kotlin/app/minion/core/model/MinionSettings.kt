@@ -9,7 +9,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-typealias MinionSettings = MinionSettings1
+typealias MinionSettings = MinionSettings2
 
 @Serializable
 data class MinionSettings2(

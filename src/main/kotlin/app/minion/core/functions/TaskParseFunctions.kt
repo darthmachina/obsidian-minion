@@ -12,7 +12,7 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger("TaskParseFunctions")
 
 interface TaskParseFunctions { companion object {
-    fun String.toTask(source: Filename, line: Int, completed: Boolean) : Either<MinionError, Task> = either {
+    fun String.toTask(source: Filename, path: File, line: Int, completed: Boolean) : Either<MinionError, Task> = either {
         logger.debug { "toTask()" }
         val dataviewFields = inlineDataviewRegex.findAll(this@toTask)
             .associate { DataviewField(it.groupValues[1]) to DataviewValue(it.groupValues[2]) }
@@ -30,7 +30,7 @@ interface TaskParseFunctions { companion object {
 
         Task(
             Content(this@toTask.extractTaskDescription()),
-            ListItemFileInfo(source, line, this@toTask),
+            ListItemFileInfo(source, path, line, this@toTask),
             tags = tags,
             dueDate = dueDate,
             repeatInfo = repeatInfo,

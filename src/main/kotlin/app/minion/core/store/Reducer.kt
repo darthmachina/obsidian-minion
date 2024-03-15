@@ -4,8 +4,10 @@ import app.minion.core.MinionError
 import app.minion.core.functions.SettingsFunctions.Companion.toJson
 import app.minion.core.store.ReducerFunctions.Companion.replaceDataForFile
 import app.minion.core.store.ReducerFunctions.Companion.replaceTask
+import app.minion.core.store.ReducerFunctions.Companion.updateForExcludedFolders
 import arrow.core.Either
 import arrow.core.getOrElse
+import arrow.core.some
 import arrow.core.toOption
 import mu.KotlinLogging
 
@@ -16,10 +18,23 @@ fun reducer(state: State, action: Action) : State =
         is Action.DisplayError -> { state.copy(error = action.error.toOption()) }
         is Action.UpdateSettings -> {
             val newSettings = state.settings.copy(
-                lifeAreas = action.lifeAreas.getOrElse { state.settings.lifeAreas }
+                lifeAreas = action.lifeAreas.getOrElse { state.settings.lifeAreas },
+                excludeFolders = action.excludeFolders.getOrElse { state.settings.excludeFolders }
             )
             state.plugin.saveData(newSettings.toJson())
-            state.copy(settings = newSettings)
+            action.excludeFolders
+                .map {
+                    state
+                        .updateForExcludedFolders()
+                        .map {
+                            state.copy(settings = newSettings)
+                        }.getOrElse {
+                            state.copy(error = it.some())
+                        }
+                }
+                .getOrElse {
+                    state.copy(settings = newSettings)
+                }
         }
         is Action.LoadInitialState -> {
             logger.debug { "LoadInitialState: ${action.state}" }

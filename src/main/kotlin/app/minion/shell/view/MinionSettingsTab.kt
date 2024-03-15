@@ -24,9 +24,10 @@ class MinionSettingsTab(
 
         containerEl.append.h2 { +"Underling Settings "}
         createListAreaColorListSetting(containerEl)
+        createExcludeFoldersSetting(containerEl)
     }
 
-    private fun createListAreaColorListSetting(containerEl: HTMLElement): Setting {
+    private fun createListAreaColorListSetting(containerEl: HTMLElement) : Setting {
         return Setting(containerEl)
             .setName("Life Area Colors")
             .setDesc("List of colors to use for Life Areas")
@@ -43,6 +44,24 @@ class MinionSettingsTab(
                             .associate { Pair(it[0], Color(it[1])) }
                             .let {
                                 store.dispatch(Action.UpdateSettings(lifeAreas = it.some()))
+                            }
+                    }
+            }
+    }
+
+    private fun createExcludeFoldersSetting(containerEl: HTMLElement) : Setting {
+        return Setting(containerEl)
+            .setName("Excluded folders")
+            .setDesc("Folders to exclude from processing")
+            .addTextArea { text ->
+                val textVersion = store.store.state.settings.excludeFolders.joinToString("\n")
+                text.setPlaceholder("folders separated by newlines")
+                    .setValue(textVersion)
+                    .onChange { value ->
+                        value.split("\n")
+                            .toSet()
+                            .let {
+                                store.dispatch(Action.UpdateSettings(excludeFolders = it.some()))
                             }
                     }
             }
