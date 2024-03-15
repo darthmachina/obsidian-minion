@@ -68,8 +68,30 @@ interface CodeBlockPageGalleryView { companion object {
 
         if (fileDataMap.isNotEmpty()) {
             element.append.div {
-                fileDataMap.forEach { entry ->
-                    outputGroup(config, entry.key, entry.value, store)
+                // if groupByOrder is set, loop over entries pulling out values
+                // If order size is less than map size, output remaining entries
+                if (config.groupByOrder.isEmpty()) {
+                    fileDataMap.forEach { entry ->
+                        outputGroup(config, entry.key, entry.value, store)
+                    }
+                } else {
+                    config.groupByOrder.forEach { group ->
+                        fileDataMap[group]
+                            .toOption().toEither {
+                                MinionError.GroupByNotFoundError("$group not found in results")
+                            }
+                            .map { outputGroup(config, group, it, store) }
+                            .mapLeft {
+                                // Don't stop processing, just report the issue and continue
+                                logger.warn { "$it" }
+                            }
+                    }
+                    // Output any remaining entries
+                    fileDataMap
+                        .filter { !config.groupByOrder.contains(it.key) }
+                        .forEach { entry ->
+                            outputGroup(config, entry.key, entry.value, store)
+                        }
                 }
             }
         }
