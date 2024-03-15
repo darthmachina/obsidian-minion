@@ -9,9 +9,17 @@ import arrow.core.Either
 import arrow.core.Option
 import arrow.core.raise.either
 import arrow.core.toOption
+import io.kvision.core.Color
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
+import mu.KotlinLoggingLevel
 
 private val logger = KotlinLogging.logger("SettingsFunctions")
 
@@ -61,3 +69,27 @@ interface SettingsFunctions { companion object {
         return jsonSerializer.encodeToString(this)
     }
 }}
+
+object LoggingLevelSerializer : KSerializer<KotlinLoggingLevel> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("LogLevel", PrimitiveKind.STRING)
+
+    override fun deserialize(decoder: Decoder): KotlinLoggingLevel {
+        return KotlinLoggingLevel.valueOf(decoder.decodeString())
+    }
+
+    override fun serialize(encoder: Encoder, value: KotlinLoggingLevel) {
+        encoder.encodeString(value.name)
+    }
+}
+
+object ColorAsStringSerializer : KSerializer<Color> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Color", PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: Color) {
+        encoder.encodeString(value.asString())
+    }
+
+    override fun deserialize(decoder: Decoder): Color {
+        return Color(decoder.decodeString())
+    }
+}

@@ -8,20 +8,28 @@ import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.toOption
 import mu.KotlinLogging
+import mu.KotlinLoggingConfiguration
 
 private val logger = KotlinLogging.logger {  }
 
 fun reducer(state: State, action: Action) : State =
     when(action) {
         is Action.DisplayError -> { state.copy(error = action.error.toOption()) }
-        is Action.LoadSettings -> { state.copy(settings = action.settings) }
+        is Action.LoadSettings -> {
+            KotlinLoggingConfiguration.LOG_LEVEL = action.settings.logLevel
+            state.copy(settings = action.settings)
+        }
         is Action.UpdateSettings -> {
             logger.debug { "UpdateSettings : $action" }
             val newSettings = state.settings.copy(
                 lifeAreas = action.lifeAreas.getOrElse { state.settings.lifeAreas },
-                excludeFolders = action.excludeFolders.getOrElse { state.settings.excludeFolders }
+                excludeFolders = action.excludeFolders.getOrElse { state.settings.excludeFolders },
+                logLevel = action.logLevel.getOrElse { state.settings.logLevel }
             )
             logger.debug { "new Settings: $newSettings" }
+            action.logLevel.map {
+                KotlinLoggingConfiguration.LOG_LEVEL = it
+            }
             state.plugin.saveData(newSettings.toJson())
             state.copy(settings = newSettings)
         }
