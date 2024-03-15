@@ -8,13 +8,15 @@ import arrow.core.None
 import arrow.core.Option
 import io.kvision.core.Color
 import io.kvision.redux.RAction
+import mu.KotlinLoggingLevel
 
 sealed interface Action : RAction {
     data class DisplayError(val error: MinionError) : Action
     data class LoadSettings(val settings: MinionSettings) : Action
     data class UpdateSettings(
         val lifeAreas: Option<Map<String, Color>> = None,
-        val excludeFolders: Option<Set<String>> = None
+        val excludeFolders: Option<Set<String>> = None,
+        val logLevel: Option<KotlinLoggingLevel> = None
     ) : Action
     data class LoadInitialState(val state: State) : Action
     data class LoadDataForFile(val fileData: FileData) : Action

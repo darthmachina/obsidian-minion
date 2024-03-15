@@ -11,6 +11,7 @@ import io.kvision.core.Color
 import kotlinx.html.dom.append
 import kotlinx.html.h2
 import mu.KotlinLogging
+import mu.KotlinLoggingLevel
 import org.w3c.dom.HTMLElement
 
 private val logger = KotlinLogging.logger("MinionSettingsTab")
@@ -28,6 +29,7 @@ class MinionSettingsTab(
         containerEl.append.h2 { +"Underling Settings "}
         createListAreaColorListSetting(containerEl)
         createExcludeFoldersSetting(containerEl)
+        createLogLevelSettings(containerEl)
     }
 
     private fun createListAreaColorListSetting(containerEl: HTMLElement) : Setting {
@@ -68,6 +70,22 @@ class MinionSettingsTab(
                                 store.dispatch(Action.UpdateSettings(excludeFolders = it.some()))
                             }
                     }
+            }
+    }
+
+    private fun createLogLevelSettings(containerEl: HTMLElement): Setting {
+        return Setting(containerEl)
+            .setName("Log Level")
+            .setDesc("Set the log level")
+            .addDropdown { dropdown ->
+                KotlinLoggingLevel.values().forEach { level ->
+                    dropdown.addOption(level.name, level.name)
+                }
+                dropdown.setValue(store.store.state.settings.logLevel.name)
+                dropdown.onChange {
+                    logger.debug { "onChange(): $it" }
+                    store.dispatch(Action.UpdateSettings(logLevel = KotlinLoggingLevel.valueOf(it).some()))
+                }
             }
     }
 }
