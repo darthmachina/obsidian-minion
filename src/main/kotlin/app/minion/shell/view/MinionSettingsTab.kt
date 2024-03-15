@@ -10,7 +10,10 @@ import arrow.core.some
 import io.kvision.core.Color
 import kotlinx.html.dom.append
 import kotlinx.html.h2
+import mu.KotlinLogging
 import org.w3c.dom.HTMLElement
+
+private val logger = KotlinLogging.logger("MinionSettingsTab")
 
 class MinionSettingsTab(
     override var app: App,
@@ -61,7 +64,8 @@ class MinionSettingsTab(
                         value.split("\n")
                             .toSet()
                             .let {
-                                store.dispatch(Action.UpdateSettings(excludeFolders = it.some()))
+                                logger.debug { "Dispatching UpdateSettings: $it" }
+                                //store.dispatch(Action.UpdateSettings(excludeFolders = it.some()))
                             }
                     }
             }

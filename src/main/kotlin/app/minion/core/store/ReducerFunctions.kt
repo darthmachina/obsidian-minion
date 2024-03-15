@@ -42,13 +42,15 @@ interface ReducerFunctions { companion object {
     }
 
     fun State.updateForExcludedFolders() : Either<MinionError, State> = either {
+        logger.debug { "updateForExcludedFolders" }
         val excludedFilenames = this@updateForExcludedFolders
             .files
             .filenamesForExcludedFolders(this@updateForExcludedFolders.settings)
             .bind()
         this@updateForExcludedFolders.copy(
-            tasks = this@updateForExcludedFolders.tasks.filterExcludedFolders(this@updateForExcludedFolders.settings).bind(),
-            files = this@updateForExcludedFolders.files.filter { excludedFilenames.contains(it.key) },
+            tasks = this@updateForExcludedFolders.tasks
+                .filterExcludedFolders(this@updateForExcludedFolders.settings).bind(),
+            files = this@updateForExcludedFolders.files.filter { !excludedFilenames.contains(it.key) },
             tagCache = this@updateForExcludedFolders.tagCache.filterExcludedFolders(excludedFilenames).bind(),
             dataviewCache = this@updateForExcludedFolders.dataviewCache.filterExcludedFolders(excludedFilenames).bind(),
             backlinkCache = this@updateForExcludedFolders.backlinkCache.filterExcludedFolders(excludedFilenames).bind()
@@ -56,13 +58,15 @@ interface ReducerFunctions { companion object {
     }
 
     fun List<Task>.filterExcludedFolders(settings: MinionSettings) : Either<MinionError, List<Task>> = either {
+        logger.debug { "List<Task>.filterExcludedFolders() : $settings" }
         this@filterExcludedFolders
             .filter { task ->
                 !settings.excludeFolders.any { task.fileInfo.path.v.startsWith(it) }
             }
     }
 
-    fun Map<Filename, FileData>.filenamesForExcludedFolders(settings: MinionSettings) : Either<MinionError, Set<Filename>> = either {
+    fun Map<Filename, FileData>.filenamesForExcludedFolders(settings: MinionSettings)
+    : Either<MinionError, Set<Filename>> = either {
         this@filenamesForExcludedFolders
             .mapValues { entry -> settings.excludeFolders.any { entry.value.path.v.startsWith(it) } }
             .mapNotNull { if (it.value) it.key else null }
@@ -70,21 +74,24 @@ interface ReducerFunctions { companion object {
             .toSet()
     }
 
-    fun Map<Tag, Set<Filename>>.filterExcludedFolders(files: Set<Filename>) : Either<MinionError, Map<Tag, Set<Filename>>> = either {
+    fun Map<Tag, Set<Filename>>.filterExcludedFolders(files: Set<Filename>)
+    : Either<MinionError, Map<Tag, Set<Filename>>> = either {
         this@filterExcludedFolders
             .mapValues { entry ->
                 entry.value.filter { !files.contains(it) }.toSet()
             }
     }
 
-    fun Map<Pair<DataviewField, DataviewValue>, Set<Filename>>.filterExcludedFolders(files: Set<Filename>) : Either<MinionError, Map<Pair<DataviewField, DataviewValue>, Set<Filename>>> = either {
+    fun Map<Pair<DataviewField, DataviewValue>, Set<Filename>>.filterExcludedFolders(files: Set<Filename>)
+    : Either<MinionError, Map<Pair<DataviewField, DataviewValue>, Set<Filename>>> = either {
         this@filterExcludedFolders
             .mapValues { entry ->
                 entry.value.filter { !files.contains(it) }.toSet()
             }
     }
 
-    fun Map<Filename, Set<Filename>>.filterExcludedFolders(files: Set<Filename>) : Either<MinionError, Map<Filename, Set<Filename>>> = either {
+    fun Map<Filename, Set<Filename>>.filterExcludedFolders(files: Set<Filename>)
+    : Either<MinionError, Map<Filename, Set<Filename>>> = either {
         this@filterExcludedFolders
             .mapValues { entry ->
                 entry.value.filter { !files.contains(it) }.toSet()

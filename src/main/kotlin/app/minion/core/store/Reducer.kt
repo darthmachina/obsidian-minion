@@ -17,6 +17,7 @@ fun reducer(state: State, action: Action) : State =
     when(action) {
         is Action.DisplayError -> { state.copy(error = action.error.toOption()) }
         is Action.UpdateSettings -> {
+            logger.debug { "UpdateSettings : $action" }
             val newSettings = state.settings.copy(
                 lifeAreas = action.lifeAreas.getOrElse { state.settings.lifeAreas },
                 excludeFolders = action.excludeFolders.getOrElse { state.settings.excludeFolders }
@@ -24,15 +25,20 @@ fun reducer(state: State, action: Action) : State =
             state.plugin.saveData(newSettings.toJson())
             action.excludeFolders
                 .map {
+                    logger.debug { "Updating state for updated excluded folders" }
                     state
+                        .copy(settings = newSettings)
                         .updateForExcludedFolders()
-                        .map {
-                            state.copy(settings = newSettings)
-                        }.getOrElse {
+                        .let {
+                            logger.debug { "Updated state: $it" }
+                            it
+                        }
+                        .getOrElse {
                             state.copy(error = it.some())
                         }
                 }
                 .getOrElse {
+                    logger.debug { "No new excluded folders, just updating settings" }
                     state.copy(settings = newSettings)
                 }
         }
