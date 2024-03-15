@@ -36,4 +36,6 @@ sealed class MinionError(
                                 override val parent: Option<MinionError> = None) : MinionError(message, throwable, parent)
     data class ConfigParseError(override val message: String, override val throwable: Option<Throwable> = None,
                                     override val parent: Option<MinionError> = None) : MinionError(message, throwable, parent)
+    data class GroupByNotFoundError(override val message: String, override val throwable: Option<Throwable> = None,
+                                override val parent: Option<MinionError> = None) : MinionError(message, throwable, parent)
 }
