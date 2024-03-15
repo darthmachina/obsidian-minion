@@ -42,4 +42,14 @@ interface CodeBlockTaskFunctions { companion object {
             !(tag.v == "task" || config.include.tags.contains(tag))
         }.toSet()
     }
+
+    fun CodeBlockConfig.maybeAddProperties() : CodeBlockConfig {
+        return if (this.properties.isEmpty()) {
+            this.copy(
+                properties = listOf(PROPERTY_DUE, PROPERTY_SOURCE, PROPERTY_TAGS)
+            )
+        } else {
+            this
+        }
+    }
 }}

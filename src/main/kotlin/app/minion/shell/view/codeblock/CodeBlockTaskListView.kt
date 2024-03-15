@@ -13,6 +13,7 @@ import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyDue
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyExcludeTags
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyIncludeTags
+import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.maybeAddProperties
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.removeConfigTags
 import app.minion.shell.view.iconHash
 import app.minion.shell.view.iconRepeat
@@ -44,11 +45,13 @@ interface CodeBlockTaskListView { companion object {
             .subscribe { error ->
                 error.map { showError(it, this) }
             }
+
+        val updatedConfig = config.maybeAddProperties()
         store
-            .sub { it.tasks.applyCodeBlockConfig(config) }
+            .sub { it.tasks.applyCodeBlockConfig(updatedConfig) }
             .subscribe { tasks ->
                 logger.debug { "Task list updated, running updateTasks(): $tasks" }
-                updateTasks(tasks, this, store, config)
+                updateTasks(tasks, this, store, updatedConfig)
             }
 
     }
@@ -88,25 +91,29 @@ interface CodeBlockTaskListView { companion object {
 
     fun FlowContent.outputContent(task: Task, store: MinionStore, config: CodeBlockConfig) {
         span(classes = "mi-codeblock-task-content") {
-            task.dueDate.map { due ->
-                span(classes = "mi-codeblock-task-content-due") {
-                    if (due.isInPast()) {
-                        style = "color: crimson"
+            if (config.properties.contains(PROPERTY_DUE)) {
+                task.dueDate.map { due ->
+                    span(classes = "mi-codeblock-task-content-due") {
+                        if (due.isInPast()) {
+                            style = "color: crimson"
+                        }
+                        +"[${due.asString()}]"
                     }
-                    +"[${due.asString()}]"
                 }
             }
             span {
                 outputStyledContent(task.content, store)
             }
-            with(task.collectTags()) {
-                if(isNotEmpty()) {
-                    span(classes = "mi-codeblock-task-content-tags") {
-                        this@with
-                            .removeConfigTags(config)
-                            .forEach { tag ->
-                                span(classes = "mi-codeblock-task-content-tags-tag") { +"#${tag.v}" }
-                            }
+            if (config.properties.contains(PROPERTY_TAGS)) {
+                with(task.collectTags()) {
+                    if (isNotEmpty()) {
+                        span(classes = "mi-codeblock-task-content-tags") {
+                            this@with
+                                .removeConfigTags(config)
+                                .forEach { tag ->
+                                    span(classes = "mi-codeblock-task-content-tags-tag") { +"#${tag.v}" }
+                                }
+                        }
                     }
                 }
             }
@@ -116,15 +123,17 @@ interface CodeBlockTaskListView { companion object {
                     unsafe { +iconRepeat }
                 }
             }
-            span(classes = "mi-codeblock-task-source") {
-                span { +"(" }
-                span(classes = "mi-codeblock-source-link") {
-                    +task.fileInfo.file.v
-                    onClickFunction = {
-                        openSourceFile(task.fileInfo.file, store.store.state.plugin.app)
+            if (config.properties.contains(PROPERTY_SOURCE)) {
+                span(classes = "mi-codeblock-task-source") {
+                    span { +"(" }
+                    span(classes = "mi-codeblock-source-link") {
+                        +task.fileInfo.file.v
+                        onClickFunction = {
+                            openSourceFile(task.fileInfo.file, store.store.state.plugin.app)
+                        }
                     }
+                    span { +")" }
                 }
-                span { +")" }
             }
             task.completedSubtaskPercent()
                 .map { percent ->
