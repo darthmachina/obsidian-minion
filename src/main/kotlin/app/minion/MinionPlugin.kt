@@ -71,13 +71,7 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
     private suspend fun loadSettings() {
         loadData().then { result ->
             SettingsFunctions.loadFromJson(result.toOption())
-                .map {
-                    store.dispatch(
-                        Action.UpdateSettings(
-                            lifeAreas = it.lifeAreas.toOption()
-                        )
-                    )
-                }
+                .map { store.dispatch(Action.LoadSettings(settings = it)) }
         }.await()
     }
 }

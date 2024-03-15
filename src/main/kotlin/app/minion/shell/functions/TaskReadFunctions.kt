@@ -33,7 +33,7 @@ interface TaskReadFunctions { companion object {
                         listItemCache
                             .mapNotNull { listItem ->
                                 contents[listItem.position.start.line.toInt()]
-                                    .processLine(listItem, filename)
+                                    .processLine(listItem, filename, file)
                                     .logLeft(logger)
                                     .getOrElse { None }
                                     .getOrNull()
@@ -45,17 +45,17 @@ interface TaskReadFunctions { companion object {
            }
     }
 
-    fun String.processLine(item: ListItemCache, filename: Filename) : Either<MinionError.VaultTaskReadError, Option<ItemTuple>> = either {
+    fun String.processLine(item: ListItemCache, filename: Filename, path: File) : Either<MinionError.VaultTaskReadError, Option<ItemTuple>> = either {
         logger.debug { "processLine() : ${this@processLine}" }
         if (item.task == null && item.parent.toInt() > 0) {
             // Only process notes if they have a parent
             logger.debug { "Create tuple for Note" }
-            createNoteTuple(this@processLine, filename, item.position.start.line.toInt(), item.parent.toInt())
+            createNoteTuple(this@processLine, filename, path, item.position.start.line.toInt(), item.parent.toInt())
                 .bind()
                 .toOption()
         } else if (this@processLine.contains("#task") || item.parent.toInt() > 0) {
             logger.debug { "Create tuple for Task" }
-            createTaskTuple(this@processLine, filename, item.position.start.line.toInt(), item.parent.toInt(), item.task?.isNotBlank() ?: false)
+            createTaskTuple(this@processLine, filename, path, item.position.start.line.toInt(), item.parent.toInt(), item.task?.isNotBlank() ?: false)
                 .bind()
                 .toOption()
         } else {
@@ -64,8 +64,8 @@ interface TaskReadFunctions { companion object {
         }
     }
 
-    fun createTaskTuple(contents: String, filename: Filename, line: Int, parent: Int, completed: Boolean) : Either<MinionError.VaultTaskReadError, ItemTuple> = either {
-        contents.toTask(filename, line, completed)
+    fun createTaskTuple(contents: String, filename: Filename, path: File, line: Int, parent: Int, completed: Boolean) : Either<MinionError.VaultTaskReadError, ItemTuple> = either {
+        contents.toTask(filename, path, line, completed)
             .map {
                 ItemTuple(
                     line,
@@ -79,13 +79,13 @@ interface TaskReadFunctions { companion object {
             }.bind()
     }
 
-    fun createNoteTuple(contents: String, filename: Filename, line: Int, parent: Int) : Either<MinionError.VaultTaskReadError, ItemTuple> = either {
+    fun createNoteTuple(contents: String, filename: Filename, path: File, line: Int, parent: Int) : Either<MinionError.VaultTaskReadError, ItemTuple> = either {
         ItemTuple(
             line,
             None,
             Note(
                 Content(contents.replace(noteSyntaxRegex, "")),
-                ListItemFileInfo(filename, line, contents)
+                ListItemFileInfo(filename, path, line, contents)
             ).toOption(),
             parent
         )

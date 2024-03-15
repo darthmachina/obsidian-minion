@@ -14,10 +14,14 @@ private val logger = KotlinLogging.logger {  }
 fun reducer(state: State, action: Action) : State =
     when(action) {
         is Action.DisplayError -> { state.copy(error = action.error.toOption()) }
+        is Action.LoadSettings -> { state.copy(settings = action.settings) }
         is Action.UpdateSettings -> {
+            logger.debug { "UpdateSettings : $action" }
             val newSettings = state.settings.copy(
-                lifeAreas = action.lifeAreas.getOrElse { state.settings.lifeAreas }
+                lifeAreas = action.lifeAreas.getOrElse { state.settings.lifeAreas },
+                excludeFolders = action.excludeFolders.getOrElse { state.settings.excludeFolders }
             )
+            logger.debug { "new Settings: $newSettings" }
             state.plugin.saveData(newSettings.toJson())
             state.copy(settings = newSettings)
         }

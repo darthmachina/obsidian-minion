@@ -23,7 +23,13 @@ interface VaultReadFunctions { companion object {
     suspend fun Vault.processIntoState(plugin: MinionPlugin, settings: MinionSettings) : Either<MinionError, State> = either {
         this@processIntoState
             .getFiles()
-            .filter { it.path.endsWith(".md") }
+            .filter { tfile ->
+                val exclude = settings.excludeFolders.any {
+                    tfile.path.startsWith(it)
+                }
+                tfile.path.endsWith(".md") &&
+                        !exclude
+            }
             .fold(StateAccumulator(plugin)) { acc, file ->
                 logger.debug { "Processing ${file.path}" }
                 this@processIntoState
