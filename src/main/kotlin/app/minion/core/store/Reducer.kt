@@ -4,10 +4,8 @@ import app.minion.core.MinionError
 import app.minion.core.functions.SettingsFunctions.Companion.toJson
 import app.minion.core.store.ReducerFunctions.Companion.replaceDataForFile
 import app.minion.core.store.ReducerFunctions.Companion.replaceTask
-import app.minion.core.store.ReducerFunctions.Companion.updateForExcludedFolders
 import arrow.core.Either
 import arrow.core.getOrElse
-import arrow.core.some
 import arrow.core.toOption
 import mu.KotlinLogging
 
@@ -23,24 +21,7 @@ fun reducer(state: State, action: Action) : State =
                 excludeFolders = action.excludeFolders.getOrElse { state.settings.excludeFolders }
             )
             state.plugin.saveData(newSettings.toJson())
-            action.excludeFolders
-                .map {
-                    logger.debug { "Updating state for updated excluded folders" }
-                    state
-                        .copy(settings = newSettings)
-                        .updateForExcludedFolders()
-                        .let {
-                            logger.debug { "Updated state: $it" }
-                            it
-                        }
-                        .getOrElse {
-                            state.copy(error = it.some())
-                        }
-                }
-                .getOrElse {
-                    logger.debug { "No new excluded folders, just updating settings" }
-                    state.copy(settings = newSettings)
-                }
+            state.copy(settings = newSettings)
         }
         is Action.LoadInitialState -> {
             logger.debug { "LoadInitialState: ${action.state}" }
