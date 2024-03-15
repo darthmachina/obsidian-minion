@@ -11,6 +11,7 @@ import io.kvision.redux.RAction
 
 sealed interface Action : RAction {
     data class DisplayError(val error: MinionError) : Action
+    data class LoadSettings(val settings: MinionSettings) : Action
     data class UpdateSettings(
         val lifeAreas: Option<Map<String, Color>> = None,
         val excludeFolders: Option<Set<String>> = None

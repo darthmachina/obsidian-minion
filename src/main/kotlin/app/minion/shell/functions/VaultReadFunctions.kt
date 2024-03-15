@@ -24,8 +24,11 @@ interface VaultReadFunctions { companion object {
         this@processIntoState
             .getFiles()
             .filter { tfile ->
+                val exclude = settings.excludeFolders.any {
+                    tfile.path.startsWith(it)
+                }
                 tfile.path.endsWith(".md") &&
-                        !settings.excludeFolders.any { tfile.path.startsWith(it) }
+                        !exclude
             }
             .fold(StateAccumulator(plugin)) { acc, file ->
                 logger.debug { "Processing ${file.path}" }

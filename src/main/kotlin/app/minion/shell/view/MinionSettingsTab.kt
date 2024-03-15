@@ -65,7 +65,7 @@ class MinionSettingsTab(
                             .toSet()
                             .let {
                                 logger.debug { "Dispatching UpdateSettings: $it" }
-                                //store.dispatch(Action.UpdateSettings(excludeFolders = it.some()))
+                                store.dispatch(Action.UpdateSettings(excludeFolders = it.some()))
                             }
                     }
             }
