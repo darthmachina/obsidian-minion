@@ -1,17 +1,25 @@
 package app.minion.shell.view
 
+import MetadataCache
+import Vault
+import app.minion.core.MinionError
 import app.minion.core.model.Content
 import app.minion.core.model.Filename
 import app.minion.core.store.MinionStore
-import app.minion.shell.functions.BOLD_REGEX
-import app.minion.shell.functions.CODE_REGEX
-import app.minion.shell.functions.ITALIC_REGEX
+import app.minion.shell.functions.*
 import app.minion.shell.functions.VaultFunctions.Companion.openSourceFile
 import app.minion.shell.functions.VaultFunctions.Companion.sourceFileExists
-import app.minion.shell.functions.WIKILINK_REGEX
+import arrow.core.Either
+import arrow.core.flatten
+import arrow.core.getOrElse
+import arrow.core.raise.either
+import arrow.core.toOption
 import kotlinx.html.FlowOrPhrasingContent
 import kotlinx.html.js.onClickFunction
 import kotlinx.html.span
+import mu.KotlinLogging
+
+private val logger = KotlinLogging.logger("ViewFunctions")
 
 interface ViewFunctions { companion object {
     fun FlowOrPhrasingContent.outputStyledContent(content: Content, store: MinionStore) {
@@ -74,5 +82,35 @@ interface ViewFunctions { companion object {
 
     fun String.parseCode() : List<String> {
         return this.replace(CODE_REGEX, "|!c\$1|").split("|")
+    }
+
+    fun String.getWikilinkResourcePath(vault: Vault, metadataCache: MetadataCache)
+    : Either<MinionError, String> = either {
+        logger.debug { "getWikilinkResourcePath: ${this@getWikilinkResourcePath}" }
+        WIKILINK_EMBED_REGEX
+            .find(this@getWikilinkResourcePath)
+            .toOption()
+            .map {
+                it.groups[1].toOption().map { it.value }
+            }
+            .flatten()
+            .toEither {
+                MinionError.ImageNotFoundError("Error parsing '${this@getWikilinkResourcePath}' for image")
+            }
+            .map { it.getImageResourcePath(vault, metadataCache).bind() }
+            .bind()
+    }
+
+    fun String.getImageResourcePath(vault: Vault, metadataCache: MetadataCache)
+    : Either<MinionError, String> = either {
+        logger.debug { "getImageResourcePath: ${this@getImageResourcePath}" }
+        metadataCache
+            .getFirstLinkpathDest(this@getImageResourcePath, "")
+            .toOption()
+            .map { vault.getResourcePath(it) }
+            .toEither {
+                MinionError.ImageNotFoundError("${this@getImageResourcePath} not found")
+            }
+            .bind()
     }
 }}

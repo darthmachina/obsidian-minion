@@ -98,12 +98,12 @@ class CodeBlockConfigTest : StringSpec({
             query: tasks
             display: table
             options:
-              - notes_on_cover
+              - image_on_cover
         """.trimIndent()
 
         val actual = Yaml.decodeFromString(CodeBlockConfig.serializer(), yaml)
 
         actual.display shouldBeEqual CodeBlockDisplay.table
-        actual.options shouldHaveSingleElement CodeBlockOptions.notes_on_cover
+        actual.options shouldHaveSingleElement CodeBlockOptions.image_on_cover
     }
 })

@@ -3,7 +3,7 @@ package app.minion.shell.view.codeblock
 import app.minion.core.model.Tag
 import kotlinx.serialization.Serializable
 
-// NOTE: Enums are lowercase so they can be deserialized easily
+// NOTE: Enums are lowercase, so they can be deserialized easily
 
 @Serializable
 data class CodeBlockConfig(
@@ -64,14 +64,15 @@ enum class GroupByOptions {
 
 @Serializable
 enum class CodeBlockOptions {
-    notes_on_cover
+    image_on_cover
 }
 
-// Hard coded property values
+// Hard coded property and field labels
 const val PROPERTY_CREATED = "created"
 const val PROPERTY_MODIFIED = "modified"
 const val PROPERTY_SOURCE = "source"
 const val PROPERTY_TAGS = "tags"
 const val PROPERTY_DUE = "due"
+const val FIELD_IMAGE = "Image"
 
 const val GROUP_BY_SINGLE = "!!single!!"
