@@ -6,30 +6,20 @@ import app.minion.core.model.Content
 import app.minion.core.model.DataviewField
 import app.minion.core.model.FileData
 import app.minion.core.store.MinionStore
+import app.minion.shell.functions.LogFunctions.Companion.log
 import app.minion.shell.functions.VaultFunctions
+import app.minion.shell.view.ViewFunctions.Companion.getImageResourcePath
+import app.minion.shell.view.ViewFunctions.Companion.getWikilinkResourcePath
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.applyCodeBlockConfig
-import app.minion.shell.view.codeblock.CodeBlockPageListView.Companion.addPageListView
-import app.minion.shell.view.codeblock.CodeBlockPageListView.Companion.outputFileDataSet
-import app.minion.shell.view.codeblock.CodeBlockPageListView.Companion.outputGroup
-import app.minion.shell.view.codeblock.CodeBlockPageListView.Companion.outputStats
 import app.minion.shell.view.iconHash
 import app.minion.shell.view.modal.UpdateDataviewValue
-import arrow.core.None
-import arrow.core.Some
-import arrow.core.toOption
+import arrow.core.*
 import io.kvision.state.sub
 import kotlinx.dom.clear
-import kotlinx.html.FlowContent
-import kotlinx.html.div
+import kotlinx.html.*
 import kotlinx.html.dom.append
 import kotlinx.html.js.onClickFunction
-import kotlinx.html.label
-import kotlinx.html.li
-import kotlinx.html.span
-import kotlinx.html.title
-import kotlinx.html.ul
-import kotlinx.html.unsafe
 import mu.KotlinLogging
 import org.w3c.dom.HTMLElement
 
@@ -58,7 +48,12 @@ interface CodeBlockPageGalleryView { companion object {
         element.append.div { +error.message }
     }
 
-    fun updatePages(fileDataMap: Map<String, Set<FileData>>, element: HTMLElement, store: MinionStore, config: CodeBlockConfig) {
+    fun updatePages(
+        fileDataMap: Map<String, Set<FileData>>,
+        element: HTMLElement,
+        store: MinionStore,
+        config: CodeBlockConfig
+    ) {
         element.clear()
         if (config.heading.isNotEmpty()) {
             element.append.div(classes = "mi-codeblock-heading") {
@@ -99,7 +94,12 @@ interface CodeBlockPageGalleryView { companion object {
         element.outputStats(fileDataMap)
     }
 
-    fun FlowContent.outputGroup(config: CodeBlockConfig, label: String, fileDataSet: Set<FileData>, store: MinionStore) {
+    fun FlowContent.outputGroup(
+        config: CodeBlockConfig,
+        label: String,
+        fileDataSet: Set<FileData>,
+        store: MinionStore
+    ) {
         if (label == GROUP_BY_SINGLE) {
             outputFileDataSet(config, fileDataSet, store)
         } else {
@@ -120,7 +120,29 @@ interface CodeBlockPageGalleryView { companion object {
 
     fun FlowContent.outputFileData(fileData: FileData, config: CodeBlockConfig, store: MinionStore) {
         div {
-            div(classes = "mi-codeblock-page-gallery-title") {
+            val includeImage = config.options.contains(CodeBlockOptions.image_on_cover)
+            var imageIncluded = false
+            if (includeImage) {
+                fileData.dataview[DataviewField(FIELD_IMAGE)]
+                    .toOption()
+                    .toEither { MinionError.ImageNotFoundError("No image specified for ${fileData.name.v}") }
+                    .flatMap {
+                        it.v.getWikilinkResourcePath(
+                            store.store.state.plugin.app.vault,
+                            store.store.state.plugin.app.metadataCache
+                        )
+                    }
+                    .map { imagePath ->
+                        imageIncluded = true
+                        div(classes = "mi-codeblock-cover-image-container") {
+                            img(classes = "mi-codeblock-cover-image", src = imagePath)
+                        }
+                    }
+                    .mapLeft {
+                        logger.warn { "$it" }
+                    }
+                }
+            div(classes = "mi-codeblock-page-gallery-title${if (!imageIncluded) " mi-full-height" else ""}") {
                 span(classes = "mi-codeblock-source-link") {
                     +fileData.name.v
                     onClickFunction = {
@@ -143,20 +165,20 @@ interface CodeBlockPageGalleryView { companion object {
                 }
             }
             if (config.properties.isNotEmpty()) {
-                outputProperties(fileData, config, store)
+                outputFields(fileData, config, store)
             }
         }
     }
 
-    fun FlowContent.outputProperties(fileData: FileData, config: CodeBlockConfig, store: MinionStore) {
+    fun FlowContent.outputFields(fileData: FileData, config: CodeBlockConfig, store: MinionStore) {
         div(classes = "mi-codeblock-page-gallery-fields") {
             config.properties.forEach { property ->
-                outputProperty(property, fileData, store)
+                outputField(property, fileData, store)
             }
         }
     }
 
-    fun FlowContent.outputProperty(label: String, fileData: FileData, store: MinionStore) {
+    fun FlowContent.outputField(label: String, fileData: FileData, store: MinionStore) {
         when(label) {
             PROPERTY_CREATED -> {}
             PROPERTY_MODIFIED -> {}
