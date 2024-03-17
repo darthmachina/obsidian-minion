@@ -192,3 +192,34 @@
    width: auto;
    height: auto;
 }
+
+.mi-codeblock-menu-container {
+    position: relative;
+    display: inline-block;
+}
+
+.mi-codeblock-menu {
+    display: none;
+    position: absolute;
+    background-color: #252525;
+    min-width: 25px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    right: 15px;
+    top: -3px
+}
+
+.mi-codeblock-menu a {
+    color: white;
+    padding: 3px 1px 1px 4px;
+    text-decoration: none;
+    display: block;
+}
+
+.mi-codeblock-menu-container:hover .mi-codeblock-menu {
+    display: block;
+}
+
+.mi-codeblock-menu-container:hover button {
+    background-color: #3e8e41;
+}
