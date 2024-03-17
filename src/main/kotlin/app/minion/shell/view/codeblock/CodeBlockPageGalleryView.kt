@@ -6,13 +6,14 @@ import app.minion.core.model.Content
 import app.minion.core.model.DataviewField
 import app.minion.core.model.FileData
 import app.minion.core.store.MinionStore
-import app.minion.shell.functions.LogFunctions.Companion.log
 import app.minion.shell.functions.VaultFunctions
-import app.minion.shell.view.ViewFunctions.Companion.getImageResourcePath
 import app.minion.shell.view.ViewFunctions.Companion.getWikilinkResourcePath
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.applyCodeBlockConfig
+import app.minion.shell.view.codeblock.CodeBlockPageGalleryView.Companion.addPageGalleryView
+import app.minion.shell.view.iconGroup
 import app.minion.shell.view.iconHash
+import app.minion.shell.view.iconMenu
 import app.minion.shell.view.modal.UpdateDataviewValue
 import arrow.core.*
 import io.kvision.state.sub
@@ -149,18 +150,25 @@ interface CodeBlockPageGalleryView { companion object {
                         VaultFunctions.openSourceFile(fileData.name, store.store.state.plugin.app)
                     }
                 }
-                span(classes = "mi-icon mi-button") {
-                    title = "Change group value"
-                    unsafe { +iconHash }
-                    onClickFunction = {
-                        UpdateDataviewValue(
-                            fileData,
-                            config.groupByField,
-                            fileData.dataview[DataviewField(config.groupByField)]!!,
-                            store.store.state.dataviewValueCache[DataviewField(config.groupByField)]!!,
-                            store,
-                            store.store.state.plugin.app
-                        ).open()
+                div(classes = "mi-codeblock-menu-container") {
+                    span(classes = "mi-icon mi-button") {
+                        unsafe { +iconMenu }
+                    }
+                    div(classes = "mi-codeblock-menu") {
+                        a {
+                            title = "Change group value"
+                            unsafe { +iconGroup }
+                            onClickFunction = {
+                                UpdateDataviewValue(
+                                    fileData,
+                                    config.groupByField,
+                                    fileData.dataview[DataviewField(config.groupByField)]!!,
+                                    store.store.state.dataviewValueCache[DataviewField(config.groupByField)]!!,
+                                    store,
+                                    store.store.state.plugin.app
+                                ).open()
+                            }
+                        }
                     }
                 }
             }
