@@ -29,6 +29,9 @@
 .mi-icon {
     color: gray;
     margin-left: 5px;
+    height: 16px;
+    display: inline-block;
+    vertical-align: sub
 }
 
 .mi-button {
@@ -206,7 +209,7 @@
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
     z-index: 1;
     right: 15px;
-    top: -3px
+    top: -1px
 }
 
 .mi-codeblock-menu a {

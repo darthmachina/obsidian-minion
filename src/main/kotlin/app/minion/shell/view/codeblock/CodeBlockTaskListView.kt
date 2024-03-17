@@ -15,12 +15,14 @@ import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyExc
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyIncludeTags
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.maybeAddProperties
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.removeConfigTags
-import app.minion.shell.view.iconHash
+import app.minion.shell.view.iconKanban
+import app.minion.shell.view.iconMenu
 import app.minion.shell.view.iconRepeat
 import app.minion.shell.view.modal.KanbanStatusSelectModal
 import io.kvision.state.sub
 import kotlinx.dom.clear
 import kotlinx.html.FlowContent
+import kotlinx.html.a
 import kotlinx.html.checkBoxInput
 import kotlinx.html.div
 import kotlinx.html.dom.append
@@ -144,11 +146,18 @@ interface CodeBlockTaskListView { companion object {
                         +"$percent%"
                     }
                 }
-            span(classes = "mi-icon mi-button") {
-                title = "Change Kanban status"
-                unsafe { +iconHash }
-                onClickFunction = {
-                    KanbanStatusSelectModal(store, task, store.store.state.plugin.app).open()
+            div(classes = "mi-codeblock-menu-container") {
+                span(classes = "mi-icon mi-button") {
+                    unsafe { +iconMenu }
+                }
+                div(classes = "mi-codeblock-menu") {
+                    a {
+                        title = "Change kanban status"
+                        unsafe { +iconKanban }
+                        onClickFunction = {
+                            KanbanStatusSelectModal(store, task, store.store.state.plugin.app).open()
+                        }
+                    }
                 }
             }
         }
