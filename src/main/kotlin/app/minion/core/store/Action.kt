@@ -3,6 +3,7 @@ package app.minion.core.store
 import app.minion.core.MinionError
 import app.minion.core.model.FileData
 import app.minion.core.model.MinionSettings
+import app.minion.core.model.PageTaskField
 import app.minion.core.model.Task
 import arrow.core.None
 import arrow.core.Option
@@ -16,7 +17,8 @@ sealed interface Action : RAction {
     data class UpdateSettings(
         val lifeAreas: Option<Map<String, Color>> = None,
         val excludeFolders: Option<Set<String>> = None,
-        val logLevel: Option<KotlinLoggingLevel> = None
+        val logLevel: Option<KotlinLoggingLevel> = None,
+        val pageTaskFields: Option<List<PageTaskField>> = None
     ) : Action
     data class LoadInitialState(val state: State) : Action
     data class LoadDataForFile(val fileData: FileData) : Action

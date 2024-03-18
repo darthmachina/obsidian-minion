@@ -5,7 +5,15 @@ import MinionPlugin
 import TFile
 import Vault
 import app.minion.core.MinionError
-import app.minion.core.model.*
+import app.minion.core.functions.TaskFunctions.Companion.maybeAddDataviewValues
+import app.minion.core.model.DataviewField
+import app.minion.core.model.DataviewValue
+import app.minion.core.model.File
+import app.minion.core.model.FileData
+import app.minion.core.model.Filename
+import app.minion.core.model.MinionSettings
+import app.minion.core.model.Tag
+import app.minion.core.model.Task
 import app.minion.core.store.State
 import app.minion.shell.functions.TaskReadFunctions.Companion.processFileTasks
 import app.minion.shell.functions.VaultReadFunctions.Companion.mapToFieldCache
@@ -20,7 +28,8 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger("VaultReadFunctions")
 
 interface VaultReadFunctions { companion object {
-    suspend fun Vault.processIntoState(plugin: MinionPlugin, settings: MinionSettings) : Either<MinionError, State> = either {
+    suspend fun Vault.processIntoState(plugin: MinionPlugin, settings: MinionSettings)
+    : Either<MinionError, State> = either {
         this@processIntoState
             .getFiles()
             .filter { tfile ->
@@ -34,12 +43,13 @@ interface VaultReadFunctions { companion object {
                 logger.debug { "Processing ${file.path}" }
                 this@processIntoState
                     .processFile(file, plugin.app.metadataCache).bind()
-                    .addToState(acc).bind()
+                    .addToState(acc, settings).bind()
            }
             .toState(settings).bind()
     }
 
-    suspend fun Vault.readFile(fileData: FileData, metadataCache: MetadataCache) : Either<MinionError, String> = either {
+    suspend fun Vault.readFile(fileData: FileData, metadataCache: MetadataCache)
+    : Either<MinionError, String> = either {
         metadataCache
             .getFirstLinkpathDest(fileData.path.v, "")
             .toOption()
@@ -102,7 +112,8 @@ interface VaultReadFunctions { companion object {
             .getOrElse { this@addBacklinks }
     }
 
-    suspend fun FileData.processFileContents(vault: Vault, metadataCache: MetadataCache) : Either<MinionError, FileData> = either {
+    suspend fun FileData.processFileContents(vault: Vault, metadataCache: MetadataCache)
+    : Either<MinionError, FileData> = either {
         logger.debug { "processFileContents: ${this@processFileContents.path.v}" }
         metadataCache
             .getFirstLinkpathDest(this@processFileContents.path.v, "")
@@ -118,8 +129,14 @@ interface VaultReadFunctions { companion object {
                         this@processFileContents.copy(
                             dataview = contents.pullOutDataviewFields().bind(),
                             tasks = contents
-                                .processFileTasks(this@processFileContents.path, this@processFileContents.name, metadataCache)
-                                .mapLeft { MinionError.VaultReadError(it.message, it.throwable, parent = it.toOption()) }
+                                .processFileTasks(
+                                    this@processFileContents.path,
+                                    this@processFileContents.name,
+                                    metadataCache
+                                )
+                                .mapLeft {
+                                    MinionError.VaultReadError(it.message, it.throwable, parent = it.toOption())
+                                }
                                 .bind()
                                 .filter { !it.completed }
                         )
@@ -134,14 +151,15 @@ interface VaultReadFunctions { companion object {
             .associate { DataviewField(it.groupValues[1]) to DataviewValue(it.groupValues[2]) }
     }
 
-    fun Set<Pair<DataviewField, DataviewValue>>.mapToFieldCache() : Either<MinionError, Map<DataviewField, Set<DataviewValue>>> = either {
+    fun Set<Pair<DataviewField, DataviewValue>>.mapToFieldCache()
+    : Either<MinionError, Map<DataviewField, Set<DataviewValue>>> = either {
         this@mapToFieldCache
             .groupBy { it.first }
             .mapValues { entry -> entry.value.map { it.second }.toSet() }
     }
 
-    fun FileData.addToState(acc: StateAccumulator) : Either<MinionError, StateAccumulator> = either {
-        acc.addFileData(this@addToState).bind()
+    fun FileData.addToState(acc: StateAccumulator, settings: MinionSettings) : Either<MinionError, StateAccumulator> = either {
+        acc.addFileData(this@addToState, settings).bind()
     }
 
 }}
@@ -157,12 +175,12 @@ data class StateAccumulator(
     val dataviewCache: MutableMap<Pair<DataviewField,DataviewValue>, MutableSet<Filename>> = mutableMapOf(),
     val backlinkCache: MutableMap<Filename, MutableSet<Filename>> = mutableMapOf()
 ) {
-    fun addFileData(fileData: FileData) : Either<MinionError, StateAccumulator> = either {
+    fun addFileData(fileData: FileData, settings: MinionSettings) : Either<MinionError, StateAccumulator> = either {
         files[fileData.name] = fileData
         addTags(fileData.tags, fileData.name)
         addBacklinks(fileData.outLinks, fileData.name)
         addDataview(fileData.dataview, fileData.name)
-        addTasks(fileData.tasks)
+        addTasks(fileData.tasks, fileData.dataview, settings)
         this@StateAccumulator
     }
 
@@ -202,7 +220,8 @@ data class StateAccumulator(
         this@StateAccumulator
     }
 
-    fun addDataview(dataview: Map<DataviewField, DataviewValue>, filename: Filename) : Either<MinionError, StateAccumulator> = either {
+    fun addDataview(dataview: Map<DataviewField, DataviewValue>, filename: Filename)
+    : Either<MinionError, StateAccumulator> = either {
         logger.debug { "addDataview()" }
         dataview.entries.forEach { entry ->
             val dataviewPair = entry.key to entry.value
@@ -217,13 +236,24 @@ data class StateAccumulator(
         this@StateAccumulator
     }
 
-    fun addTasks(tasks: List<Task>) : Either<MinionError, StateAccumulator> = either {
+    fun addTasks(tasks: List<Task>, dataview: Map<DataviewField, DataviewValue>, settings: MinionSettings)
+    : Either<MinionError, StateAccumulator> = either {
         logger.debug { "addTasks()" }
-        this@StateAccumulator.tasks.addAll(tasks)
+        this@StateAccumulator.tasks.addAll(tasks.maybeAddDataviewValues(settings, dataview).bind())
         this@StateAccumulator
     }
 
     fun toState(settings: MinionSettings) : Either<MinionError, State> = either {
-        State(plugin, settings, None, tasks, files, tagCache, dataviewCache, dataviewCache.keys.mapToFieldCache().bind(), backlinkCache)
+        State(
+            plugin,
+            settings,
+            None,
+            tasks,
+            files,
+            tagCache,
+            dataviewCache,
+            dataviewCache.keys.mapToFieldCache().bind(),
+            backlinkCache
+        )
     }
 }

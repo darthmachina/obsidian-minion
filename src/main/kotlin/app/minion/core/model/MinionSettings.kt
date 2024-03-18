@@ -19,7 +19,8 @@ data class MinionSettings2(
     val version: String,
     @Serializable(with = LoggingLevelSerializer::class) val logLevel: KotlinLoggingLevel,
     val lifeAreas: Map<String, @Serializable(ColorAsStringSerializer::class)Color>,
-    val excludeFolders: Set<String>
+    val excludeFolders: Set<String>,
+    val pageTaskFields: List<PageTaskField>
 ) { companion object {
     fun default() : MinionSettings2 {
         return MinionSettings2(
@@ -32,9 +33,11 @@ data class MinionSettings2(
                 "family" to Color("#8E791C"),
                 "work" to Color("#D34807")
             ),
-            setOf()
+            setOf(),
+            listOf()
         )
-    }}}
+    }
+}}
 
 @Serializable
 data class MinionSettings1(
@@ -52,10 +55,19 @@ data class MinionSettings1(
                 "work" to Color("#D34807")
             )
         )
-    }}}
+    }
+}}
 
 @Serializable
 data class SettingsVersion(
     val version: String
 )
 
+@Serializable
+enum class PageTaskFieldType {
+    TAG,
+    DATAVIEW
+}
+
+@Serializable
+data class PageTaskField(val field: DataviewField, val type: PageTaskFieldType)

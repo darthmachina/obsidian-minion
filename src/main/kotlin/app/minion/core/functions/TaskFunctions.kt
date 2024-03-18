@@ -3,6 +3,12 @@ package app.minion.core.functions
 import app.minion.core.MinionError
 import app.minion.core.functions.MarkdownConversionFunctions.Companion.completeAsMarkdown
 import app.minion.core.functions.RepeatingTaskFunctions.Companion.maybeRepeat
+import app.minion.core.functions.TaskFunctions.Companion.maybeAddDataviewValues
+import app.minion.core.model.DataviewField
+import app.minion.core.model.DataviewValue
+import app.minion.core.model.MinionSettings
+import app.minion.core.model.PageTaskFieldType
+import app.minion.core.model.Tag
 import app.minion.core.model.Task
 import app.minion.core.store.ReducerFunctions.Companion.replaceTask
 import arrow.core.Either
@@ -58,5 +64,34 @@ interface TaskFunctions { companion object {
                 it
             }
         }
+    }
+
+    fun List<Task>.maybeAddDataviewValues(settings: MinionSettings, dataview: Map<DataviewField, DataviewValue>)
+    : Either<MinionError, List<Task>> = either {
+        if (settings.pageTaskFields.isEmpty()) {
+            this@maybeAddDataviewValues
+        } else {
+            this@maybeAddDataviewValues
+                .map { task ->
+                    task.copy(
+                        tags = task.tags.maybeAddDataviewTags(settings, dataview).bind(),
+                    )
+                }
+        }
+    }
+
+    fun Set<Tag>.maybeAddDataviewTags(settings: MinionSettings, dataview: Map<DataviewField, DataviewValue>)
+    : Either<MinionError, Set<Tag>> = either {
+        settings
+            .pageTaskFields
+            .filter { it.type == PageTaskFieldType.TAG }
+            .map { it.field }
+            .let { fields ->
+                dataview.filter { fields.contains(it.key) }
+            }
+            .map { Tag(it.value.v.drop(1)) } // value contains #, drop it
+            .let {
+                this@maybeAddDataviewTags.plus(it)
+            }
     }
 }}

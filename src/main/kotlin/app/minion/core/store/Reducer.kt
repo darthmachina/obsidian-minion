@@ -24,7 +24,8 @@ fun reducer(state: State, action: Action) : State =
             val newSettings = state.settings.copy(
                 lifeAreas = action.lifeAreas.getOrElse { state.settings.lifeAreas },
                 excludeFolders = action.excludeFolders.getOrElse { state.settings.excludeFolders },
-                logLevel = action.logLevel.getOrElse { state.settings.logLevel }
+                logLevel = action.logLevel.getOrElse { state.settings.logLevel },
+                pageTaskFields = action.pageTaskFields.getOrElse { state.settings.pageTaskFields }
             )
             logger.debug { "new Settings: $newSettings" }
             action.logLevel.map {
