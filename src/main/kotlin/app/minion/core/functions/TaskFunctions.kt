@@ -75,22 +75,23 @@ interface TaskFunctions { companion object {
                 .map { task ->
                     task.copy(
                         tags = task.tags.maybeAddDataviewTags(settings, dataview).bind(),
-
                     )
                 }
-            this@maybeAddDataviewValues
         }
     }
 
     fun Set<Tag>.maybeAddDataviewTags(settings: MinionSettings, dataview: Map<DataviewField, DataviewValue>)
     : Either<MinionError, Set<Tag>> = either {
-        if (settings.pageTaskFields.any { taskField -> taskField.type == PageTaskFieldType.TAG }) {
-            // Add any referenced tags
-            this@maybeAddDataviewTags
-        } else {
-            this@maybeAddDataviewTags
-        }
+        settings
+            .pageTaskFields
+            .filter { it.type == PageTaskFieldType.TAG }
+            .map { it.field }
+            .let { fields ->
+                dataview.filter { fields.contains(it.key) }
+            }
+            .map { Tag(it.value.v.drop(1)) } // value contains #, drop it
+            .let {
+                this@maybeAddDataviewTags.plus(it)
+            }
     }
-
-
 }}

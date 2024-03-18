@@ -4,9 +4,13 @@ import App
 import MinionPlugin
 import PluginSettingTab
 import Setting
+import app.minion.core.model.DataviewField
+import app.minion.core.model.PageTaskField
+import app.minion.core.model.PageTaskFieldType
 import app.minion.core.store.Action
 import app.minion.core.store.MinionStore
 import arrow.core.some
+import arrow.core.toOption
 import io.kvision.core.Color
 import kotlinx.html.dom.append
 import kotlinx.html.h2
@@ -32,8 +36,8 @@ class MinionSettingsTab(
         createLogLevelSettings(containerEl)
     }
 
-    private fun createListAreaColorListSetting(containerEl: HTMLElement) : Setting {
-        return Setting(containerEl)
+    private fun createListAreaColorListSetting(containerEl: HTMLElement) {
+        Setting(containerEl)
             .setName("Life Area Colors")
             .setDesc("List of colors to use for Life Areas")
             .addTextArea { text ->
@@ -54,8 +58,8 @@ class MinionSettingsTab(
             }
     }
 
-    private fun createExcludeFoldersSetting(containerEl: HTMLElement) : Setting {
-        return Setting(containerEl)
+    private fun createExcludeFoldersSetting(containerEl: HTMLElement) {
+        Setting(containerEl)
             .setName("Excluded folders")
             .setDesc("Folders to exclude from processing")
             .addTextArea { text ->
@@ -73,8 +77,8 @@ class MinionSettingsTab(
             }
     }
 
-    private fun createLogLevelSettings(containerEl: HTMLElement): Setting {
-        return Setting(containerEl)
+    private fun createLogLevelSettings(containerEl: HTMLElement) {
+        Setting(containerEl)
             .setName("Log Level")
             .setDesc("Set the log level")
             .addDropdown { dropdown ->
@@ -86,6 +90,28 @@ class MinionSettingsTab(
                     logger.debug { "onChange(): $it" }
                     store.dispatch(Action.UpdateSettings(logLevel = KotlinLoggingLevel.valueOf(it).some()))
                 }
+            }
+    }
+
+    private fun createPageTaskFieldSettings(containerEl: HTMLElement) {
+        Setting(containerEl)
+            .setName("Page Task Tag Fields")
+            .setDesc("Page level Dataview fields containing Task tags")
+            .addTextArea { text ->
+                text
+                    .setPlaceholder("Dataview fields separated by newlines")
+                    .setValue(store.store.state.settings.pageTaskFields.map { it.field.v }.joinToString("\n"))
+                    .onChange { value ->
+                        value
+                            .split("\n")
+                            .map {
+                                PageTaskField(DataviewField(it), PageTaskFieldType.TAG)
+                            }
+                            .let {
+                                logger.debug { "Dispatching UpdateSettings: $it" }
+                                store.dispatch(Action.UpdateSettings(pageTaskFields = it.some()))
+                            }
+                    }
             }
     }
 }

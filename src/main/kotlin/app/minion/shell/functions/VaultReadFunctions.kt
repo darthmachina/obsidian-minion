@@ -5,6 +5,7 @@ import MinionPlugin
 import TFile
 import Vault
 import app.minion.core.MinionError
+import app.minion.core.functions.TaskFunctions.Companion.maybeAddDataviewValues
 import app.minion.core.model.DataviewField
 import app.minion.core.model.DataviewValue
 import app.minion.core.model.File
@@ -238,8 +239,7 @@ data class StateAccumulator(
     fun addTasks(tasks: List<Task>, dataview: Map<DataviewField, DataviewValue>, settings: MinionSettings)
     : Either<MinionError, StateAccumulator> = either {
         logger.debug { "addTasks()" }
-        if (settings.pageTaskFields.isNotEmpty())
-        this@StateAccumulator.tasks.addAll(tasks)
+        this@StateAccumulator.tasks.addAll(tasks.maybeAddDataviewValues(settings, dataview).bind())
         this@StateAccumulator
     }
 
