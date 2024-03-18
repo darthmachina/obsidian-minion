@@ -12,8 +12,11 @@ import app.minion.core.store.MinionStore
 import arrow.core.some
 import arrow.core.toOption
 import io.kvision.core.Color
+import kotlinx.html.div
 import kotlinx.html.dom.append
 import kotlinx.html.h2
+import kotlinx.html.hr
+import kotlinx.html.span
 import mu.KotlinLogging
 import mu.KotlinLoggingLevel
 import org.w3c.dom.HTMLElement
@@ -34,6 +37,12 @@ class MinionSettingsTab(
         createListAreaColorListSetting(containerEl)
         createExcludeFoldersSetting(containerEl)
         createLogLevelSettings(containerEl)
+        createPageTaskFieldSettings(containerEl)
+        containerEl.append.div {
+            hr {  }
+            span(classes = "mi-bold") { +"Note: " }
+            span { +"Items marked with a * require a plugin restart" }
+        }
     }
 
     private fun createListAreaColorListSetting(containerEl: HTMLElement) {
@@ -60,7 +69,7 @@ class MinionSettingsTab(
 
     private fun createExcludeFoldersSetting(containerEl: HTMLElement) {
         Setting(containerEl)
-            .setName("Excluded folders")
+            .setName("Excluded folders*")
             .setDesc("Folders to exclude from processing")
             .addTextArea { text ->
                 val textVersion = store.store.state.settings.excludeFolders.joinToString("\n")
@@ -95,7 +104,7 @@ class MinionSettingsTab(
 
     private fun createPageTaskFieldSettings(containerEl: HTMLElement) {
         Setting(containerEl)
-            .setName("Page Task Tag Fields")
+            .setName("Page Task Tag Fields*")
             .setDesc("Page level Dataview fields containing Task tags")
             .addTextArea { text ->
                 text
