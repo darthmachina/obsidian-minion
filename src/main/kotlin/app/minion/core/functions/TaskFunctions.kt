@@ -68,7 +68,9 @@ interface TaskFunctions { companion object {
 
     fun List<Task>.maybeAddDataviewValues(settings: MinionSettings, dataview: Map<DataviewField, DataviewValue>)
     : Either<MinionError, List<Task>> = either {
+        logger.debug { "maybeAddDataviewValues\n$settings\n$dataview" }
         if (settings.pageTaskFields.isEmpty()) {
+            logger.debug { "Empty settings" }
             this@maybeAddDataviewValues
         } else {
             this@maybeAddDataviewValues
@@ -82,6 +84,7 @@ interface TaskFunctions { companion object {
 
     fun Set<Tag>.maybeAddDataviewTags(settings: MinionSettings, dataview: Map<DataviewField, DataviewValue>)
     : Either<MinionError, Set<Tag>> = either {
+        logger.debug { "maybeAddDataviewTags" }
         settings
             .pageTaskFields
             .filter { it.type == PageTaskFieldType.TAG }
@@ -91,6 +94,7 @@ interface TaskFunctions { companion object {
             }
             .map { Tag(it.value.v.drop(1)) } // value contains #, drop it
             .let {
+                logger.debug { "Adding $it to tag set" }
                 this@maybeAddDataviewTags.plus(it)
             }
     }

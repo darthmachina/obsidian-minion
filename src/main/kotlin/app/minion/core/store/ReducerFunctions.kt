@@ -1,6 +1,8 @@
 package app.minion.core.store
 
 import app.minion.core.MinionError
+import app.minion.core.functions.FileDataFunctions.Companion.addPageTags
+import app.minion.core.functions.TaskFunctions.Companion.maybeAddDataviewValues
 import app.minion.core.functions.TaskFunctions.Companion.replaceTask
 import app.minion.core.model.FileData
 import app.minion.core.model.Task
@@ -23,7 +25,12 @@ interface ReducerFunctions { companion object {
             tagCache = fileData.addToTagCache(this@replaceDataForFile.tagCache),
             dataviewCache = fileData.addToDataviewCache(this@replaceDataForFile.dataviewCache),
             backlinkCache = fileData.addToBacklinkCache(this@replaceDataForFile.backlinkCache),
-            tasks = fileData.replaceTasks(this@replaceDataForFile.tasks),
+            tasks = this@replaceDataForFile
+                .tasks
+                .replaceTasks(
+                    fileData
+                        .addPageTags(this@replaceDataForFile.settings, fileData.dataview).bind()
+                ),
             error = None
         )
     }
