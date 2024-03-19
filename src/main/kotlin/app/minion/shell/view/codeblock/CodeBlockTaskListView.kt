@@ -15,6 +15,7 @@ import app.minion.shell.thunk.TaskThunks
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputHeading
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputTaskStats
+import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.maybeAddProperties
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.removeConfigTags
@@ -23,6 +24,7 @@ import app.minion.shell.view.iconMenu
 import app.minion.shell.view.iconRepeat
 import app.minion.shell.view.modal.KanbanStatusSelectModal
 import arrow.core.Option
+import arrow.core.toOption
 import io.kvision.state.sub
 import kotlinx.dom.clear
 import kotlinx.html.FlowContent
@@ -49,7 +51,7 @@ interface CodeBlockTaskListView { companion object {
         store
             .sub { it.error }
             .subscribe { error ->
-                error.map { showError(it, this) }
+                error.map { this.showError(it) }
             }
 
         val updatedConfig = config.maybeAddProperties()
@@ -62,12 +64,6 @@ interface CodeBlockTaskListView { companion object {
                         updateTasks(it, this, store, updatedConfig)
                     }
             }
-
-    }
-
-    fun showError(error: MinionError, element: HTMLElement) {
-        element.clear()
-        element.append.div { +error.message }
     }
 
     fun updateTasks(tasks: Map<String, List<Task>>, element: HTMLElement, store: MinionStore, config: CodeBlockConfig) {
@@ -77,13 +73,47 @@ interface CodeBlockTaskListView { companion object {
         }
 
         if (tasks.isNotEmpty()) {
-            tasks.forEach { task ->
-                element.append.div(classes = "mi-codeblock-task") {
-                    outputTask(task.value, store, config)
+            element.append.div {
+                if (config.groupByOrder.isEmpty()) {
+                    tasks.forEach { entry ->
+                        outputGroup(entry.key, entry.value, config, store)
+                    }
+                } else {
+                    config.groupByOrder.forEach { group ->
+                        tasks[group]
+                            .toOption().toEither {
+                                MinionError.GroupByNotFoundError("$group not found in results")
+                            }
+                            .map { outputGroup(group, it, config, store) }
+                            .mapLeft { logger.warn { "$it" } }
+                    }
                 }
             }
         }
         element.outputTaskStats(tasks)
+    }
+
+    fun FlowContent.outputGroup(label: String, tasks: List<Task>, config: CodeBlockConfig, store: MinionStore) {
+        if (label == GROUP_BY_SINGLE) {
+            outputTaskList(tasks, config, store)
+        } else {
+            ul {
+                li {
+                    +label
+                    outputTaskList(tasks, config, store)
+                }
+            }
+        }
+    }
+
+    fun FlowContent.outputTaskList(tasks: List<Task>, config: CodeBlockConfig, store: MinionStore) {
+        div {
+            tasks.forEach { task ->
+                div(classes = "mi-codeblock-task") {
+                    outputTask(task, store, config)
+                }
+            }
+        }
     }
 
     fun FlowContent.outputTask(task: Task, store: MinionStore, config: CodeBlockConfig) {
