@@ -16,10 +16,10 @@ interface StateFunctions { companion object {
         }
     }
 
-    fun FileData.replaceTasks(tasks: List<Task>) : List<Task> {
-        return tasks
-            .filter { task -> task.fileInfo.file != this.name }
-            .plus(this.tasks)
+    fun List<Task>.replaceTasks(fileData: FileData) : List<Task> {
+        return this
+            .filter { task -> task.fileInfo.file != fileData.name }
+            .plus(fileData.tasks)
     }
 
     fun FileData.addToTagCache(tagCache: Map<Tag, Set<Filename>>) : Map<Tag, Set<Filename>> {
