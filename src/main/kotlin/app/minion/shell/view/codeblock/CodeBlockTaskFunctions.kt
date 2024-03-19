@@ -9,6 +9,13 @@ import app.minion.core.model.Tag
 import app.minion.core.model.Task
 
 interface CodeBlockTaskFunctions { companion object {
+    fun List<Task>.applyCodeBlockConfig(config: CodeBlockConfig) : List<Task> {
+        return this
+            .applyDue(config)
+            .applyIncludeTags(config)
+            .applyExcludeTags(config)
+    }
+
     fun List<Task>.applyDue(config: CodeBlockConfig) : List<Task> {
         return if (config.due.contains(DueOptions.today) && config.due.contains(DueOptions.overdue)) {
             this.filterByTodayOrOverdue()

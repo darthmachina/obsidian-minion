@@ -9,6 +9,7 @@ import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions
 import app.minion.shell.view.ViewFunctions.Companion.getWikilinkResourcePath
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
+import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockPageGalleryView.Companion.addPageGalleryView
 import app.minion.shell.view.iconGroup
@@ -32,7 +33,7 @@ interface CodeBlockPageGalleryView { companion object {
         store
             .sub { it.error }
             .subscribe { error ->
-                error.map { showError(it, this) }
+                error.map { this.showError(it) }
             }
         store
             .sub { it.applyCodeBlockConfig(config) }
@@ -40,13 +41,8 @@ interface CodeBlockPageGalleryView { companion object {
                 logger.debug { "Page list updated, running updatePages(): $pages" }
                 pages
                     .map { updatePages(it, this, store, config) }
-                    .mapLeft { showError(it, this) }
+                    .mapLeft { this.showError(it) }
             }
-    }
-
-    fun showError(error: MinionError, element: HTMLElement) {
-        element.clear()
-        element.append.div { +error.message }
     }
 
     fun updatePages(

@@ -10,6 +10,7 @@ import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions.Companion.openSourceFile
 import app.minion.shell.thunk.TaskThunks
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
+import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyDue
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyExcludeTags
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyIncludeTags
@@ -202,12 +203,5 @@ interface CodeBlockTaskListView { companion object {
         this.append.div(classes = "mi-codeblock-item-count") {
             +"Task Count: ${tasks.size}"
         }
-    }
-
-    fun List<Task>.applyCodeBlockConfig(config: CodeBlockConfig) : List<Task> {
-        return this
-            .applyDue(config)
-            .applyIncludeTags(config)
-            .applyExcludeTags(config)
     }
 }}
