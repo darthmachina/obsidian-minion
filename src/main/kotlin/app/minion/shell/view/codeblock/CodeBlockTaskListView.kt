@@ -10,10 +10,9 @@ import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions.Companion.openSourceFile
 import app.minion.shell.thunk.TaskThunks
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
+import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputHeading
+import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputTaskStats
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyCodeBlockConfig
-import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyDue
-import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyExcludeTags
-import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyIncludeTags
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.maybeAddProperties
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.removeConfigTags
 import app.minion.shell.view.iconKanban
@@ -67,9 +66,7 @@ interface CodeBlockTaskListView { companion object {
     fun updateTasks(tasks: List<Task>, element: HTMLElement, store: MinionStore, config: CodeBlockConfig) {
         element.clear()
         if (config.heading.isNotEmpty()) {
-            element.append.div(classes = "mi-codeblock-heading") {
-                +config.heading
-            }
+            element.outputHeading(config.heading)
         }
 
         tasks.forEach { task ->
@@ -77,7 +74,7 @@ interface CodeBlockTaskListView { companion object {
                 outputTask(task, store, config)
             }
         }
-        element.outputStats(tasks)
+        element.outputTaskStats(tasks)
     }
 
     fun FlowContent.outputTask(task: Task, store: MinionStore, config: CodeBlockConfig) {
@@ -196,12 +193,6 @@ interface CodeBlockTaskListView { companion object {
                     }
                 }
             }
-        }
-    }
-
-    fun HTMLElement.outputStats(tasks: List<Task>) {
-        this.append.div(classes = "mi-codeblock-item-count") {
-            +"Task Count: ${tasks.size}"
         }
     }
 }}

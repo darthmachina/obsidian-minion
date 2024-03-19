@@ -2,10 +2,15 @@ package app.minion.shell.view.codeblock
 
 import app.minion.core.model.Task
 import app.minion.core.store.MinionStore
+import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputHeading
+import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputTaskStats
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.maybeAddProperties
 import io.kvision.state.sub
+import kotlinx.dom.clear
+import kotlinx.html.dom.append
+import kotlinx.html.js.div
 import mu.KotlinLogging
 import org.w3c.dom.HTMLElement
 
@@ -29,6 +34,17 @@ interface CodeBlockTaskGalleryView { companion object {
     }
 
     fun HTMLElement.updateTasks(tasks: List<Task>, store: MinionStore, config: CodeBlockConfig) {
+        this.clear()
+        if (config.heading.isNotEmpty()) {
+            this.outputHeading(config.heading)
+        }
 
+        tasks.forEach { task ->
+            this.append.div {
+
+            }
+        }
+
+        this.outputTaskStats(tasks)
     }
 }}
