@@ -1,6 +1,7 @@
 package app.minion.shell.view.codeblock
 
 import app.minion.core.MinionError
+import app.minion.core.functions.StatisticsFunctions.Companion.calculateTotalCount
 import app.minion.core.model.Task
 import kotlinx.dom.clear
 import kotlinx.html.div
@@ -19,9 +20,9 @@ interface CodeBlockFunctions { companion object {
         }
     }
 
-    fun HTMLElement.outputTaskStats(tasks: List<Task>) {
+    fun HTMLElement.outputTaskStats(tasks: Map<String, List<Task>>) {
         this.append.div(classes = "mi-codeblock-item-count") {
-            +"Task Count: ${tasks.size}"
+            +"Task Count: ${tasks.calculateTotalCount()}"
         }
     }
 }}
