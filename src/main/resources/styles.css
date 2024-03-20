@@ -158,8 +158,14 @@
     flex-direction: column;
 }
 
-.mi-codeblock-card-title {
+.mi-codeblock-card-title-container {
     font-weight: bolder;
+    display: flex;
+    padding: 10px;
+}
+
+.mi-codeblock-card-title {
+    flex: 1;
 }
 
 .mi-codeblock-card-description {
