@@ -153,6 +153,31 @@
     grid-gap: 5px;
 }
 
+.mi-codeblock-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.mi-codeblock-card-title {
+    font-weight: bolder;
+}
+
+.mi-codeblock-card-description {
+
+}
+
+.mi-codeblock-card-properties {
+
+}
+
+.mi-codeblock-card-properties-label {
+
+}
+
+.mi-codeblock-card-properties-value {
+
+}
+
 .mi-codeblock-page-gallery > div {
     background-color: #303030;
     margin-bottom: 10px;
@@ -161,7 +186,6 @@
 .mi-codeblock-page-gallery-title {
     display: flex;
     padding: 10px;
-    align-items: end;
 }
 
 .mi-codeblock-page-gallery-title > span:first-of-type {
@@ -185,7 +209,7 @@
 }
 
 .mi-codeblock-cover-image-container {
-    margin-bottom: -11px;
+    min-height: 126px;
 }
 
 .mi-codeblock-cover-image {
@@ -206,7 +230,7 @@
     position: absolute;
     background-color: #252525;
     min-width: 25px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
     z-index: 1;
     right: 15px;
     top: -1px
