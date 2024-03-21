@@ -38,6 +38,10 @@
     cursor: pointer;
 }
 
+input[type=checkbox] {
+    margin-bottom: -2px;
+}
+
 .mi-codeblock {
 
 }
@@ -122,7 +126,7 @@
 }
 
 .mi-codeblock-task-subtask-content {
-
+    font-size: 0.85em;
 }
 
 .mi-codeblock-task-notes {
@@ -153,15 +157,51 @@
     grid-gap: 5px;
 }
 
-.mi-codeblock-page-gallery > div {
-    background-color: #303030;
+.mi-codeblock-card {
+    display: flex;
+    flex-direction: column;
+    background-color: #252525;
     margin-bottom: 10px;
+}
+
+.mi-codeblock-card-title-container {
+    background-color: #303030;
+    font-weight: bolder;
+    display: flex;
+    padding: 10px 10px 0 10px;
+}
+
+.mi-codeblock-card-title {
+    flex: 1;
+}
+
+.mi-codeblock-card-description {
+    background-color: #303030;
+    padding-top: 4px;
+    padding-bottom: 6px;
+
+}
+
+.mi-codeblock-card-properties {
+    background-color: #252525;
+    display: grid;
+    row-gap: 3px;
+    grid-template-columns: 2fr 3fr;
+    padding: 5px 10px;
+    font-size: 0.75em;
+}
+
+.mi-codeblock-card-properties-label {
+
+}
+
+.mi-codeblock-card-properties-value {
+
 }
 
 .mi-codeblock-page-gallery-title {
     display: flex;
     padding: 10px;
-    align-items: end;
 }
 
 .mi-codeblock-page-gallery-title > span:first-of-type {
@@ -185,7 +225,7 @@
 }
 
 .mi-codeblock-cover-image-container {
-    margin-bottom: -11px;
+    min-height: 126px;
 }
 
 .mi-codeblock-cover-image {
@@ -206,10 +246,10 @@
     position: absolute;
     background-color: #252525;
     min-width: 25px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
     z-index: 1;
     right: 15px;
-    top: -1px
+    top: 1px
 }
 
 .mi-codeblock-menu a {

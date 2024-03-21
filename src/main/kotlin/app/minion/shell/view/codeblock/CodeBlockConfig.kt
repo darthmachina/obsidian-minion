@@ -76,3 +76,4 @@ const val PROPERTY_DUE = "due"
 const val FIELD_IMAGE = "Image"
 
 const val GROUP_BY_SINGLE = "!!single!!"
+const val GROUP_BY_UNKNOWN = "Not Grouped"

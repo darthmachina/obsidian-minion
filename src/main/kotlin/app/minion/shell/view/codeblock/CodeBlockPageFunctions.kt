@@ -1,7 +1,11 @@
 package app.minion.shell.view.codeblock
 
 import app.minion.core.MinionError
-import app.minion.core.model.*
+import app.minion.core.model.DataviewField
+import app.minion.core.model.DataviewValue
+import app.minion.core.model.FileData
+import app.minion.core.model.Filename
+import app.minion.core.model.Tag
 import app.minion.core.store.State
 import arrow.core.Either
 import arrow.core.flatten
@@ -29,12 +33,14 @@ interface CodeBlockPageFunctions { companion object {
             .toSet()
     }
 
-    fun Set<Filename>.applyInclude(tagCache: Map<Tag, Set<Filename>>, config: CodeBlockConfig) : Either<MinionError, Set<Filename>> = either {
+    fun Set<Filename>.applyInclude(tagCache: Map<Tag, Set<Filename>>, config: CodeBlockConfig)
+    : Either<MinionError, Set<Filename>> = either {
         this@applyInclude
             .applyIncludeTags(tagCache, config).bind()
     }
 
-    fun Set<Filename>.applyIncludeTags(tagCache: Map<Tag, Set<Filename>>, config: CodeBlockConfig) : Either<MinionError, Set<Filename>> = either {
+    fun Set<Filename>.applyIncludeTags(tagCache: Map<Tag, Set<Filename>>, config: CodeBlockConfig)
+    : Either<MinionError, Set<Filename>> = either {
         if (config.include.tags.isNotEmpty()) {
             tagCache
                 .findFilesMatchingTags(config.include.tags.toSet()).bind()
@@ -76,7 +82,8 @@ interface CodeBlockPageFunctions { companion object {
     /**
      * Groups a Set of FileData by the criteria specified in the config
      */
-    fun Set<FileData>.applyGroupByForDataview(config: CodeBlockConfig) : Either<MinionError, Map<DataviewValue, Set<FileData>>> = either {
+    fun Set<FileData>.applyGroupByForDataview(config: CodeBlockConfig)
+    : Either<MinionError, Map<DataviewValue, Set<FileData>>> = either {
         if (config.groupBy == GroupByOptions.NONE) {
             raise(MinionError.ConfigError("applyGroupBy called with no groupBy specified"))
         }

@@ -1,6 +1,7 @@
 package app.minion.core.functions
 
 import app.minion.core.functions.DateTimeFunctions.Companion.asString
+import app.minion.core.functions.TaskTagFunctions.Companion.asString
 import app.minion.core.model.DateTime
 import app.minion.core.model.RepeatInfo
 import app.minion.core.model.Task
@@ -19,7 +20,7 @@ interface MarkdownConversionFunctions { companion object {
         markdownElements.add(if (completedOn.isSome()) "- [x]" else "- [ ]")
         markdownElements.add(content.v)
         if (tags.isNotEmpty()) {
-            markdownElements.add(tags.joinToString(" ") { tag -> "#${tag.v}"})
+            markdownElements.add(tags.asString())
         }
         dueDate.map { markdownElements.add("${it.toMarkdown("due")} ") }
         hideUntil.map { markdownElements.add("${it.toMarkdown("hide")} ") }

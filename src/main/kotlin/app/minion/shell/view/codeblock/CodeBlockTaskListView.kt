@@ -5,20 +5,26 @@ import app.minion.core.functions.DateTimeFunctions.Companion.asString
 import app.minion.core.functions.DateTimeFunctions.Companion.isInPast
 import app.minion.core.functions.TaskStatisticsFunctions.Companion.completedSubtaskPercent
 import app.minion.core.functions.TaskTagFunctions.Companion.collectTags
+import app.minion.core.model.DateTime
+import app.minion.core.model.ListItemFileInfo
+import app.minion.core.model.Tag
 import app.minion.core.model.Task
 import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions.Companion.openSourceFile
 import app.minion.shell.thunk.TaskThunks
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
-import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyDue
-import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyExcludeTags
-import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyIncludeTags
+import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputHeading
+import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputTaskStats
+import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
+import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.maybeAddProperties
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.removeConfigTags
 import app.minion.shell.view.iconKanban
 import app.minion.shell.view.iconMenu
 import app.minion.shell.view.iconRepeat
 import app.minion.shell.view.modal.KanbanStatusSelectModal
+import arrow.core.Option
+import arrow.core.toOption
 import io.kvision.state.sub
 import kotlinx.dom.clear
 import kotlinx.html.FlowContent
@@ -45,7 +51,7 @@ interface CodeBlockTaskListView { companion object {
         store
             .sub { it.error }
             .subscribe { error ->
-                error.map { showError(it, this) }
+                error.map { this.showError(it) }
             }
 
         val updatedConfig = config.maybeAddProperties()
@@ -53,30 +59,61 @@ interface CodeBlockTaskListView { companion object {
             .sub { it.tasks.applyCodeBlockConfig(updatedConfig) }
             .subscribe { tasks ->
                 logger.debug { "Task list updated, running updateTasks(): $tasks" }
-                updateTasks(tasks, this, store, updatedConfig)
+                tasks
+                    .map {
+                        updateTasks(it, this, store, updatedConfig)
+                    }
             }
-
     }
 
-    fun showError(error: MinionError, element: HTMLElement) {
-        element.clear()
-        element.append.div { +error.message }
-    }
-
-    fun updateTasks(tasks: List<Task>, element: HTMLElement, store: MinionStore, config: CodeBlockConfig) {
+    fun updateTasks(tasks: Map<String, List<Task>>, element: HTMLElement, store: MinionStore, config: CodeBlockConfig) {
         element.clear()
         if (config.heading.isNotEmpty()) {
-            element.append.div(classes = "mi-codeblock-heading") {
-                +config.heading
-            }
+            element.outputHeading(config.heading)
         }
 
-        tasks.forEach { task ->
-            element.append.div(classes = "mi-codeblock-task") {
-                outputTask(task, store, config)
+        if (tasks.isNotEmpty()) {
+            element.append.div {
+                if (config.groupByOrder.isEmpty()) {
+                    tasks.forEach { entry ->
+                        outputGroup(entry.key, entry.value, config, store)
+                    }
+                } else {
+                    config.groupByOrder.forEach { group ->
+                        tasks[group]
+                            .toOption().toEither {
+                                MinionError.GroupByNotFoundError("$group not found in results")
+                            }
+                            .map { outputGroup(group, it, config, store) }
+                            .mapLeft { logger.warn { "$it" } }
+                    }
+                }
             }
         }
-        element.outputStats(tasks)
+        element.outputTaskStats(tasks)
+    }
+
+    fun FlowContent.outputGroup(label: String, tasks: List<Task>, config: CodeBlockConfig, store: MinionStore) {
+        if (label == GROUP_BY_SINGLE) {
+            outputTaskList(tasks, config, store)
+        } else {
+            ul {
+                li {
+                    +label
+                    outputTaskList(tasks, config, store)
+                }
+            }
+        }
+    }
+
+    fun FlowContent.outputTaskList(tasks: List<Task>, config: CodeBlockConfig, store: MinionStore) {
+        div {
+            tasks.forEach { task ->
+                div(classes = "mi-codeblock-task") {
+                    outputTask(task, store, config)
+                }
+            }
+        }
     }
 
     fun FlowContent.outputTask(task: Task, store: MinionStore, config: CodeBlockConfig) {
@@ -95,12 +132,7 @@ interface CodeBlockTaskListView { companion object {
         span(classes = "mi-codeblock-task-content") {
             if (config.properties.contains(PROPERTY_DUE)) {
                 task.dueDate.map { due ->
-                    span(classes = "mi-codeblock-task-content-due") {
-                        if (due.isInPast()) {
-                            style = "color: crimson"
-                        }
-                        +"[${due.asString()}]"
-                    }
+                    outputDue(due)
                 }
             }
             span {
@@ -109,13 +141,7 @@ interface CodeBlockTaskListView { companion object {
             if (config.properties.contains(PROPERTY_TAGS)) {
                 with(task.collectTags()) {
                     if (isNotEmpty()) {
-                        span(classes = "mi-codeblock-task-content-tags") {
-                            this@with
-                                .removeConfigTags(config)
-                                .forEach { tag ->
-                                    span(classes = "mi-codeblock-task-content-tags-tag") { +"#${tag.v}" }
-                                }
-                        }
+                        outputTags(this, config)
                     }
                 }
             }
@@ -126,16 +152,7 @@ interface CodeBlockTaskListView { companion object {
                 }
             }
             if (config.properties.contains(PROPERTY_SOURCE)) {
-                span(classes = "mi-codeblock-task-source") {
-                    span { +"(" }
-                    span(classes = "mi-codeblock-source-link") {
-                        +task.fileInfo.file.v
-                        onClickFunction = {
-                            openSourceFile(task.fileInfo.file, store.store.state.plugin.app)
-                        }
-                    }
-                    span { +")" }
-                }
+                outputSource(task.fileInfo, store)
             }
             task.completedSubtaskPercent()
                 .map { percent ->
@@ -160,6 +177,38 @@ interface CodeBlockTaskListView { companion object {
                     }
                 }
             }
+        }
+    }
+
+    fun FlowContent.outputDue(due: DateTime) {
+        span(classes = "mi-codeblock-task-content-due") {
+            if (due.isInPast()) {
+                style = "color: crimson"
+            }
+            +"[${due.asString()}]"
+        }
+    }
+
+    fun FlowContent.outputTags(tags: Set<Tag>, config: CodeBlockConfig) {
+        span(classes = "mi-codeblock-task-content-tags") {
+            tags
+                .removeConfigTags(config)
+                .forEach { tag ->
+                    span(classes = "mi-codeblock-task-content-tags-tag") { +"#${tag.v}" }
+                }
+        }
+    }
+
+    fun FlowContent.outputSource(fileInfo: ListItemFileInfo, store: MinionStore) {
+        span(classes = "mi-codeblock-task-source") {
+            span { +"(" }
+            span(classes = "mi-codeblock-source-link") {
+                +fileInfo.file.v
+                onClickFunction = {
+                    openSourceFile(fileInfo.file, store.store.state.plugin.app)
+                }
+            }
+            span { +")" }
         }
     }
 
@@ -196,18 +245,5 @@ interface CodeBlockTaskListView { companion object {
                 }
             }
         }
-    }
-
-    fun HTMLElement.outputStats(tasks: List<Task>) {
-        this.append.div(classes = "mi-codeblock-item-count") {
-            +"Task Count: ${tasks.size}"
-        }
-    }
-
-    fun List<Task>.applyCodeBlockConfig(config: CodeBlockConfig) : List<Task> {
-        return this
-            .applyDue(config)
-            .applyIncludeTags(config)
-            .applyExcludeTags(config)
     }
 }}
