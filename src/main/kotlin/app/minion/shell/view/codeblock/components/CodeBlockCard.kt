@@ -155,7 +155,6 @@ interface CodeBlockCard { companion object {
             // Title
             div(classes = "mi-codeblock-card-title-container") {
                 span(classes = "mi-codeblock-card-title") { title() }
-                outputCardMenu(menuItems)
                 if (config.groupBy != GroupByOptions.NONE) {
                     outputCardMenu(menuItems)
                 }
