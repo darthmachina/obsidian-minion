@@ -3,8 +3,11 @@ package app.minion.shell.view.codeblock.components
 import app.minion.core.MinionError
 import app.minion.core.model.DataviewField
 import app.minion.core.model.FileData
+import app.minion.core.model.Task
 import app.minion.core.store.MinionStore
+import app.minion.shell.thunk.TaskThunks
 import app.minion.shell.view.ViewFunctions.Companion.getWikilinkResourcePath
+import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.codeblock.CodeBlockConfig
 import app.minion.shell.view.codeblock.FIELD_IMAGE
 import app.minion.shell.view.iconGroup
@@ -15,6 +18,7 @@ import arrow.core.raise.either
 import arrow.core.toOption
 import kotlinx.html.FlowContent
 import kotlinx.html.a
+import kotlinx.html.checkBoxInput
 import kotlinx.html.div
 import kotlinx.html.js.onClickFunction
 import kotlinx.html.span
@@ -34,6 +38,29 @@ interface CodeBlockCardFunctions { companion object {
                     )
                     .bind()
             }.bind()
+    }
+
+    fun FlowContent.outputSubtasks(task: Task, store: MinionStore) {
+        task.subtasks.forEach { subtask ->
+            if (!subtask.completed) {
+                div(classes = "mi-codeblock-task-subtask") {
+                    checkBoxInput {
+                        onClickFunction = {
+                            store.dispatch(
+                                (TaskThunks.completeSubtask(
+                                    store.store.state.plugin.app,
+                                    task,
+                                    subtask
+                                ))
+                            )
+                        }
+                    }
+                    span(classes = "mi-codeblock-task-subtask-content") {
+                        outputStyledContent(subtask.content, store)
+                    }
+                }
+            }
+        }
     }
 
     fun FlowContent.outputCardMenu(menuItems: List<FlowContent.() -> Unit> ) {

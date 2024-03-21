@@ -46,4 +46,8 @@ interface TaskTagFunctions { companion object {
         this@addTag
             .copy(tags = this@addTag.tags.plus(tag))
     }
+
+    fun Set<Tag>.asString() : String {
+        return this.joinToString(" ") { tag -> "#${tag.v}" }
+    }
 }}

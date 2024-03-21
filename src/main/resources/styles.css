@@ -38,6 +38,10 @@
     cursor: pointer;
 }
 
+input[type=checkbox] {
+    margin-bottom: -2px;
+}
+
 .mi-codeblock {
 
 }
@@ -122,7 +126,7 @@
 }
 
 .mi-codeblock-task-subtask-content {
-
+    font-size: 0.85em;
 }
 
 .mi-codeblock-task-notes {
@@ -156,6 +160,8 @@
 .mi-codeblock-card {
     display: flex;
     flex-direction: column;
+    background-color: #252525;
+    margin-bottom: 10px;
 }
 
 .mi-codeblock-card-title-container {
@@ -165,15 +171,22 @@
 }
 
 .mi-codeblock-card-title {
+    background-color: #303030;
     flex: 1;
 }
 
 .mi-codeblock-card-description {
+    background-color: #303030;
 
 }
 
 .mi-codeblock-card-properties {
-
+    background-color: #252525;
+    display: grid;
+    row-gap: 3px;
+    grid-template-columns: 2fr 3fr;
+    padding: 5px 10px;
+    font-size: 0.75em;
 }
 
 .mi-codeblock-card-properties-label {
@@ -182,11 +195,6 @@
 
 .mi-codeblock-card-properties-value {
 
-}
-
-.mi-codeblock-page-gallery > div {
-    background-color: #303030;
-    margin-bottom: 10px;
 }
 
 .mi-codeblock-page-gallery-title {
