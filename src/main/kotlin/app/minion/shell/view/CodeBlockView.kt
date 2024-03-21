@@ -10,6 +10,7 @@ import app.minion.shell.view.codeblock.CodeBlockErrorView.Companion.addErrorView
 import app.minion.shell.view.codeblock.CodeBlockPageGalleryView.Companion.addPageGalleryView
 import app.minion.shell.view.codeblock.CodeBlockPageListView.Companion.addPageListView
 import app.minion.shell.view.codeblock.CodeBlockQuery
+import app.minion.shell.view.codeblock.CodeBlockTaskGalleryView.Companion.addTaskGalleryView
 import app.minion.shell.view.codeblock.CodeBlockTaskListView.Companion.addTaskListView
 import arrow.core.toOption
 import net.mamoe.yamlkt.Yaml
@@ -39,7 +40,7 @@ interface CodeBlockView { companion object {
     fun processTaskCodeBlock(config: CodeBlockConfig, store: MinionStore, element: HTMLElement) {
         when(config.display) {
             CodeBlockDisplay.list -> element.addTaskListView(config, store)
-            CodeBlockDisplay.gallery -> element.addCardTestView(config, store)
+            CodeBlockDisplay.gallery -> element.addTaskGalleryView(config, store)
             CodeBlockDisplay.kanban -> TODO()
             CodeBlockDisplay.table -> TODO()
         }

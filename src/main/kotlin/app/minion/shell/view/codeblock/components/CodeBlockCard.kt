@@ -2,6 +2,7 @@ package app.minion.shell.view.codeblock.components
 
 import app.minion.core.functions.DateTimeFunctions.Companion.asString
 import app.minion.core.functions.TaskTagFunctions.Companion.asString
+import app.minion.core.functions.TaskTagFunctions.Companion.collectTags
 import app.minion.core.model.Content
 import app.minion.core.model.DataviewField
 import app.minion.core.model.FileData
@@ -13,11 +14,13 @@ import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.codeblock.CodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockDisplay
 import app.minion.shell.view.codeblock.CodeBlockOptions
+import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.removeConfigTags
 import app.minion.shell.view.codeblock.GroupByOptions
 import app.minion.shell.view.codeblock.PROPERTY_DUE
 import app.minion.shell.view.codeblock.PROPERTY_SOURCE
 import app.minion.shell.view.codeblock.PROPERTY_TAGS
 import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Companion.createChangeGroupMenuItem
+import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Companion.createChangeKanbanMenuItem
 import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Companion.getImagePath
 import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Companion.outputCardMenu
 import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Companion.outputSubtasks
@@ -80,7 +83,7 @@ interface CodeBlockCard { companion object {
                         task.dueDate.map { "Due" to it.asString() }.getOrNull()
                     }
                     PROPERTY_TAGS -> {
-                        "Tags" to task.tags.asString()
+                        "Tags" to task.collectTags().removeConfigTags(config).asString()
                     }
                     PROPERTY_SOURCE -> {
                         "Source" to "[[${task.fileInfo.file.v}]]"
@@ -104,7 +107,7 @@ interface CodeBlockCard { companion object {
             { outputSubtasks(task, store) },
             properties,
             None,
-            emptyList(),
+            listOf(createChangeKanbanMenuItem(task, config, store)),
             config,
             store
         )

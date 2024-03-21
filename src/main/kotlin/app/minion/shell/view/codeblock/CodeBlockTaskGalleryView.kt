@@ -14,6 +14,7 @@ import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyCod
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.maybeAddProperties
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.removeConfigTags
 import app.minion.shell.view.codeblock.CodeBlockTaskListView.Companion.outputSource
+import app.minion.shell.view.codeblock.components.CodeBlockCard.Companion.outputTaskCard
 import arrow.core.toOption
 import io.kvision.state.sub
 import kotlinx.dom.clear
@@ -91,7 +92,7 @@ interface CodeBlockTaskGalleryView { companion object {
     fun FlowContent.outputTaskList(tasks: List<Task>, config: CodeBlockConfig, store: MinionStore) {
         div(classes = "mi-codeblock-page-gallery") {
             tasks.forEach { task ->
-                outputTask(task, config, store)
+                outputTaskCard(task, config, store)
             }
         }
     }

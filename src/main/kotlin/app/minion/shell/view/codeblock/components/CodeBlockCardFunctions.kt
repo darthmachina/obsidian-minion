@@ -11,7 +11,9 @@ import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.codeblock.CodeBlockConfig
 import app.minion.shell.view.codeblock.FIELD_IMAGE
 import app.minion.shell.view.iconGroup
+import app.minion.shell.view.iconKanban
 import app.minion.shell.view.iconMenu
+import app.minion.shell.view.modal.KanbanStatusSelectModal
 import app.minion.shell.view.modal.UpdateDataviewValue
 import arrow.core.Either
 import arrow.core.raise.either
@@ -91,6 +93,19 @@ interface CodeBlockCardFunctions { companion object {
                         store,
                         store.store.state.plugin.app
                     ).open()
+                }
+            }
+        }
+    }
+
+    fun FlowContent.createChangeKanbanMenuItem(task: Task, config: CodeBlockConfig, store: MinionStore)
+    : FlowContent.() -> Unit {
+        return {
+            a {
+                title = "Change kanban status"
+                unsafe { +iconKanban }
+                onClickFunction = {
+                    KanbanStatusSelectModal(store, task, store.store.state.plugin.app).open()
                 }
             }
         }
