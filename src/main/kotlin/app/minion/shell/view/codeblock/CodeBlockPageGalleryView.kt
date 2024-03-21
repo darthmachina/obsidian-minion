@@ -2,34 +2,17 @@ package app.minion.shell.view.codeblock
 
 import app.minion.core.MinionError
 import app.minion.core.functions.StatisticsFunctions.Companion.calculateTotalCount
-import app.minion.core.model.Content
-import app.minion.core.model.DataviewField
 import app.minion.core.model.FileData
 import app.minion.core.store.MinionStore
-import app.minion.shell.functions.VaultFunctions
-import app.minion.shell.view.ViewFunctions.Companion.getWikilinkResourcePath
-import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.codeblock.components.CodeBlockCard.Companion.outputPageCard
-import app.minion.shell.view.iconGroup
-import app.minion.shell.view.iconMenu
-import app.minion.shell.view.modal.UpdateDataviewValue
-import arrow.core.None
-import arrow.core.Some
-import arrow.core.flatMap
 import arrow.core.toOption
 import io.kvision.state.sub
 import kotlinx.dom.clear
 import kotlinx.html.FlowContent
-import kotlinx.html.a
 import kotlinx.html.div
 import kotlinx.html.dom.append
-import kotlinx.html.img
-import kotlinx.html.js.onClickFunction
-import kotlinx.html.span
-import kotlinx.html.title
-import kotlinx.html.unsafe
 import mu.KotlinLogging
 import org.w3c.dom.HTMLElement
 
@@ -119,97 +102,6 @@ interface CodeBlockPageGalleryView { companion object {
         div(classes = "mi-codeblock-page-gallery") {
             fileDataSet.forEach { fileData ->
                 outputPageCard(fileData, config, store)
-            }
-        }
-    }
-
-    fun FlowContent.outputFileData(fileData: FileData, config: CodeBlockConfig, store: MinionStore) {
-        div {
-            val includeImage = config.options.contains(CodeBlockOptions.image_on_cover)
-            var imageIncluded = false
-            if (includeImage) {
-                fileData.dataview[DataviewField(FIELD_IMAGE)]
-                    .toOption()
-                    .toEither { MinionError.ImageNotFoundError("No image specified for ${fileData.name.v}") }
-                    .flatMap {
-                        it.v.getWikilinkResourcePath(
-                            store.store.state.plugin.app.vault,
-                            store.store.state.plugin.app.metadataCache
-                        )
-                    }
-                    .map { imagePath ->
-                        imageIncluded = true
-                        div(classes = "mi-codeblock-cover-image-container") {
-                            img(classes = "mi-codeblock-cover-image", src = imagePath)
-                        }
-                    }
-                    .mapLeft {
-                        logger.warn { "$it" }
-                    }
-                }
-            div(classes = "mi-codeblock-page-gallery-title${if (!imageIncluded) " mi-full-height" else ""}") {
-                span(classes = "mi-codeblock-source-link") {
-                    +fileData.name.v
-                    onClickFunction = {
-                        VaultFunctions.openSourceFile(fileData.name, store.store.state.plugin.app)
-                    }
-                }
-                div(classes = "mi-codeblock-menu-container") {
-                    span(classes = "mi-icon mi-button") {
-                        unsafe { +iconMenu }
-                    }
-                    div(classes = "mi-codeblock-menu") {
-                        a {
-                            title = "Change group value"
-                            unsafe { +iconGroup }
-                            onClickFunction = {
-                                UpdateDataviewValue(
-                                    fileData,
-                                    config.groupByField,
-                                    fileData.dataview[DataviewField(config.groupByField)]!!,
-                                    store.store.state.dataviewValueCache[DataviewField(config.groupByField)]!!,
-                                    store,
-                                    store.store.state.plugin.app
-                                ).open()
-                            }
-                        }
-                    }
-                }
-            }
-            if (config.properties.isNotEmpty()) {
-                outputFields(fileData, config, store)
-            }
-        }
-    }
-
-    fun FlowContent.outputFields(fileData: FileData, config: CodeBlockConfig, store: MinionStore) {
-        div(classes = "mi-codeblock-page-gallery-fields") {
-            config.properties.forEach { property ->
-                outputField(property, fileData, store)
-            }
-        }
-    }
-
-    fun FlowContent.outputField(label: String, fileData: FileData, store: MinionStore) {
-        when(label) {
-            PROPERTY_CREATED -> {}
-            PROPERTY_MODIFIED -> {}
-            PROPERTY_SOURCE -> {}
-            PROPERTY_DUE -> {}
-            PROPERTY_TAGS -> {}
-            else -> {
-                // Is a dataview field
-                when(val value = fileData.dataview[DataviewField(label)].toOption()) {
-                    is Some -> {
-                        div(classes = "mi-codeblock-page-gallery-fields-label") {
-                            +label
-                        }
-                        div(classes = "mi-codeblock-page-gallery-fields-value") {
-                            outputStyledContent(Content(value.value.v), store)
-                        }
-                    }
-                    is None -> {}
-                }
             }
         }
     }
