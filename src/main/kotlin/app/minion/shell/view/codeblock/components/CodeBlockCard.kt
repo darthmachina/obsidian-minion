@@ -143,7 +143,10 @@ interface CodeBlockCard { companion object {
                                 img(classes = "mi-codeblock-cover-image", src = it)
                             }
                         }
-                    } else -> {} // Other display settings aren't involved here
+                    } else -> {
+                        // Other display settings aren't involved here
+                        logger.info { "No image display for ${config.display}" }
+                    }
                 }
             }
             // Title

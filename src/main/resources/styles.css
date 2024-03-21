@@ -165,18 +165,20 @@ input[type=checkbox] {
 }
 
 .mi-codeblock-card-title-container {
+    background-color: #303030;
     font-weight: bolder;
     display: flex;
-    padding: 10px;
+    padding: 10px 10px 0 10px;
 }
 
 .mi-codeblock-card-title {
-    background-color: #303030;
     flex: 1;
 }
 
 .mi-codeblock-card-description {
     background-color: #303030;
+    padding-top: 4px;
+    padding-bottom: 6px;
 
 }
 
@@ -247,7 +249,7 @@ input[type=checkbox] {
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
     z-index: 1;
     right: 15px;
-    top: -1px
+    top: 1px
 }
 
 .mi-codeblock-menu a {

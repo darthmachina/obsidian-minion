@@ -11,6 +11,7 @@ import app.minion.shell.view.ViewFunctions.Companion.getWikilinkResourcePath
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.applyCodeBlockConfig
+import app.minion.shell.view.codeblock.components.CodeBlockCard.Companion.outputPageCard
 import app.minion.shell.view.iconGroup
 import app.minion.shell.view.iconMenu
 import app.minion.shell.view.modal.UpdateDataviewValue
@@ -117,7 +118,7 @@ interface CodeBlockPageGalleryView { companion object {
     fun FlowContent.outputFileDataSet(config: CodeBlockConfig, fileDataSet: Set<FileData>, store: MinionStore) {
         div(classes = "mi-codeblock-page-gallery") {
             fileDataSet.forEach { fileData ->
-                outputFileData(fileData, config, store)
+                outputPageCard(fileData, config, store)
             }
         }
     }
