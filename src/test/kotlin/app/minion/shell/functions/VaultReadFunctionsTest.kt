@@ -1,14 +1,7 @@
 package app.minion.shell.functions
 
-import app.minion.core.model.FileData
-import app.minion.core.model.Filename
-import app.minion.shell.functions.VaultReadFunctions.Companion.addBacklinks
-import app.minion.shell.functions.VaultReadFunctions.Companion.addTags
-import app.minion.util.test.TestCachedMetadata
-import app.minion.util.test.TestMetadataCache
-import io.kotest.assertions.arrow.core.shouldBeRight
+import io.kotest.assertions.fail
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.types.shouldBeSameInstanceAs
 
 class VaultReadFunctionsTest : StringSpec({
 //    "FileData.addTags passes if there are no tags in the file" {
@@ -30,4 +23,8 @@ class VaultReadFunctionsTest : StringSpec({
 //        val actual = actualEither.shouldBeRight()
 //        actual shouldBeSameInstanceAs fileData
 //    }
+
+    "StateAccumulator.addBacklinks creates the correct backlinkCache" {
+        fail("Implement test")
+    }
 })

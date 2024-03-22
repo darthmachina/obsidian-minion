@@ -39,13 +39,13 @@ interface VaultReadFunctions { companion object {
                 tfile.path.endsWith(".md") &&
                         !exclude
             }
-            .fold(StateAccumulator(plugin)) { acc, file ->
+            .fold(StateAccumulator()) { acc, file ->
                 logger.debug { "Processing ${file.path}" }
                 this@processIntoState
                     .processFile(file, plugin.app.metadataCache).bind()
                     .addToState(acc, settings).bind()
            }
-            .toState(settings).bind()
+            .toState(settings, plugin).bind()
     }
 
     suspend fun Vault.readFile(fileData: FileData, metadataCache: MetadataCache)
@@ -65,7 +65,7 @@ interface VaultReadFunctions { companion object {
     suspend fun Vault.processFile(file: TFile, metadataCache: MetadataCache) : Either<MinionError, FileData> = either {
         FileData(Filename(file.basename), File(file.path))
             .addTags(metadataCache).bind()
-            .addBacklinks(metadataCache).bind()
+            .addOutlinks(metadataCache).bind()
             .processFileContents(this@processFile, metadataCache).bind()
     }
 
@@ -93,10 +93,10 @@ interface VaultReadFunctions { companion object {
             .getOrElse { this@addTags }// No tags in the file, just return
     }
 
-    fun FileData.addBacklinks(metadataCache: MetadataCache) : Either<MinionError, FileData> = either {
+    fun FileData.addOutlinks(metadataCache: MetadataCache) : Either<MinionError, FileData> = either {
         logger.debug { "FileData.addBacklinks()" }
         metadataCache
-            .getCache(this@addBacklinks.path.v)
+            .getCache(this@addOutlinks.path.v)
             .toOption()
             .map { it.links?.toList() ?: emptyList() }
             .map { linkCache ->
@@ -106,10 +106,10 @@ interface VaultReadFunctions { companion object {
                     }
                     .distinct()
                     .let {
-                        this@addBacklinks.copy(outLinks = it)
+                        this@addOutlinks.copy(outLinks = it)
                     }
             }
-            .getOrElse { this@addBacklinks }
+            .getOrElse { this@addOutlinks }
     }
 
     suspend fun FileData.processFileContents(vault: Vault, metadataCache: MetadataCache)
@@ -168,7 +168,6 @@ interface VaultReadFunctions { companion object {
  * Intermediate data class to be used internally for vault processing.
  */
 data class StateAccumulator(
-    val plugin: MinionPlugin,
     val tasks: MutableList<Task> = mutableListOf(),
     val files: MutableMap<Filename, FileData> = mutableMapOf(),
     val tagCache: MutableMap<Tag, MutableSet<Filename>> = mutableMapOf(),
@@ -243,7 +242,7 @@ data class StateAccumulator(
         this@StateAccumulator
     }
 
-    fun toState(settings: MinionSettings) : Either<MinionError, State> = either {
+    fun toState(settings: MinionSettings, plugin: MinionPlugin) : Either<MinionError, State> = either {
         State(
             plugin,
             settings,
