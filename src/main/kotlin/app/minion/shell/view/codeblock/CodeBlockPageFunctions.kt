@@ -9,7 +9,9 @@ import app.minion.core.model.Tag
 import app.minion.core.store.State
 import arrow.core.Either
 import arrow.core.flatten
+import arrow.core.getOrElse
 import arrow.core.raise.either
+import arrow.core.toOption
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger("CodeBlockPageFunctions")
@@ -94,11 +96,13 @@ interface CodeBlockPageFunctions { companion object {
         // Group FileData into buckets by group values
         // Return map
         this@applyGroupByForDataview
-            .filter { fileData ->
-                fileData.dataview.containsKey(DataviewField(config.groupByField))
-            }
             .groupBy { fileData ->
-                fileData.dataview[DataviewField(config.groupByField)]!!
+                fileData
+                    .dataview[DataviewField(config.groupByField)]
+                    .toOption()
+                    .getOrElse {
+                        DataviewValue(GROUP_BY_UNKNOWN)
+                    }
             }
             .mapValues { it.value.toSet() }
     }
