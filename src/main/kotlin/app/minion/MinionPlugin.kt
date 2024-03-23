@@ -65,6 +65,21 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
                     store.dispatch(VaultThunks.fileModified(app.vault, app.metadataCache, file))
                 }
             )
+            registerEvent(
+                app.vault.on("delete") { file ->
+                    if (file is TFile) {
+                        store.dispatch(VaultThunks.fileDeleted(app.vault, app.metadataCache, file))
+                    }
+                }
+            )
+            registerEvent(
+                app.vault.on("rename") { file, oldPath ->
+                    if (file is TFile) {
+                        store.dispatch(VaultThunks.fileRenamed(app.vault, file, oldPath))
+                    }
+                }
+            )
+
         }
     }
 

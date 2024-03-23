@@ -4,6 +4,8 @@ import MetadataCache
 import MinionPlugin
 import TFile
 import Vault
+import app.minion.core.model.File
+import app.minion.core.model.Filename
 import app.minion.core.model.MinionSettings
 import app.minion.core.model.Task
 import app.minion.core.store.Action
@@ -51,6 +53,20 @@ interface VaultThunks { companion object {
                 // Process habits from full task list
                 //state().tasks.dispatchHabitStats(dispatch)
             }
+        }
+    }
+
+    fun fileDeleted(vault: Vault, metadataCache: MetadataCache, file: TFile) : ActionCreator<Action, State> {
+        return { dispatch, state ->
+            logger.debug { "fileDeleted() : ${file.basename}" }
+            dispatch(Action.RemoveDataForFile(Filename(file.basename)))
+        }
+    }
+
+    fun fileRenamed(vault: Vault, file: TFile, oldPath: String) : ActionCreator<Action, State> {
+        return { dispatch, state ->
+            logger.debug { "fileRenamed() : ${file.name} from '$oldPath'"}
+            dispatch(Action.FileRenamed(File(oldPath), File(file.path)))
         }
     }
 }}
