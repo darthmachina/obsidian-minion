@@ -2,10 +2,13 @@ package app.minion.core.store
 
 import app.minion.core.MinionError
 import app.minion.core.functions.SettingsFunctions.Companion.toJson
+import app.minion.core.store.ReducerFunctions.Companion.fileRenamed
+import app.minion.core.store.ReducerFunctions.Companion.removeDataForFile
 import app.minion.core.store.ReducerFunctions.Companion.replaceDataForFile
 import app.minion.core.store.ReducerFunctions.Companion.replaceTask
 import arrow.core.Either
 import arrow.core.getOrElse
+import arrow.core.right
 import arrow.core.toOption
 import mu.KotlinLogging
 import mu.KotlinLoggingConfiguration
@@ -43,6 +46,14 @@ fun reducer(state: State, action: Action) : State =
             val result = s.replaceDataForFile(a.fileData)
             logger.debug { " - updated state: $result" }
             result
+        }
+        is Action.RemoveDataForFile -> handleError(state, action) { s, a ->
+            logger.debug { "RemoveDataForFile: ${a.name.v}" }
+            s.removeDataForFile(a.name)
+        }
+        is Action.FileRenamed -> handleError(state, action) { s, a ->
+            logger.debug { "FileRenamed: ${a.oldPath.v} to ${a.file.v}" }
+            s.fileRenamed(a.file, a.oldPath)
         }
         is Action.TaskCompleted -> handleError(state, action) { s, a ->
             logger.debug { "TaskCompleted: ${a.task}" }

@@ -1,7 +1,9 @@
 package app.minion.core.store
 
 import app.minion.core.MinionError
+import app.minion.core.model.File
 import app.minion.core.model.FileData
+import app.minion.core.model.Filename
 import app.minion.core.model.MinionSettings
 import app.minion.core.model.PageTaskField
 import app.minion.core.model.Task
@@ -22,6 +24,8 @@ sealed interface Action : RAction {
     ) : Action
     data class LoadInitialState(val state: State) : Action
     data class LoadDataForFile(val fileData: FileData) : Action
+    data class RemoveDataForFile(val name: Filename) : Action
+    data class FileRenamed(val oldPath: File, val file: File) : Action
     data class TaskCompleted(val task: Task) : Action
     data class SubtaskCompleted(val task: Task, val subtask: Task) : Action
     data class TaskUpdated(val task: Task) : Action

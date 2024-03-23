@@ -8,23 +8,38 @@ import app.minion.core.model.Filename
 import app.minion.core.model.Tag
 import app.minion.core.store.StateFunctions.Companion.updateDataviewCache
 import app.minion.core.store.StateFunctions.Companion.updateTagCache
-import app.minion.core.store.StateFunctions.Companion.replaceData
+import app.minion.core.store.StateFunctions.Companion.upsertData
 import app.minion.core.store.StateFunctions.Companion.updateBacklinkCache
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.maps.shouldContainExactly
 
 class StateFunctionsTest : StringSpec({
-    "replaceData correctly replaces fileData instance" {
+    "upsertData correctly replaces fileData instance" {
         val fileDataMap = mapOf(
             Filename("test") to FileData(Filename("test"), File("test/test.md"), tags = listOf(Tag("old"))),
             Filename("keep") to FileData(Filename("keep"), File("test/keep.md"), tags = listOf(Tag("keep")))
         )
         val updated = FileData(Filename("test"), File("test/test.md"), tags = listOf(Tag("new")))
 
-        val actual = fileDataMap.replaceData(updated)
+        val actual = fileDataMap.upsertData(updated)
         actual shouldContainExactly mapOf(
             Filename("keep") to FileData(Filename("keep"), File("test/keep.md"), tags = listOf(Tag("keep"))),
             Filename("test") to updated
+        )
+    }
+
+    "upsertData adds new file data" {
+        val fileDataMap = mapOf(
+            Filename("test") to FileData(Filename("test"), File("test/test.md"), tags = listOf(Tag("old"))),
+            Filename("keep") to FileData(Filename("keep"), File("test/keep.md"), tags = listOf(Tag("keep")))
+        )
+        val inserted = FileData(Filename("new"), File("new.md"))
+
+        val actual = fileDataMap.upsertData(inserted)
+        actual shouldContainExactly mapOf(
+            Filename("test") to FileData(Filename("test"), File("test/test.md"), tags = listOf(Tag("old"))),
+            Filename("keep") to FileData(Filename("keep"), File("test/keep.md"), tags = listOf(Tag("keep"))),
+            Filename("new") to FileData(Filename("new"), File("new.md"))
         )
     }
 

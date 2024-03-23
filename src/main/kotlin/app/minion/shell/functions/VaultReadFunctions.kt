@@ -158,10 +158,10 @@ interface VaultReadFunctions { companion object {
             .mapValues { entry -> entry.value.map { it.second }.toSet() }
     }
 
-    fun FileData.addToState(acc: StateAccumulator, settings: MinionSettings) : Either<MinionError, StateAccumulator> = either {
+    fun FileData.addToState(acc: StateAccumulator, settings: MinionSettings)
+    : Either<MinionError, StateAccumulator> = either {
         acc.addFileData(this@addToState, settings).bind()
     }
-
 }}
 
 /**
