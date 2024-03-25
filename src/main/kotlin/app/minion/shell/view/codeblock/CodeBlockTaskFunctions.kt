@@ -40,7 +40,7 @@ interface CodeBlockTaskFunctions { companion object {
 
     fun List<Task>.applyIncludeTags(config: CodeBlockConfig) : List<Task> {
         return if (config.include.tags.isNotEmpty()) {
-            this.filterByTags(config.include.tags)
+            this.filterByTags(config.include.tags.map { Tag(it) })
         } else {
             this
         }
@@ -48,7 +48,7 @@ interface CodeBlockTaskFunctions { companion object {
 
     fun List<Task>.applyExcludeTags(config: CodeBlockConfig) : List<Task> {
         return if (config.exclude.tags.isNotEmpty()) {
-            this.excludeByTags(config.exclude.tags)
+            this.excludeByTags(config.exclude.tags.map { Tag(it) })
         } else {
             this
         }
@@ -89,7 +89,7 @@ interface CodeBlockTaskFunctions { companion object {
 
     fun Set<Tag>.removeConfigTags(config: CodeBlockConfig) : Set<Tag> {
         return filter { tag ->
-            !(tag.v == "task" || config.include.tags.contains(tag))
+            !(tag.v == "task" || config.include.tags.contains(tag.v))
         }.toSet()
     }
 

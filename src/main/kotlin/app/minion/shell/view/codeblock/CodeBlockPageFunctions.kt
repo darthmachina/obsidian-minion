@@ -45,7 +45,7 @@ interface CodeBlockPageFunctions { companion object {
     : Either<MinionError, Set<Filename>> = either {
         if (config.include.tags.isNotEmpty()) {
             tagCache
-                .findFilesMatchingTags(config.include.tags.toSet()).bind()
+                .findFilesMatchingTags(config.include.tags.map { Tag(it) }.toSet()).bind()
                 .let { tagFiles ->
                     this@applyIncludeTags
                         .filter {

@@ -45,7 +45,7 @@ enum class DueOptions {
 
 @Serializable
 data class IncludeExcludeOptions(
-    val tags: List<Tag> = emptyList(),
+    val tags: List<String> = emptyList(),
     val parentTags: List<String> = emptyList(),
     val links: List<String> = emptyList(),
     val dateCreated: String = "",

@@ -9,6 +9,7 @@ import app.minion.core.model.DataviewValue
 import app.minion.core.model.MinionSettings
 import app.minion.core.model.PageTaskFieldType
 import app.minion.core.model.Tag
+import app.minion.core.model.TagType
 import app.minion.core.model.Task
 import app.minion.core.store.ReducerFunctions.Companion.replaceTask
 import arrow.core.Either
@@ -92,7 +93,7 @@ interface TaskFunctions { companion object {
             .let { fields ->
                 dataview.filter { fields.contains(it.key) }
             }
-            .map { Tag(it.value.v.drop(1)) } // value contains #, drop it
+            .map { Tag(it.value.v.drop(1), type = TagType.PAGE) } // value contains #, drop it
             .let {
                 logger.debug { "Adding $it to tag set" }
                 this@maybeAddDataviewTags.plus(it)
