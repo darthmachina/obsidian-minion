@@ -2,6 +2,7 @@ package app.minion.shell.view.codeblock
 
 import app.minion.core.model.Tag
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainOnly
 import io.kotest.matchers.collections.shouldHaveSingleElement
 import io.kotest.matchers.collections.shouldHaveSize
@@ -105,5 +106,59 @@ class CodeBlockConfigTest : StringSpec({
 
         actual.display shouldBeEqual CodeBlockDisplay.table
         actual.options shouldHaveSingleElement CodeBlockOptions.image_on_cover
+    }
+
+    "Decodes config with and include with nested or" {
+        val yaml = """
+            query: tasks
+            display: table
+            include:
+              and:
+                - or:
+                  - tags:
+                    - tag1
+                    - tag2
+                  - links:
+                    - link
+        """.trimIndent()
+        val actual = Yaml.decodeFromString(CodeBlockConfig.serializer(), yaml)
+
+        actual.include.and shouldContainExactly listOf(
+            IncludeExcludeOptions(or = listOf(
+                IncludeExcludeOptions(
+                    tags = listOf("tag1", "tag2")
+                ),
+                IncludeExcludeOptions(
+                    links = listOf("link")
+                )
+            ))
+        )
+    }
+
+    "Decodes config with and include mixed with nested or" {
+        val yaml = """
+            query: tasks
+            display: table
+            include:
+              and:
+                - or:
+                  - tags:
+                    - tag1
+                    - tag2
+                - links:
+                  - link
+        """.trimIndent()
+        val actual = Yaml.decodeFromString(CodeBlockConfig.serializer(), yaml)
+
+        actual.include.and shouldContainExactly listOf(
+            IncludeExcludeOptions(or = listOf(
+                IncludeExcludeOptions(
+                    tags = listOf("tag1", "tag2")
+                )
+            )),
+            IncludeExcludeOptions(
+                links = listOf("link")
+            )
+        )
     }
 })
