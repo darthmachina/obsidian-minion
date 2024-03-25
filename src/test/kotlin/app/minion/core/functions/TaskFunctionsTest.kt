@@ -11,6 +11,7 @@ import app.minion.core.model.PageTaskFieldType
 import app.minion.core.model.RepeatInfo
 import app.minion.core.model.RepeatSpan
 import app.minion.core.model.Tag
+import app.minion.core.model.TagType
 import app.minion.util.test.TaskFactory
 import arrow.core.toOption
 import io.kotest.assertions.arrow.core.shouldBeNone
@@ -54,6 +55,7 @@ class TaskFunctionsTest : StringSpec({
         repeatTask.dueDate shouldBeSome DateTime(LocalDate(2050, 1, 3))
         repeatTask.repeatInfo shouldBeSome expectedRepeatInfo
     }
+
     "maybeAddDataviewTags adds tags if setting exists" {
         val settings = MinionSettings.default().copy(pageTaskFields = listOf(
             PageTaskField(DataviewField("Test"), PageTaskFieldType.TAG)
@@ -67,6 +69,6 @@ class TaskFunctionsTest : StringSpec({
         val actual = actualEither.shouldBeRight()
 
         actual shouldHaveSize 1
-        actual[0].tags shouldContainOnly setOf(Tag("foo"), Tag("task"))
+        actual[0].tags shouldContainOnly setOf(Tag("foo", TagType.PAGE), Tag("task"))
     }
 })

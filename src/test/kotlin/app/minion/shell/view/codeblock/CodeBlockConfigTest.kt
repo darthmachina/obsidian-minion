@@ -48,7 +48,7 @@ class CodeBlockConfigTest : StringSpec({
 
         actual.display shouldBeEqual CodeBlockDisplay.table
         actual.include.tags shouldHaveSize 1
-        actual.include.tags shouldContainOnly listOf(Tag("foo"))
+        actual.include.tags shouldContainOnly listOf("foo")
     }
 
     "Decodes config with exclude options" {
@@ -64,7 +64,7 @@ class CodeBlockConfigTest : StringSpec({
 
         actual.display shouldBeEqual CodeBlockDisplay.table
         actual.exclude.tags shouldHaveSize 1
-        actual.exclude.tags shouldContainOnly listOf(Tag("foo"))
+        actual.exclude.tags shouldContainOnly listOf("foo")
     }
 
     "Decodes config with limit set" {

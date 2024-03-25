@@ -48,7 +48,7 @@ class CodeBlockPageFunctionsTest : StringSpec({
             display = CodeBlockDisplay.list,
             query = CodeBlockQuery.pages,
             include = IncludeExcludeOptions(
-                tags = listOf(Tag("bar"))
+                tags = listOf("bar")
             )
         )
 
