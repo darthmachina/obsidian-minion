@@ -2,7 +2,6 @@ package app.minion.shell.functions
 
 import app.minion.core.model.Filename
 import io.kotest.assertions.arrow.core.shouldBeRight
-import io.kotest.assertions.fail
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.maps.shouldContainExactly
 
