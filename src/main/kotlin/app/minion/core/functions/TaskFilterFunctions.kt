@@ -4,6 +4,7 @@ import app.minion.core.functions.DateTimeFunctions.Companion.isInPast
 import app.minion.core.functions.DateTimeFunctions.Companion.isToday
 import app.minion.core.functions.DateTimeFunctions.Companion.isTodayOrOverdue
 import app.minion.core.functions.DateTimeFunctions.Companion.toLocalDateTime
+import app.minion.core.functions.TaskFilterFunctions.Companion.filterByTags
 import app.minion.core.model.Tag
 import app.minion.core.model.Task
 import arrow.core.getOrElse
@@ -55,6 +56,13 @@ interface TaskFilterFunctions { companion object {
         return this
             .filter { task ->
                 task.tags.containsAll(tags)
+            }
+    }
+
+    fun List<Task>.filterByAnyTag(tags: List<Tag>) : List<Task> {
+        return this
+            .filter { task ->
+                task.tags.any { tags.contains(it) }
             }
     }
 
