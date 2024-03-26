@@ -4,6 +4,7 @@ import app.minion.core.functions.TaskFilterFunctions.Companion.filterByAnyTag
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByTags
 import app.minion.core.model.Tag
 import app.minion.core.model.Task
+import app.minion.shell.view.codeblock.CodeBlockIncludeFunctions.Companion.applyIncludeAnd
 
 interface CodeBlockIncludeFunctions { companion object {
     /**
@@ -21,13 +22,31 @@ interface CodeBlockIncludeFunctions { companion object {
     }
 
     fun List<Task>.applyIncludeAnd(include: List<IncludeExcludeOptions>) : List<Task> {
-
-        return this
+        var filteredTasks = this
+        include.forEach { include ->
+            filteredTasks = if (include.and.isNotEmpty()) {
+                this.applyIncludeAnd(include.and)
+            } else if (include.or.isNotEmpty()) {
+                this.applyIncludeOr(include.or)
+            } else {
+                this.applyIncludeTagsAnd(include)
+            }
+        }
+        return filteredTasks
     }
 
     fun List<Task>.applyIncludeOr(include: List<IncludeExcludeOptions>) : List<Task> {
-
-        return this
+        var filteredTasks = this
+        include.forEach { include ->
+            filteredTasks = if (include.and.isNotEmpty()) {
+                this.applyIncludeAnd(include.and)
+            } else if (include.or.isNotEmpty()) {
+                this.applyIncludeOr(include.or)
+            } else {
+                this.applyIncludeTagsOr(include)
+            }
+        }
+        return filteredTasks
     }
 
     fun List<Task>.applyIncludeTagsAnd(include: IncludeExcludeOptions) : List<Task> {
