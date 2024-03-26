@@ -5,6 +5,9 @@ import app.minion.core.functions.TaskFilterFunctions.Companion.filterByTags
 import app.minion.core.model.Tag
 import app.minion.core.model.Task
 import app.minion.shell.view.codeblock.CodeBlockIncludeFunctions.Companion.applyIncludeAnd
+import mu.KotlinLogging
+
+private val logger = KotlinLogging.logger("CodeBlockIncludeFunctions")
 
 interface CodeBlockIncludeFunctions { companion object {
     /**
@@ -21,29 +24,29 @@ interface CodeBlockIncludeFunctions { companion object {
         }
     }
 
-    fun List<Task>.applyIncludeAnd(include: List<IncludeExcludeOptions>) : List<Task> {
+    fun List<Task>.applyIncludeAnd(includeList: List<IncludeExcludeOptions>) : List<Task> {
         var filteredTasks = this
-        include.forEach { include ->
+        includeList.forEach { include ->
             filteredTasks = if (include.and.isNotEmpty()) {
-                this.applyIncludeAnd(include.and)
+                filteredTasks.applyIncludeAnd(include.and)
             } else if (include.or.isNotEmpty()) {
-                this.applyIncludeOr(include.or)
+                filteredTasks.applyIncludeOr(include.or)
             } else {
-                this.applyIncludeTagsAnd(include)
+                filteredTasks.applyIncludeTagsAnd(include)
             }
         }
         return filteredTasks
     }
 
-    fun List<Task>.applyIncludeOr(include: List<IncludeExcludeOptions>) : List<Task> {
+    fun List<Task>.applyIncludeOr(includeList: List<IncludeExcludeOptions>) : List<Task> {
         var filteredTasks = this
-        include.forEach { include ->
+        includeList.forEach { include ->
             filteredTasks = if (include.and.isNotEmpty()) {
-                this.applyIncludeAnd(include.and)
+                filteredTasks.applyIncludeAnd(include.and)
             } else if (include.or.isNotEmpty()) {
-                this.applyIncludeOr(include.or)
+                filteredTasks.applyIncludeOr(include.or)
             } else {
-                this.applyIncludeTagsOr(include)
+                filteredTasks.applyIncludeTagsOr(include)
             }
         }
         return filteredTasks

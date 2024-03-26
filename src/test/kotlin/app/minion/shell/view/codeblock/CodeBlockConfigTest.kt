@@ -7,6 +7,9 @@ import io.kotest.matchers.collections.shouldContainOnly
 import io.kotest.matchers.collections.shouldHaveSingleElement
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.equals.shouldBeEqual
+import mu.KotlinLogging
+import mu.KotlinLoggingConfiguration
+import mu.KotlinLoggingLevel
 import net.mamoe.yamlkt.Yaml
 
 class CodeBlockConfigTest : StringSpec({
