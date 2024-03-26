@@ -3,12 +3,12 @@ package app.minion.shell.view.codeblock
 import app.minion.core.MinionError
 import app.minion.core.functions.TaskFilterFunctions.Companion.excludeByTags
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByOverdue
-import app.minion.core.functions.TaskFilterFunctions.Companion.filterByTags
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByToday
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByTodayOrOverdue
 import app.minion.core.functions.TaskTagFunctions.Companion.findTagWithPrefix
 import app.minion.core.model.Tag
 import app.minion.core.model.Task
+import app.minion.shell.view.codeblock.CodeBlockIncludeFunctions.Companion.applyInclude
 import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.raise.either
@@ -21,7 +21,7 @@ interface CodeBlockTaskFunctions { companion object {
     : Either<MinionError, Map<String, List<Task>>> = either {
         this@applyCodeBlockConfig
             .applyDue(config)
-            .applyIncludeTags(config)
+            .applyInclude(config.include)
             .applyExcludeTags(config)
             .applyGroupBy(config).bind()
     }
@@ -33,14 +33,6 @@ interface CodeBlockTaskFunctions { companion object {
             this.filterByToday()
         } else if (config.due.contains(DueOptions.overdue)) {
             this.filterByOverdue()
-        } else {
-            this
-        }
-    }
-
-    fun List<Task>.applyIncludeTags(config: CodeBlockConfig) : List<Task> {
-        return if (config.include.tags.isNotEmpty()) {
-            this.filterByTags(config.include.tags.map { Tag(it) })
         } else {
             this
         }

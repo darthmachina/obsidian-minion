@@ -50,7 +50,9 @@ data class IncludeExcludeOptions(
     val links: List<String> = emptyList(),
     val dateCreated: String = "",
     val dateModified: String = "",
-    val dataview: List<String> = emptyList()
+    val dataview: List<String> = emptyList(),
+    val and: List<IncludeExcludeOptions> = emptyList(),
+    val or: List<IncludeExcludeOptions> = emptyList()
 )
 
 @Serializable
