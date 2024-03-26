@@ -32,6 +32,8 @@ import kotlinx.html.a
 import kotlinx.html.checkBoxInput
 import kotlinx.html.div
 import kotlinx.html.dom.append
+import kotlinx.html.h3
+import kotlinx.html.h4
 import kotlinx.html.hr
 import kotlinx.html.js.onClickFunction
 import kotlinx.html.li
@@ -97,11 +99,9 @@ interface CodeBlockTaskListView { companion object {
         if (label == GROUP_BY_SINGLE) {
             outputTaskList(tasks, config, store)
         } else {
-            ul {
-                li {
-                    +label
-                    outputTaskList(tasks, config, store)
-                }
+            h4(classes = "mi-codeblock-group-label") { +label.replaceFirstChar(Char::uppercaseChar) }
+            div {
+                outputTaskList(tasks, config, store)
             }
         }
     }
