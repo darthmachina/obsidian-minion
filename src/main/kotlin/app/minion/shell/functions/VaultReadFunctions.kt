@@ -82,7 +82,7 @@ interface VaultReadFunctions { companion object {
                 tagCache
                     .map {
                         logger.debug { "- creating Tag from ${it.tag}" }
-                        Tag(it.tag.drop(1))
+                        Tag(it.tag.drop(1).trim())
                     }
                     .distinct()
                     .let {
@@ -148,7 +148,7 @@ interface VaultReadFunctions { companion object {
     fun String.pullOutDataviewFields() : Either<MinionError, Map<DataviewField, DataviewValue>> = either {
         logger.debug { "pullOutDataviewFields()" }
         dataviewRegex.findAll(this@pullOutDataviewFields)
-            .associate { DataviewField(it.groupValues[1]) to DataviewValue(it.groupValues[2]) }
+            .associate { DataviewField(it.groupValues[1]) to DataviewValue(it.groupValues[2].trim()) }
     }
 
     fun Set<Pair<DataviewField, DataviewValue>>.mapToFieldCache()

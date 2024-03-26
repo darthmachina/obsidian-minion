@@ -24,7 +24,7 @@ interface TaskParseFunctions { companion object {
         val tags = allTagsRegex
             .findAll(this@toTask)
             .map {
-                Tag(it.groupValues[1])
+                Tag(it.groupValues[1].trim())
             }
             .toSet()
 

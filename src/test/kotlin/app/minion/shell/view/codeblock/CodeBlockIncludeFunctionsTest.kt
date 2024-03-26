@@ -1,14 +1,25 @@
 package app.minion.shell.view.codeblock
 
 import app.minion.core.model.Tag
+import app.minion.core.model.TagType
 import app.minion.shell.view.codeblock.CodeBlockIncludeFunctions.Companion.applyInclude
 import app.minion.shell.view.codeblock.CodeBlockIncludeFunctions.Companion.applyIncludeOr
+import app.minion.shell.view.codeblock.CodeBlockIncludeFunctions.Companion.applyIncludeTagsAnd
 import app.minion.shell.view.codeblock.CodeBlockIncludeFunctions.Companion.applyIncludeTagsOr
 import app.minion.util.test.TaskFactory
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 
 class CodeBlockIncludeFunctionsTest : StringSpec({
+    "applyIncludeTagsAnd work for page tags" {
+        val task1 = TaskFactory.createBasicTask().copy(tags = setOf(Tag("regular")))
+        val task2 = TaskFactory.createBasicTask().copy(tags = setOf(Tag("page", TagType.PAGE)))
+        val tasks = listOf(task1, task2)
+
+        val actual = tasks.applyIncludeTagsAnd(IncludeExcludeOptions(tags = listOf("page")))
+        actual shouldContainExactly listOf(task2)
+    }
+
     "applyIncludeTagsOr returns correct list" {
         val task1 = TaskFactory.createBasicTask().copy(tags = setOf(Tag("tag1")))
         val task2 = TaskFactory.createBasicTask().copy(tags = setOf(Tag("tag2")))
