@@ -10,6 +10,7 @@ import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputGroupL
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.iconHash
 import app.minion.shell.view.modal.UpdateDataviewValue
+import arrow.core.toOption
 import io.kvision.state.sub
 import kotlinx.dom.clear
 import kotlinx.html.FlowContent
@@ -92,7 +93,7 @@ interface CodeBlockPageListView { companion object {
                                 UpdateDataviewValue(
                                     fileData,
                                     config.groupByField,
-                                    fileData.dataview[DataviewField(config.groupByField)]!!,
+                                    fileData.dataview[DataviewField(config.groupByField)].toOption(),
                                     store.store.state.dataviewValueCache[DataviewField(config.groupByField)]!!,
                                     store,
                                     store.store.state.plugin.app
