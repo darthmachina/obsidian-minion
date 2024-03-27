@@ -33,6 +33,7 @@ interface CodeBlockFunctions { companion object {
         h4(classes = "mi-codeblock-group-label") {
             +label
                 .replace(PARENT_TAG_REGEX, "")
+                .replace("#", "")
                 .replaceFirstChar(Char::uppercaseChar)
         }
     }
