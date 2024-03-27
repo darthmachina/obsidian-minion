@@ -12,6 +12,7 @@ import app.minion.core.model.Task
 import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions.Companion.openSourceFile
 import app.minion.shell.thunk.TaskThunks
+import app.minion.shell.view.ViewFunctions.Companion.outputDue
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputHeading
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputTaskStats
@@ -177,15 +178,6 @@ interface CodeBlockTaskListView { companion object {
                     }
                 }
             }
-        }
-    }
-
-    fun FlowContent.outputDue(due: DateTime) {
-        span(classes = "mi-codeblock-task-content-due") {
-            if (due.isInPast()) {
-                style = "color: crimson"
-            }
-            +"[${due.asString()}]"
         }
     }
 
