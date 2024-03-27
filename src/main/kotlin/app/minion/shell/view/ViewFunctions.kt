@@ -3,8 +3,11 @@ package app.minion.shell.view
 import MetadataCache
 import Vault
 import app.minion.core.MinionError
+import app.minion.core.functions.DateTimeFunctions.Companion.asString
+import app.minion.core.functions.DateTimeFunctions.Companion.isInPast
 import app.minion.core.functions.ImageFunctions.Companion.getImageName
 import app.minion.core.model.Content
+import app.minion.core.model.DateTime
 import app.minion.core.model.Filename
 import app.minion.core.store.MinionStore
 import app.minion.shell.functions.*
@@ -15,9 +18,11 @@ import arrow.core.flatten
 import arrow.core.getOrElse
 import arrow.core.raise.either
 import arrow.core.toOption
+import kotlinx.html.FlowContent
 import kotlinx.html.FlowOrPhrasingContent
 import kotlinx.html.js.onClickFunction
 import kotlinx.html.span
+import kotlinx.html.style
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger("ViewFunctions")
@@ -105,5 +110,14 @@ interface ViewFunctions { companion object {
                 MinionError.ImageNotFoundError("${this@getImageResourcePath} not found")
             }
             .bind()
+    }
+
+    fun FlowContent.outputDue(due: DateTime) {
+        span(classes = "mi-codeblock-task-content-due") {
+            if (due.isInPast()) {
+                style = "color: crimson"
+            }
+            +"[${due.asString()}]"
+        }
     }
 }}

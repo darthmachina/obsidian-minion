@@ -10,6 +10,7 @@ import app.minion.core.model.Task
 import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions
 import app.minion.shell.thunk.TaskThunks
+import app.minion.shell.view.ViewFunctions.Companion.outputDue
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.codeblock.CodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockDisplay
@@ -81,10 +82,10 @@ interface CodeBlockCard { companion object {
             .mapNotNull { field ->
                 when(field) {
                     PROPERTY_DUE -> {
-                        task.dueDate.map {
+                        task.dueDate.map {due ->
                             "Due" to {
                                 span {
-                                    +it.asString()
+                                    outputDue(due)
                                     task.repeatInfo.map {
                                         span(classes = "mi-icon") {
                                             title = it.asString()
