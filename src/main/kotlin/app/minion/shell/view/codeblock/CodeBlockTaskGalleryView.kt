@@ -3,6 +3,7 @@ package app.minion.shell.view.codeblock
 import app.minion.core.MinionError
 import app.minion.core.model.Task
 import app.minion.core.store.MinionStore
+import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputGroupLabel
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputHeading
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputTaskStats
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
@@ -74,7 +75,7 @@ interface CodeBlockTaskGalleryView { companion object {
             outputTaskList(tasks, config, store)
         } else {
             div {
-                div(classes = "mi-codeblock-group-label") { +label }
+                outputGroupLabel(label)
                 outputTaskList(tasks, config, store)
             }
         }

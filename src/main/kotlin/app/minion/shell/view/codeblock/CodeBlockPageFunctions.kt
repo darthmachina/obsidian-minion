@@ -1,6 +1,7 @@
 package app.minion.shell.view.codeblock
 
 import app.minion.core.MinionError
+import app.minion.core.functions.TaskTagFunctions.Companion.removeParentTag
 import app.minion.core.model.DataviewField
 import app.minion.core.model.DataviewValue
 import app.minion.core.model.FileData

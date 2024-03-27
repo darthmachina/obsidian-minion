@@ -1,7 +1,6 @@
 package app.minion.core.functions
 
 import app.minion.core.MinionError
-import app.minion.shell.functions.WIKILINK_EMBED_REGEX
 import arrow.core.Either
 import arrow.core.flatten
 import arrow.core.getOrElse

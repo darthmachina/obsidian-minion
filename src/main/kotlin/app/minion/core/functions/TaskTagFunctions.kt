@@ -19,6 +19,10 @@ interface TaskTagFunctions { companion object {
             .getOrElse { raise(MinionError.TagPrefixNotFoundError("Tag with prefix '$prefix' not found")) }
     }
 
+    fun String.removeParentTag() : String {
+        return this.replace(PARENT_TAG_REGEX, "")
+    }
+
     fun Task.replaceTag(old: Tag, updated: Tag) : Either<MinionError, Task> = either {
         this@replaceTag.tags
             .map { tag ->
