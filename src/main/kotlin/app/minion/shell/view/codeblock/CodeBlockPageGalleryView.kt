@@ -4,6 +4,7 @@ import app.minion.core.MinionError
 import app.minion.core.functions.StatisticsFunctions.Companion.calculateTotalCount
 import app.minion.core.model.FileData
 import app.minion.core.store.MinionStore
+import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputGroupLabel
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.codeblock.components.CodeBlockCard.Companion.outputPageCard
@@ -92,7 +93,7 @@ interface CodeBlockPageGalleryView { companion object {
             outputFileDataSet(config, fileDataSet, store)
         } else {
             div {
-                div(classes = "mi-codeblock-group-label") { +label }
+                outputGroupLabel(label)
                 outputFileDataSet(config, fileDataSet, store)
             }
         }

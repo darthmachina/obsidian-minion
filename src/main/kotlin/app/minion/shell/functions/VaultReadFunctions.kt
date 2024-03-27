@@ -6,6 +6,7 @@ import TFile
 import Vault
 import app.minion.core.MinionError
 import app.minion.core.functions.TaskFunctions.Companion.maybeAddDataviewValues
+import app.minion.core.functions.dataviewRegex
 import app.minion.core.model.DataviewField
 import app.minion.core.model.DataviewValue
 import app.minion.core.model.File

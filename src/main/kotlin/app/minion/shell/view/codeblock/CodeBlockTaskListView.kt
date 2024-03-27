@@ -14,6 +14,7 @@ import app.minion.shell.functions.VaultFunctions.Companion.openSourceFile
 import app.minion.shell.thunk.TaskThunks
 import app.minion.shell.view.ViewFunctions.Companion.outputDue
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
+import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputGroupLabel
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputHeading
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputTaskStats
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
@@ -100,8 +101,8 @@ interface CodeBlockTaskListView { companion object {
         if (label == GROUP_BY_SINGLE) {
             outputTaskList(tasks, config, store)
         } else {
-            h4(classes = "mi-codeblock-group-label") { +label.replaceFirstChar(Char::uppercaseChar) }
             div {
+                outputGroupLabel(label)
                 outputTaskList(tasks, config, store)
             }
         }

@@ -6,6 +6,7 @@ import app.minion.core.model.DataviewField
 import app.minion.core.model.FileData
 import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions
+import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputGroupLabel
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.iconHash
 import app.minion.shell.view.modal.UpdateDataviewValue
@@ -71,11 +72,9 @@ interface CodeBlockPageListView { companion object {
         if (label == GROUP_BY_SINGLE) {
             outputFileDataSet(config, fileDataSet, store)
         } else {
-            ul {
-                li {
-                    +label
-                    outputFileDataSet(config, fileDataSet, store)
-                }
+            div {
+                outputGroupLabel(label)
+                outputFileDataSet(config, fileDataSet, store)
             }
         }
     }

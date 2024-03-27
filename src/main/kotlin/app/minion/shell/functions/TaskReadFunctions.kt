@@ -4,6 +4,7 @@ import ListItemCache
 import MetadataCache
 import app.minion.core.MinionError
 import app.minion.core.functions.TaskParseFunctions.Companion.toTask
+import app.minion.core.functions.noteSyntaxRegex
 import app.minion.core.model.*
 import app.minion.shell.functions.LogFunctions.Companion.logLeft
 import arrow.core.Either
