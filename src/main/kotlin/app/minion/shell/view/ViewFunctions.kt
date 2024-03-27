@@ -3,6 +3,7 @@ package app.minion.shell.view
 import MetadataCache
 import Vault
 import app.minion.core.MinionError
+import app.minion.core.functions.ImageFunctions.Companion.getImageName
 import app.minion.core.model.Content
 import app.minion.core.model.Filename
 import app.minion.core.store.MinionStore
@@ -87,16 +88,8 @@ interface ViewFunctions { companion object {
     fun String.getWikilinkResourcePath(vault: Vault, metadataCache: MetadataCache)
     : Either<MinionError, String> = either {
         logger.debug { "getWikilinkResourcePath: ${this@getWikilinkResourcePath}" }
-        WIKILINK_EMBED_REGEX
-            .find(this@getWikilinkResourcePath)
-            .toOption()
-            .map {
-                it.groups[1].toOption().map { it.value }
-            }
-            .flatten()
-            .toEither {
-                MinionError.ImageNotFoundError("Error parsing '${this@getWikilinkResourcePath}' for image")
-            }
+        this@getWikilinkResourcePath
+            .getImageName()
             .map { it.getImageResourcePath(vault, metadataCache).bind() }
             .bind()
     }
