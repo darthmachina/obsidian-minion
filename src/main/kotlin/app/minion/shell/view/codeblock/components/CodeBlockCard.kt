@@ -15,7 +15,6 @@ import app.minion.shell.view.codeblock.CodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockDisplay
 import app.minion.shell.view.codeblock.CodeBlockOptions
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.removeConfigTags
-import app.minion.shell.view.codeblock.GroupByOptions
 import app.minion.shell.view.codeblock.PROPERTY_DUE
 import app.minion.shell.view.codeblock.PROPERTY_SOURCE
 import app.minion.shell.view.codeblock.PROPERTY_TAGS
@@ -24,6 +23,7 @@ import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Compani
 import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Companion.getImagePath
 import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Companion.outputCardMenu
 import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Companion.outputSubtasks
+import app.minion.shell.view.iconRepeat
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.toOption
@@ -33,6 +33,8 @@ import kotlinx.html.div
 import kotlinx.html.img
 import kotlinx.html.js.onClickFunction
 import kotlinx.html.span
+import kotlinx.html.title
+import kotlinx.html.unsafe
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger("CodeBlockCard")
@@ -53,7 +55,7 @@ interface CodeBlockCard { companion object {
             .mapNotNull { field ->
                 fileData.dataview[DataviewField(field)]
                     .toOption()
-                    .map { field to it.v }
+                    .map { field to { span { +it.v } } }
                     .getOrNull()
             }
 
@@ -70,7 +72,6 @@ interface CodeBlockCard { companion object {
             image,
             listOf(createChangeGroupMenuItem(fileData, config, store)),
             config,
-            store
         )
     }
 
@@ -80,13 +81,34 @@ interface CodeBlockCard { companion object {
             .mapNotNull { field ->
                 when(field) {
                     PROPERTY_DUE -> {
-                        task.dueDate.map { "Due" to it.asString() }.getOrNull()
+                        task.dueDate.map {
+                            "Due" to {
+                                span {
+                                    +it.asString()
+                                    task.repeatInfo.map {
+                                        span(classes = "mi-icon") {
+                                            title = it.asString()
+                                            unsafe { +iconRepeat }
+                                        }
+                                    }
+                                }
+                            }
+                        }.getOrNull()
                     }
                     PROPERTY_TAGS -> {
-                        "Tags" to task.collectTags().removeConfigTags(config).asString()
+                        "Tags" to {
+                            span {
+                                +task.collectTags().removeConfigTags(config).asString()
+                            }
+                        }
                     }
                     PROPERTY_SOURCE -> {
-                        "Source" to "[[${task.fileInfo.file.v}]]"
+                        "Source" to {
+                            span {
+                                outputStyledContent(Content("[[${task.fileInfo.file.v}]]"), store)
+                            }
+
+                        }
                     }
                     else -> {
                         logger.debug { "Property $field not supported yet" }
@@ -109,7 +131,6 @@ interface CodeBlockCard { companion object {
             None,
             listOf(createChangeKanbanMenuItem(task, config, store)),
             config,
-            store
         )
     }
 
@@ -123,11 +144,10 @@ interface CodeBlockCard { companion object {
     fun FlowContent.outputCard(
         title: FlowContent.() -> Unit,
         description: FlowContent.() -> Unit,
-        properties: List<Pair<String, String>>,
+        properties: List<Pair<String, () -> Unit>>,
         image: Option<String>,
         menuItems: List<FlowContent.() -> Unit>,
         config: CodeBlockConfig,
-        store: MinionStore
     ) {
         div(classes = "mi-codeblock-card") { // Main card
             // Image
@@ -163,12 +183,11 @@ interface CodeBlockCard { companion object {
             }
             // Properties
             if (properties.isNotEmpty()) {
-                logger.debug { "Outputting properties: $properties" }
                 div(classes = "mi-codeblock-card-properties") {
                     properties.forEach {
                         div(classes = "mi-codeblock-card-properties-label") { +it.first }
                         div(classes = "mi-codeblock-card-properties-value") {
-                            outputStyledContent(Content(it.second), store)
+                            it.second()
                         }
                     }
                 }
