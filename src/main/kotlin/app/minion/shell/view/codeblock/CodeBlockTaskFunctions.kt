@@ -6,6 +6,7 @@ import app.minion.core.functions.TaskFilterFunctions.Companion.filterByOverdue
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByToday
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByTodayOrOverdue
 import app.minion.core.functions.TaskTagFunctions.Companion.findTagWithPrefix
+import app.minion.core.model.DateTime
 import app.minion.core.model.Tag
 import app.minion.core.model.Task
 import app.minion.shell.view.codeblock.CodeBlockIncludeFunctions.Companion.applyInclude
@@ -24,7 +25,7 @@ interface CodeBlockTaskFunctions { companion object {
             .applyDue(config)
             .applyInclude(config.include)
             .applyExcludeTags(config)
-            .sortedWith(compareByDescending<Task> { it.dueDate.getOrNull() }.thenBy { it.content.v })
+            .sortedWith(compareBy<Task, DateTime?>(nullsLast()) { it.dueDate.getOrNull() }.thenBy { it.content.v })
             .applyGroupBy(config).bind()
     }
 
