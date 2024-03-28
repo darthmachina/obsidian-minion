@@ -4,12 +4,11 @@ import app.minion.core.functions.TaskFilterFunctions.Companion.filterByAnyTag
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByTags
 import app.minion.core.model.Tag
 import app.minion.core.model.Task
-import app.minion.shell.view.codeblock.CodeBlockIncludeFunctions.Companion.applyIncludeAnd
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger("CodeBlockIncludeFunctions")
 
-interface CodeBlockIncludeFunctions { companion object {
+interface CodeBlockTaskIncludeFunctions { companion object {
     /**
      * Root filter function, calls other functions as needed.
      */

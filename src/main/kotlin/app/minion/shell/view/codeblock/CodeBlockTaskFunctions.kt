@@ -9,9 +9,8 @@ import app.minion.core.functions.TaskTagFunctions.Companion.findTagWithPrefix
 import app.minion.core.model.DateTime
 import app.minion.core.model.Tag
 import app.minion.core.model.Task
-import app.minion.shell.view.codeblock.CodeBlockIncludeFunctions.Companion.applyInclude
+import app.minion.shell.view.codeblock.CodeBlockTaskIncludeFunctions.Companion.applyInclude
 import arrow.core.Either
-import arrow.core.andThen
 import arrow.core.getOrElse
 import arrow.core.raise.either
 import mu.KotlinLogging
