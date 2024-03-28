@@ -6,6 +6,18 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 
 class ViewFunctionsTesta: StringSpec({
+    "tokensize parses links with a plus" {
+        val content = Content("This is a [[link+]]")
+
+        val actual = content.tokenize()
+
+        actual shouldContainExactly listOf(
+            "This is a ",
+            "!llink+",
+            ""
+        )
+    }
+
     "tokenize parses basic bold" {
         val content = Content("This is **bold**")
 
