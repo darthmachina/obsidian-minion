@@ -88,7 +88,7 @@ interface CodeBlockCardFunctions { companion object {
                     UpdateDataviewValue(
                         fileData,
                         config.groupByField,
-                        fileData.dataview[DataviewField(config.groupByField)]!!,
+                        fileData.dataview[DataviewField(config.groupByField)].toOption(),
                         store.store.state.dataviewValueCache[DataviewField(config.groupByField)]!!,
                         store,
                         store.store.state.plugin.app

@@ -8,6 +8,7 @@ import app.minion.core.model.DataviewValue
 import app.minion.core.model.FileData
 import app.minion.core.store.MinionStore
 import app.minion.shell.thunk.PageThunks
+import arrow.core.Option
 import mu.KotlinLogging
 
 const val NEW = "New"
@@ -17,7 +18,7 @@ private val logger = KotlinLogging.logger("UpdateDataviewValue")
 class UpdateDataviewValue(
     private val fileData: FileData,
     private val field: String,
-    private val current: DataviewValue,
+    private val current: Option<DataviewValue>,
     private val dataviewValues: Set<DataviewValue>,
     val store: MinionStore,
     override var app: App
@@ -50,7 +51,9 @@ class UpdateDataviewValue(
                         text.setDisabled(true)
                     }
                 }
-                component.setValue(current.v)
+                current.map {
+                    component.setValue(it.v)
+                }
             }
 
         text

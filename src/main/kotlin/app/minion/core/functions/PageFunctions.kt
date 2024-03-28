@@ -4,14 +4,28 @@ import app.minion.core.MinionError
 import app.minion.core.model.DataviewField
 import app.minion.core.model.DataviewValue
 import arrow.core.Either
+import arrow.core.Option
+import arrow.core.getOrElse
 import arrow.core.raise.either
+import mu.KotlinLogging
+
+private val logger = KotlinLogging.logger("PageFunctions")
 
 interface PageFunctions { companion object {
-    fun String.replaceDataviewValue(field: DataviewField, oldValue: DataviewValue, newValue: DataviewValue)
+    fun String.upsertDataviewValue(field: DataviewField, oldValue: Option<DataviewValue>, newValue: DataviewValue)
     : Either<MinionError, String> = either {
-        val old = "${field.v}:: ${oldValue.v}"
         val updated = "${field.v}:: ${newValue.v}"
-        this@replaceDataviewValue
-            .replace(old, updated)
+        oldValue.map {
+            val old = "${field.v}:: ${it.v}"
+            this@upsertDataviewValue
+                .replace(old, updated)
+        }.getOrElse {
+            val old = "${field.v}::"
+            if (this@upsertDataviewValue.indexOf(old) >= 0) {
+                this@upsertDataviewValue.replace(old, updated)
+            } else {
+                "$updated\n${this@upsertDataviewValue}"
+            }
+        }
     }
 }}
