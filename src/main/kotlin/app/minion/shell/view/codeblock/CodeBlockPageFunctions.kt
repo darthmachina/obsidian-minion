@@ -7,6 +7,7 @@ import app.minion.core.model.FileData
 import app.minion.core.model.Filename
 import app.minion.core.model.Tag
 import app.minion.core.store.State
+import app.minion.shell.view.codeblock.CodeBlockPageIncludeFunctions.Companion.applyInclude
 import arrow.core.Either
 import arrow.core.flatten
 import arrow.core.getOrElse
@@ -21,9 +22,8 @@ interface CodeBlockPageFunctions { companion object {
     : Either<MinionError, Map<String, List<FileData>>> = either {
         this@applyCodeBlockConfig
             .files
-            .keys
-            .applyInclude(this@applyCodeBlockConfig.tagCache, config).bind()
-            .getFileData(this@applyCodeBlockConfig.files).bind()
+            .map { it.value }
+            .applyInclude(config.include).bind()
             .sortedWith(compareBy { it.name.v })
             .applyGroupBy(config).bind()
     }
@@ -37,9 +37,9 @@ interface CodeBlockPageFunctions { companion object {
             .toSet()
     }
 
-    fun Set<Filename>.applyInclude(tagCache: Map<Tag, Set<Filename>>, config: CodeBlockConfig)
+    fun Set<Filename>.applyIncludeWithCache(tagCache: Map<Tag, Set<Filename>>, config: CodeBlockConfig)
     : Either<MinionError, Set<Filename>> = either {
-        this@applyInclude
+        this@applyIncludeWithCache
             .applyIncludeTags(tagCache, config).bind()
     }
 

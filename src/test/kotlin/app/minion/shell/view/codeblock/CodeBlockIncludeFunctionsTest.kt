@@ -2,10 +2,9 @@ package app.minion.shell.view.codeblock
 
 import app.minion.core.model.Tag
 import app.minion.core.model.TagType
-import app.minion.shell.view.codeblock.CodeBlockIncludeFunctions.Companion.applyInclude
-import app.minion.shell.view.codeblock.CodeBlockIncludeFunctions.Companion.applyIncludeOr
-import app.minion.shell.view.codeblock.CodeBlockIncludeFunctions.Companion.applyIncludeTagsAnd
-import app.minion.shell.view.codeblock.CodeBlockIncludeFunctions.Companion.applyIncludeTagsOr
+import app.minion.shell.view.codeblock.CodeBlockTaskIncludeFunctions.Companion.applyInclude
+import app.minion.shell.view.codeblock.CodeBlockTaskIncludeFunctions.Companion.applyIncludeTagsAnd
+import app.minion.shell.view.codeblock.CodeBlockTaskIncludeFunctions.Companion.applyIncludeTagsOr
 import app.minion.util.test.TaskFactory
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
