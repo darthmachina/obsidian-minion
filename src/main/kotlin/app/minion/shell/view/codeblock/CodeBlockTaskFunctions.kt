@@ -10,6 +10,7 @@ import app.minion.core.model.Tag
 import app.minion.core.model.Task
 import app.minion.shell.view.codeblock.CodeBlockIncludeFunctions.Companion.applyInclude
 import arrow.core.Either
+import arrow.core.andThen
 import arrow.core.getOrElse
 import arrow.core.raise.either
 import mu.KotlinLogging
@@ -23,6 +24,7 @@ interface CodeBlockTaskFunctions { companion object {
             .applyDue(config)
             .applyInclude(config.include)
             .applyExcludeTags(config)
+            .sortedWith(compareByDescending<Task> { it.dueDate.getOrNull() }.thenBy { it.content.v })
             .applyGroupBy(config).bind()
     }
 
