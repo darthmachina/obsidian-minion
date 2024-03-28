@@ -28,7 +28,7 @@ class PageFunctionsTest : StringSpec({
     "upsertDataviewValue adds value to empty field" {
         val page = """
             Keep:: keep
-            Change::
+            Change:: 
         """.trimIndent()
 
         val actualEither = page.upsertDataviewValue(DataviewField("Change"), None, DataviewValue("newvalue"))
@@ -36,7 +36,7 @@ class PageFunctionsTest : StringSpec({
 
         actual shouldBeEqual """
             Keep:: keep
-            Change:: newvalue
+            Change:: newvalue 
         """.trimIndent()
     }
 

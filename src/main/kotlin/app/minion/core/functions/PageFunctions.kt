@@ -7,6 +7,9 @@ import arrow.core.Either
 import arrow.core.Option
 import arrow.core.getOrElse
 import arrow.core.raise.either
+import mu.KotlinLogging
+
+private val logger = KotlinLogging.logger("PageFunctions")
 
 interface PageFunctions { companion object {
     fun String.upsertDataviewValue(field: DataviewField, oldValue: Option<DataviewValue>, newValue: DataviewValue)
@@ -19,8 +22,10 @@ interface PageFunctions { companion object {
         }.getOrElse {
             val old = "${field.v}::"
             if (this@upsertDataviewValue.indexOf(old) > 0) {
+                logger.debug { "$old found, replacing" }
                 this@upsertDataviewValue.replace(old, updated)
             } else {
+                logger.debug { "$old not found, adding field" }
                 "$updated\n${this@upsertDataviewValue}"
             }
         }
