@@ -16,7 +16,8 @@ class PageFunctionsTest : StringSpec({
             Change:: oldvalue
         """.trimIndent()
 
-        val actualEither = page.upsertDataviewValue(DataviewField("Change"), DataviewValue("oldvalue").some(), DataviewValue("newvalue"))
+        val actualEither = page.upsertDataviewValue(
+            DataviewField("Change"), DataviewValue("oldvalue").some(), DataviewValue("newvalue"))
         val actual = actualEither.shouldBeRight()
 
         actual shouldBeEqual """
@@ -41,7 +42,6 @@ class PageFunctionsTest : StringSpec({
     }
 
     "upsertDataviewValue adds field/value if non-existent" {
-
         val page = """
             Keep:: keep
         """.trimIndent()

@@ -21,11 +21,9 @@ interface PageFunctions { companion object {
                 .replace(old, updated)
         }.getOrElse {
             val old = "${field.v}::"
-            if (this@upsertDataviewValue.indexOf(old) > 0) {
-                logger.debug { "$old found, replacing" }
+            if (this@upsertDataviewValue.indexOf(old) >= 0) {
                 this@upsertDataviewValue.replace(old, updated)
             } else {
-                logger.debug { "$old not found, adding field" }
                 "$updated\n${this@upsertDataviewValue}"
             }
         }
