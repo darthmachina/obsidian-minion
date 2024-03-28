@@ -1,7 +1,6 @@
 package app.minion.shell.view.codeblock
 
 import app.minion.core.MinionError
-import app.minion.core.functions.TaskTagFunctions.Companion.removeParentTag
 import app.minion.core.model.DataviewField
 import app.minion.core.model.DataviewValue
 import app.minion.core.model.FileData
@@ -18,12 +17,14 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger("CodeBlockPageFunctions")
 
 interface CodeBlockPageFunctions { companion object {
-    fun State.applyCodeBlockConfig(config: CodeBlockConfig) : Either<MinionError, Map<String, Set<FileData>>> = either {
+    fun State.applyCodeBlockConfig(config: CodeBlockConfig)
+    : Either<MinionError, Map<String, List<FileData>>> = either {
         this@applyCodeBlockConfig
             .files
             .keys
             .applyInclude(this@applyCodeBlockConfig.tagCache, config).bind()
             .getFileData(this@applyCodeBlockConfig.files).bind()
+            .sortedWith(compareBy { it.name.v })
             .applyGroupBy(config).bind()
     }
 
@@ -67,7 +68,7 @@ interface CodeBlockPageFunctions { companion object {
             .toSet()
     }
 
-    fun Set<FileData>.applyGroupBy(config: CodeBlockConfig) : Either<MinionError, Map<String, Set<FileData>>> = either {
+    fun List<FileData>.applyGroupBy(config: CodeBlockConfig) : Either<MinionError, Map<String, List<FileData>>> = either {
         if (config.groupBy == GroupByOptions.NONE) {
             mapOf(GROUP_BY_SINGLE to this@applyGroupBy)
         } else {
@@ -85,8 +86,8 @@ interface CodeBlockPageFunctions { companion object {
     /**
      * Groups a Set of FileData by the criteria specified in the config
      */
-    fun Set<FileData>.applyGroupByForDataview(config: CodeBlockConfig)
-    : Either<MinionError, Map<DataviewValue, Set<FileData>>> = either {
+    fun List<FileData>.applyGroupByForDataview(config: CodeBlockConfig)
+    : Either<MinionError, Map<DataviewValue, List<FileData>>> = either {
         if (config.groupBy == GroupByOptions.NONE) {
             raise(MinionError.ConfigError("applyGroupBy called with no groupBy specified"))
         }
@@ -105,6 +106,5 @@ interface CodeBlockPageFunctions { companion object {
                         DataviewValue(GROUP_BY_UNKNOWN)
                     }
             }
-            .mapValues { it.value.toSet() }
     }
 }}

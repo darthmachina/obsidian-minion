@@ -50,7 +50,7 @@ interface CodeBlockPageListView { companion object {
         element.append.div { +error.message }
     }
 
-    fun updatePages(fileDataMap: Map<String, Set<FileData>>, element: HTMLElement, store: MinionStore, config: CodeBlockConfig) {
+    fun updatePages(fileDataMap: Map<String, List<FileData>>, element: HTMLElement, store: MinionStore, config: CodeBlockConfig) {
         element.clear()
         if (config.heading.isNotEmpty()) {
             element.append.div(classes = "mi-codeblock-heading") {
@@ -69,7 +69,12 @@ interface CodeBlockPageListView { companion object {
         element.outputStats(fileDataMap)
     }
 
-    fun FlowContent.outputGroup(config: CodeBlockConfig, label: String, fileDataSet: Set<FileData>, store: MinionStore) {
+    fun FlowContent.outputGroup(
+        config: CodeBlockConfig,
+        label: String,
+        fileDataSet: List<FileData>,
+        store: MinionStore
+    ) {
         if (label == GROUP_BY_SINGLE) {
             outputFileDataSet(config, fileDataSet, store)
         } else {
@@ -80,7 +85,7 @@ interface CodeBlockPageListView { companion object {
         }
     }
 
-    fun FlowContent.outputFileDataSet(config: CodeBlockConfig, fileDataSet: Set<FileData>, store: MinionStore) {
+    fun FlowContent.outputFileDataSet(config: CodeBlockConfig, fileDataSet: List<FileData>, store: MinionStore) {
         ul {
             fileDataSet.forEach { fileData ->
                 li {
@@ -115,7 +120,7 @@ interface CodeBlockPageListView { companion object {
         }
     }
 
-    fun HTMLElement.outputStats(fileDataList: Map<String, Set<FileData>>) {
+    fun HTMLElement.outputStats(fileDataList: Map<String, List<FileData>>) {
         this.append.div(classes = "mi-codeblock-item-count") {
             +"Page Count: ${fileDataList.calculateTotalCount()}"
         }

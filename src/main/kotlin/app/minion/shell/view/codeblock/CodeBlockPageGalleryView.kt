@@ -38,7 +38,7 @@ interface CodeBlockPageGalleryView { companion object {
     }
 
     fun updatePages(
-        fileDataMap: Map<String, Set<FileData>>,
+        fileDataMap: Map<String, List<FileData>>,
         element: HTMLElement,
         store: MinionStore,
         config: CodeBlockConfig
@@ -86,7 +86,7 @@ interface CodeBlockPageGalleryView { companion object {
     fun FlowContent.outputGroup(
         config: CodeBlockConfig,
         label: String,
-        fileDataSet: Set<FileData>,
+        fileDataSet: List<FileData>,
         store: MinionStore
     ) {
         if (label == GROUP_BY_SINGLE) {
@@ -99,7 +99,7 @@ interface CodeBlockPageGalleryView { companion object {
         }
     }
 
-    fun FlowContent.outputFileDataSet(config: CodeBlockConfig, fileDataSet: Set<FileData>, store: MinionStore) {
+    fun FlowContent.outputFileDataSet(config: CodeBlockConfig, fileDataSet: List<FileData>, store: MinionStore) {
         div(classes = "mi-codeblock-page-gallery") {
             fileDataSet.forEach { fileData ->
                 outputPageCard(fileData, config, store)
@@ -107,7 +107,7 @@ interface CodeBlockPageGalleryView { companion object {
         }
     }
 
-    fun HTMLElement.outputStats(fileDataList: Map<String, Set<FileData>>) {
+    fun HTMLElement.outputStats(fileDataList: Map<String, List<FileData>>) {
         this.append.div(classes = "mi-codeblock-item-count") {
             +"Page Count: ${fileDataList.calculateTotalCount()}"
         }
