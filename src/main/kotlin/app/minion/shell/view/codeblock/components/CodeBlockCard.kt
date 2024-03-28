@@ -56,7 +56,9 @@ interface CodeBlockCard { companion object {
             .mapNotNull { field ->
                 fileData.dataview[DataviewField(field)]
                     .toOption()
-                    .map { field to { span { +it.v } } }
+                    .map { field to { span {
+                        outputStyledContent(Content(it.v), store)
+                    } } }
                     .getOrNull()
             }
 
