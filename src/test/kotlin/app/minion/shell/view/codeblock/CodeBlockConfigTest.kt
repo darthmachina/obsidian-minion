@@ -7,6 +7,7 @@ import io.kotest.matchers.collections.shouldContainOnly
 import io.kotest.matchers.collections.shouldHaveSingleElement
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.equals.shouldBeEqual
+import kotlinx.serialization.decodeFromString
 import mu.KotlinLogging
 import mu.KotlinLoggingConfiguration
 import mu.KotlinLoggingLevel
@@ -162,6 +163,32 @@ class CodeBlockConfigTest : StringSpec({
             IncludeExcludeOptions(
                 links = listOf("link")
             )
+        )
+    }
+
+    "Decodes config with complex dataview includes" {
+        val yaml = """
+            query: pages
+            display: gallery
+            include:
+              and:
+                - dataview:
+                  - "WithMina:: ✅"
+                - or:
+                  - dataview:
+                    - "Status:: #media/inprogress"
+                    - "Status:: #media/next"
+            groupBy: dataview
+            groupByField: Status
+        """.trimIndent()
+
+        val actual = Yaml.decodeFromString(CodeBlockConfig.serializer(), yaml)
+
+        actual.include.and shouldContainExactly listOf(
+            IncludeExcludeOptions(dataview = listOf("WithMina:: ✅")),
+            IncludeExcludeOptions(or = listOf(
+                IncludeExcludeOptions(dataview = listOf("Status:: #media/inprogress", "Status:: #media/next"))
+            ))
         )
     }
 })
