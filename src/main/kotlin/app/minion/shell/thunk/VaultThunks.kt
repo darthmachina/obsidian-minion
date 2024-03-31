@@ -41,17 +41,21 @@ interface VaultThunks { companion object {
     fun fileModified(vault: Vault, metadataCache: MetadataCache, file: TFile) : ActionCreator<Action, State> {
         return { dispatch, state ->
             logger.debug { "fileModified() : ${file.name}" }
-            CoroutineScope(Dispatchers.Unconfined).launch {
-                vault
-                    .processFile(file, metadataCache)
-                    .map { fileData ->
-                        dispatch(Action.LoadDataForFile(fileData))
-                    }
-                    .mapLeft {
-                        dispatch(Action.DisplayError(it))
-                    }
-                // Process habits from full task list
-                //state().tasks.dispatchHabitStats(dispatch)
+            if (state().settings.excludeFolders.any { file.path.startsWith(it) }) {
+                logger.debug { " - in exclude folders list, ignore" }
+            } else {
+                CoroutineScope(Dispatchers.Unconfined).launch {
+                    vault
+                        .processFile(file, metadataCache)
+                        .map { fileData ->
+                            dispatch(Action.LoadDataForFile(fileData))
+                        }
+                        .mapLeft {
+                            dispatch(Action.DisplayError(it))
+                        }
+                    // Process habits from full task list
+                    //state().tasks.dispatchHabitStats(dispatch)
+                }
             }
         }
     }
