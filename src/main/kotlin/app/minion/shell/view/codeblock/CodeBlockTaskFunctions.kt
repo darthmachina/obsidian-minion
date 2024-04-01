@@ -5,6 +5,7 @@ import app.minion.core.functions.TaskFilterFunctions.Companion.excludeByTags
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByOverdue
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByToday
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByTodayOrOverdue
+import app.minion.core.functions.TaskFilterFunctions.Companion.filterByUpcoming
 import app.minion.core.functions.TaskTagFunctions.Companion.findTagWithPrefix
 import app.minion.core.model.DateTime
 import app.minion.core.model.Tag
@@ -35,6 +36,8 @@ interface CodeBlockTaskFunctions { companion object {
             this.filterByToday()
         } else if (config.due.contains(DueOptions.overdue)) {
             this.filterByOverdue()
+        } else if (config.due.contains(DueOptions.upcoming)) {
+            this.filterByUpcoming()
         } else {
             this
         }

@@ -1,10 +1,26 @@
 package app.minion.core.functions
 
 import app.minion.core.MinionError
+import app.minion.core.functions.DateTimeFunctions.Companion.toLocalDateTime
 import app.minion.core.model.DateTime
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.getOrElse
 import arrow.core.raise.either
-import kotlinx.datetime.*
+import arrow.core.some
+import arrow.core.toOption
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger("DateTimeFunctions")
@@ -45,8 +61,13 @@ interface DateTimeFunctions { companion object {
         return LocalDateTime(this.date, this.time.getOrElse { LocalTime(hour = 23, minute = 59) })
     }
 
+    fun LocalDateTime.toDateTime() : DateTime {
+        return DateTime(this.date, this.time.some())
+    }
+
     fun DateTime.daysDifference() : Int {
-        val hoursDifference = Clock.System.now().minus(this.toLocalDateTime().toInstant(TimeZone.currentSystemDefault()), DateTimeUnit.HOUR)
+        val hoursDifference = Clock.System.now()
+            .minus(this.toLocalDateTime().toInstant(TimeZone.currentSystemDefault()), DateTimeUnit.HOUR)
         return hoursDifference.toInt() / 24
     }
 
@@ -70,12 +91,14 @@ interface DateTimeFunctions { companion object {
     }
 
     fun DateTime.isInPast() : Boolean {
-        val hoursDifference = Clock.System.now().minus(this.toLocalDateTime().toInstant(TimeZone.currentSystemDefault()), DateTimeUnit.HOUR)
+        val hoursDifference = Clock.System.now()
+            .minus(this.toLocalDateTime().toInstant(TimeZone.currentSystemDefault()), DateTimeUnit.HOUR)
         return hoursDifference > 0
     }
 
     fun DateTime.isTodayOrOverdue() : Boolean {
-        val hoursDifference = Clock.System.now().minus(this.toLocalDateTime().toInstant(TimeZone.currentSystemDefault()), DateTimeUnit.HOUR)
+        val hoursDifference = Clock.System.now()
+            .minus(this.toLocalDateTime().toInstant(TimeZone.currentSystemDefault()), DateTimeUnit.HOUR)
         return hoursDifference > -24
     }
 
@@ -87,4 +110,25 @@ interface DateTimeFunctions { companion object {
                 && today.dayOfMonth == this.date.dayOfMonth
     }
 
+    /** Returns true if the Date is in the range tomorrow -> 7 days from not, false otherwise */
+    fun DateTime.isUpcoming() : Boolean {
+        val tomorrow = Clock.System.now()
+            .plus(1, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .toDateTime()
+            .copy(time = LocalTime(0, 0, 0).some())
+            .toLocalDateTime()
+            .toInstant(TimeZone.currentSystemDefault())
+        val sevenDays = Clock.System.now()
+            .plus(7, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .toDateTime()
+            .copy(time = LocalTime(23, 59, 59).some())
+            .toLocalDateTime()
+            .toInstant(TimeZone.currentSystemDefault())
+        return this
+            .toLocalDateTime()
+            .toInstant(TimeZone.currentSystemDefault()) in tomorrow..sevenDays
+            
+    }
 }}
