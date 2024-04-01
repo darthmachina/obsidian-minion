@@ -84,6 +84,7 @@ interface CodeBlockTaskListView { companion object {
                     }
                 } else {
                     config.groupByOrder.forEach { group ->
+                        logger.debug { "Outputting group $group" }
                         if (group.contains(":")) {
                             group.split(":")
                                 .let {
@@ -93,6 +94,16 @@ interface CodeBlockTaskListView { companion object {
                             outputGroupWithLabel(group, group, tasks, config, store)
                         }
                     }
+                    // Output any remaining entries
+                    tasks
+                        .filter { entry ->
+                            !config.groupByOrder.any { group ->
+                                group.startsWith(entry.key)
+                            }
+                        }
+                        .forEach { entry ->
+                            outputGroupDiv(entry.key, entry.value, config, store)
+                        }
                 }
             }
         }
@@ -100,6 +111,7 @@ interface CodeBlockTaskListView { companion object {
     }
 
     fun FlowContent.outputGroupWithLabel(group: String, label: String, tasks: Map<String, List<Task>>, config: CodeBlockConfig, store: MinionStore) {
+        logger.debug { "outputGroupWithLabel: $group, $label" }
         tasks[group]
             .toOption().toEither {
                 MinionError.GroupByNotFoundError("$group not found in results")

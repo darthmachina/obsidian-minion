@@ -8,6 +8,8 @@ import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputGroupLabel
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.applyCodeBlockConfig
+import app.minion.shell.view.codeblock.CodeBlockPageGalleryView.Companion.outputGroupDiv
+import app.minion.shell.view.codeblock.CodeBlockTaskGalleryView.Companion.outputGroupWithLabel
 import app.minion.shell.view.iconHash
 import app.minion.shell.view.modal.UpdateDataviewValue
 import arrow.core.toOption
@@ -60,8 +62,30 @@ interface CodeBlockPageListView { companion object {
 
         if (fileDataMap.isNotEmpty()) {
             element.append.div {
-                fileDataMap.forEach { entry ->
-                    outputGroup(config, entry.key, entry.value, store)
+                if (config.groupByOrder.isEmpty()) {
+                    fileDataMap.forEach { entry ->
+                        outputGroupDiv(entry.key, entry.value, config, store)
+                    }
+                } else {
+                    config.groupByOrder.forEach { group ->
+                        if (group.contains(":")) {
+                            group.split(":")
+                                .let {
+                                    outputGroupWithLabel(it[0], it[1], fileDataMap, config, store)
+                                }
+                        } else {
+                            outputGroupWithLabel(group, group, fileDataMap, config, store)
+                        }
+                    }
+                    fileDataMap
+                        .filter { entry ->
+                            !config.groupByOrder.any { group ->
+                                group.startsWith(entry.key)
+                            }
+                        }
+                        .forEach { entry ->
+                            outputGroupDiv(entry.key, entry.value, config, store)
+                        }
                 }
             }
         }
@@ -69,10 +93,25 @@ interface CodeBlockPageListView { companion object {
         element.outputStats(fileDataMap)
     }
 
-    fun FlowContent.outputGroup(
+    fun FlowContent.outputGroupWithLabel(
+        group: String,
+        label: String,
+        fileData: Map<String, List<FileData>>,
         config: CodeBlockConfig,
+        store: MinionStore
+    ) {
+        fileData[group]
+            .toOption().toEither {
+                MinionError.GroupByNotFoundError("$group not found in results")
+            }
+            .map { outputGroupDiv(label, it, config, store) }
+            .mapLeft { logger.warn { "$it" } }
+    }
+
+    fun FlowContent.outputGroupDiv(
         label: String,
         fileDataSet: List<FileData>,
+        config: CodeBlockConfig,
         store: MinionStore
     ) {
         if (label == GROUP_BY_SINGLE) {

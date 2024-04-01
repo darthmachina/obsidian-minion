@@ -9,6 +9,7 @@ import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputTaskSt
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.maybeAddProperties
+import app.minion.shell.view.codeblock.CodeBlockTaskListView.Companion.outputGroupDiv
 import app.minion.shell.view.codeblock.components.CodeBlockCard.Companion.outputTaskCard
 import arrow.core.toOption
 import io.kvision.state.sub
@@ -52,17 +53,28 @@ interface CodeBlockTaskGalleryView { companion object {
             this.append.div {
                 if (config.groupByOrder.isEmpty()) {
                     tasks.forEach { entry ->
-                        outputGroup(entry.key, entry.value, config, store)
+                        outputGroupDiv(entry.key, entry.value, config, store)
                     }
                 } else {
                     config.groupByOrder.forEach { group ->
-                        tasks[group]
-                            .toOption().toEither {
-                                MinionError.GroupByNotFoundError("$group not found in results")
-                            }
-                            .map { outputGroup(group, it, config, store) }
-                            .mapLeft { logger.warn { "$it" } }
+                        if (group.contains(":")) {
+                            group.split(":")
+                                .let {
+                                    outputGroupWithLabel(it[0], it[1], tasks, config, store)
+                                }
+                        } else {
+                            outputGroupWithLabel(group, group, tasks, config, store)
+                        }
                     }
+                    tasks
+                        .filter { entry ->
+                            !config.groupByOrder.any { group ->
+                                group.startsWith(entry.key)
+                            }
+                        }
+                        .forEach { entry ->
+                            outputGroupDiv(entry.key, entry.value, config, store)
+                        }
                 }
             }
         }
@@ -70,7 +82,16 @@ interface CodeBlockTaskGalleryView { companion object {
         this.outputTaskStats(tasks)
     }
 
-    fun FlowContent.outputGroup(label: String, tasks: List<Task>, config: CodeBlockConfig, store: MinionStore) {
+    fun FlowContent.outputGroupWithLabel(group: String, label: String, tasks: Map<String, List<Task>>, config: CodeBlockConfig, store: MinionStore) {
+        tasks[group]
+            .toOption().toEither {
+                MinionError.GroupByNotFoundError("$group not found in results")
+            }
+            .map { outputGroupDiv(label, it, config, store) }
+            .mapLeft { logger.warn { "$it" } }
+    }
+
+    fun FlowContent.outputGroupDiv(label: String, tasks: List<Task>, config: CodeBlockConfig, store: MinionStore) {
         if (label == GROUP_BY_SINGLE) {
             outputTaskList(tasks, config, store)
         } else {
