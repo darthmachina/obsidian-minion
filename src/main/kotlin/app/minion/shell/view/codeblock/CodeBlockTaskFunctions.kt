@@ -60,6 +60,10 @@ interface CodeBlockTaskFunctions { companion object {
                     this@applyGroupBy
                         .applyGroupByForParentTag(config).bind()
                 }
+                GroupByOptions.source -> {
+                    this@applyGroupBy
+                        .applyGroupByForSource().bind()
+                }
                 else -> raise(MinionError.ConfigError("${config.groupBy} not implemented yet"))
             }
         }
@@ -81,6 +85,14 @@ interface CodeBlockTaskFunctions { companion object {
                         GROUP_BY_UNKNOWN
                     }
 
+            }
+    }
+
+    fun List<Task>.applyGroupByForSource()
+    : Either<MinionError, Map<String, List<Task>>> = either {
+        this@applyGroupByForSource
+            .groupBy { task ->
+                task.fileInfo.file.v
             }
     }
 
