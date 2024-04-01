@@ -3,6 +3,7 @@ package app.minion.core.functions
 import app.minion.core.functions.DateTimeFunctions.Companion.isInPast
 import app.minion.core.functions.DateTimeFunctions.Companion.isToday
 import app.minion.core.functions.DateTimeFunctions.Companion.isTodayOrOverdue
+import app.minion.core.functions.DateTimeFunctions.Companion.isUpcoming
 import app.minion.core.functions.DateTimeFunctions.Companion.toLocalDateTime
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByTags
 import app.minion.core.model.Tag
@@ -45,6 +46,19 @@ interface TaskFilterFunctions { companion object {
             .filter { task ->
                 task.dueDate
                     .map { it.isInPast() }
+                    .getOrElse { false }
+            }
+            .sortedBy { task ->
+                task.dueDate.map { it.toLocalDateTime() }.getOrNull()
+            }
+    }
+
+    fun List<Task>.filterByUpcoming() : List<Task> {
+        logger.debug { "filterByUpcoming()" }
+        return this
+            .filter { task ->
+                task.dueDate
+                    .map { it.isUpcoming() }
                     .getOrElse { false }
             }
             .sortedBy { task ->
