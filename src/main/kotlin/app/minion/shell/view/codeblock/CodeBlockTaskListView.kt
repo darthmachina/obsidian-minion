@@ -80,24 +80,47 @@ interface CodeBlockTaskListView { companion object {
             element.append.div {
                 if (config.groupByOrder.isEmpty()) {
                     tasks.forEach { entry ->
-                        outputGroup(entry.key, entry.value, config, store)
+                        outputGroupDiv(entry.key, entry.value, config, store)
                     }
                 } else {
                     config.groupByOrder.forEach { group ->
-                        tasks[group]
-                            .toOption().toEither {
-                                MinionError.GroupByNotFoundError("$group not found in results")
-                            }
-                            .map { outputGroup(group, it, config, store) }
-                            .mapLeft { logger.warn { "$it" } }
+                        logger.debug { "Outputting group $group" }
+                        if (group.contains(":")) {
+                            group.split(":")
+                                .let {
+                                    outputGroupWithLabel(it[0], it[1], tasks, config, store)
+                                }
+                        } else {
+                            outputGroupWithLabel(group, group, tasks, config, store)
+                        }
                     }
+                    // Output any remaining entries
+                    tasks
+                        .filter { entry ->
+                            !config.groupByOrder.any { group ->
+                                group.startsWith(entry.key)
+                            }
+                        }
+                        .forEach { entry ->
+                            outputGroupDiv(entry.key, entry.value, config, store)
+                        }
                 }
             }
         }
         element.outputTaskStats(tasks)
     }
 
-    fun FlowContent.outputGroup(label: String, tasks: List<Task>, config: CodeBlockConfig, store: MinionStore) {
+    fun FlowContent.outputGroupWithLabel(group: String, label: String, tasks: Map<String, List<Task>>, config: CodeBlockConfig, store: MinionStore) {
+        logger.debug { "outputGroupWithLabel: $group, $label" }
+        tasks[group]
+            .toOption().toEither {
+                MinionError.GroupByNotFoundError("$group not found in results")
+            }
+            .map { outputGroupDiv(label, it, config, store) }
+            .mapLeft { logger.warn { "$it" } }
+    }
+
+    fun FlowContent.outputGroupDiv(label: String, tasks: List<Task>, config: CodeBlockConfig, store: MinionStore) {
         if (label == GROUP_BY_SINGLE) {
             outputTaskList(tasks, config, store)
         } else {

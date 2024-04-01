@@ -7,6 +7,7 @@ import app.minion.core.store.MinionStore
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputGroupLabel
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.applyCodeBlockConfig
+import app.minion.shell.view.codeblock.CodeBlockTaskGalleryView.Companion.outputGroupWithLabel
 import app.minion.shell.view.codeblock.components.CodeBlockCard.Companion.outputPageCard
 import arrow.core.toOption
 import io.kvision.state.sub
@@ -56,25 +57,29 @@ interface CodeBlockPageGalleryView { companion object {
                 // If order size is less than map size, output remaining entries
                 if (config.groupByOrder.isEmpty()) {
                     fileDataMap.forEach { entry ->
-                        outputGroup(config, entry.key, entry.value, store)
+                        outputGroupDiv(entry.key, entry.value, config, store)
                     }
                 } else {
                     config.groupByOrder.forEach { group ->
-                        fileDataMap[group]
-                            .toOption().toEither {
-                                MinionError.GroupByNotFoundError("$group not found in results")
-                            }
-                            .map { outputGroup(config, group, it, store) }
-                            .mapLeft {
-                                // Don't stop processing, just report the issue and continue
-                                logger.warn { "$it" }
-                            }
+                        logger.debug { "Outputting group $group" }
+                        if (group.contains(":")) {
+                            group.split(":")
+                                .let {
+                                    outputGroupWithLabel(it[0], it[1], fileDataMap, config, store)
+                                }
+                        } else {
+                            outputGroupWithLabel(group, group, fileDataMap, config, store)
+                        }
                     }
                     // Output any remaining entries
                     fileDataMap
-                        .filter { !config.groupByOrder.contains(it.key) }
+                        .filter { entry ->
+                            !config.groupByOrder.any { group ->
+                                group.startsWith(entry.key)
+                            }
+                        }
                         .forEach { entry ->
-                            outputGroup(config, entry.key, entry.value, store)
+                            outputGroupDiv(entry.key, entry.value, config, store)
                         }
                 }
             }
@@ -83,10 +88,29 @@ interface CodeBlockPageGalleryView { companion object {
         element.outputStats(fileDataMap)
     }
 
-    fun FlowContent.outputGroup(
+    fun FlowContent.outputGroupWithLabel(
+        group: String,
+        label: String,
+        fileDataMap: Map<String, List<FileData>>,
         config: CodeBlockConfig,
+        store: MinionStore
+    ) {
+        logger.debug { "outputGroupWithLabel: $group, $label" }
+        fileDataMap[group]
+            .toOption().toEither {
+                MinionError.GroupByNotFoundError("$group not found in results")
+            }
+            .map { outputGroupDiv(label, it, config, store) }
+            .mapLeft {
+                // Don't stop processing, just report the issue and continue
+                logger.warn { "$it" }
+            }
+    }
+
+    fun FlowContent.outputGroupDiv(
         label: String,
         fileDataSet: List<FileData>,
+        config: CodeBlockConfig,
         store: MinionStore
     ) {
         if (label == GROUP_BY_SINGLE) {

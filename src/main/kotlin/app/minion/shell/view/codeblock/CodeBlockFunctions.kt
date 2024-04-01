@@ -31,10 +31,14 @@ interface CodeBlockFunctions { companion object {
 
     fun FlowContent.outputGroupLabel(label: String) {
         h4(classes = "mi-codeblock-group-label") {
-            +label
-                .replace(PARENT_TAG_REGEX, "")
-                .replace("#", "")
-                .replaceFirstChar(Char::uppercaseChar)
+            if (label.contains(":")) {
+                +label.split(":")[1]
+            } else {
+                +label
+                    .replace(PARENT_TAG_REGEX, "")
+                    .replace("#", "")
+                    .replaceFirstChar(Char::uppercaseChar)
+            }
         }
     }
 }}
