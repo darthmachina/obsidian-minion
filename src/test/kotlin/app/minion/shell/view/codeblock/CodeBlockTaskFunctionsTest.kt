@@ -19,7 +19,7 @@ class CodeBlockTaskFunctionsTest : StringSpec({
         val config = CodeBlockConfig(query = CodeBlockQuery.tasks, display = CodeBlockDisplay.list)
 
         val actual = config.maybeAddProperties()
-        actual.properties shouldContainOnly listOf(PROPERTY_DUE, PROPERTY_SOURCE, PROPERTY_TAGS)
+        actual.properties shouldContainOnly listOf(PROPERTY_DUE, PROPERTY_SOURCE, PROPERTY_TAGS, PROPERTY_EISENHOWER)
     }
 
     "maybeAddProperties does nothing if properties already set" {

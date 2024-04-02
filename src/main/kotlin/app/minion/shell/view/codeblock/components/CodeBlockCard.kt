@@ -17,6 +17,7 @@ import app.minion.shell.view.codeblock.CodeBlockDisplay
 import app.minion.shell.view.codeblock.CodeBlockOptions
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.removeConfigTags
 import app.minion.shell.view.codeblock.PROPERTY_DUE
+import app.minion.shell.view.codeblock.PROPERTY_EISENHOWER
 import app.minion.shell.view.codeblock.PROPERTY_SOURCE
 import app.minion.shell.view.codeblock.PROPERTY_TAGS
 import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Companion.createChangeGroupMenuItem
@@ -24,7 +25,9 @@ import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Compani
 import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Companion.getImagePath
 import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Companion.outputCardMenu
 import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Companion.outputSubtasks
+import app.minion.shell.view.iconImportant
 import app.minion.shell.view.iconRepeat
+import app.minion.shell.view.iconUrgent
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.toOption
@@ -111,6 +114,18 @@ interface CodeBlockCard { companion object {
                                 outputStyledContent(Content("[[${task.fileInfo.file.v}]]"), store)
                             }
 
+                        }
+                    }
+                    PROPERTY_EISENHOWER -> {
+                        "Eisenhower" to {
+                            span {
+                                if (task.important) {
+                                    span(classes = "mi-icon") { unsafe { +iconImportant } }
+                                }
+                                if (task.urgent) {
+                                    span(classes = "mi-icon") { unsafe { +iconUrgent } }
+                                }
+                            }
                         }
                     }
                     else -> {

@@ -82,7 +82,13 @@ interface CodeBlockTaskGalleryView { companion object {
         this.outputTaskStats(tasks)
     }
 
-    fun FlowContent.outputGroupWithLabel(group: String, label: String, tasks: Map<String, List<Task>>, config: CodeBlockConfig, store: MinionStore) {
+    fun FlowContent.outputGroupWithLabel(
+        group: String,
+        label: String,
+        tasks: Map<String, List<Task>>,
+        config: CodeBlockConfig,
+        store: MinionStore
+    ) {
         tasks[group]
             .toOption().toEither {
                 MinionError.GroupByNotFoundError("$group not found in results")
