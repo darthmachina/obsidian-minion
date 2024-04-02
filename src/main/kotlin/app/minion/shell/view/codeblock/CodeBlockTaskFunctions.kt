@@ -25,7 +25,7 @@ interface CodeBlockTaskFunctions { companion object {
             .applyDue(config)
             .applyInclude(config.include)
             .applyExcludeTags(config)
-            .sortedWith(compareBy<Task, DateTime?>(nullsLast()) { it.dueDate.getOrNull() }.thenBy { it.content.v })
+            .applySort(config).bind()
             .applyGroupBy(config).bind()
     }
 
@@ -48,6 +48,27 @@ interface CodeBlockTaskFunctions { companion object {
             this.excludeByTags(config.exclude.tags.map { Tag(it) })
         } else {
             this
+        }
+    }
+
+    fun List<Task>.applySort(config: CodeBlockConfig) : Either<MinionError, List<Task>> = either {
+        if (config.sort.contains("eisenhower")) {
+            // Sort by due date then important/urgent
+            // 3 -> important && urgent
+            // 2 -> urgent
+            // 1 -> important
+            // 0 -> neither
+            this@applySort.sortedWith(
+                compareBy<Task, DateTime?>(nullsLast()) { it.dueDate.getOrNull() }
+                    .thenByDescending {
+                        0 + (if (it.important) 1 else 0) + (if (it.urgent) 2 else 0)
+                    }
+            )
+        } else {
+            this@applySort.sortedWith(
+                compareBy<Task, DateTime?>(nullsLast()) { it.dueDate.getOrNull() }
+                    .thenBy { it.content.v }
+            )
         }
     }
 
