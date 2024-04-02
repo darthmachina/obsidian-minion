@@ -4,6 +4,7 @@ import app.minion.core.functions.DateTimeFunctions.Companion.asString
 import app.minion.core.functions.TaskTagFunctions.Companion.asString
 import app.minion.core.model.DateTime
 import app.minion.core.model.RepeatInfo
+import app.minion.core.model.Tag
 import app.minion.core.model.TagType
 import app.minion.core.model.Task
 import arrow.core.Option
@@ -20,8 +21,17 @@ interface MarkdownConversionFunctions { companion object {
 
         markdownElements.add(if (completedOn.isSome()) "- [x]" else "- [ ]")
         markdownElements.add(content.v)
-        if (tags.isNotEmpty()) {
-            markdownElements.add(tags.filter { it.type == TagType.TASK }.toSet().asString())
+        if (tags.isNotEmpty() || important || urgent) {
+            logger.debug { "$important / $urgent" }
+            tags
+                .let { if (important) it.plus(Tag("i")) else it }
+                .let { if (urgent) it.plus(Tag("u")) else it }
+                .filter { it.type == TagType.TASK }
+                .toSet()
+                .let {
+                    logger.debug { "Outputting tags $it" }
+                    markdownElements.add(it.asString())
+                }
         }
         dueDate.map { markdownElements.add("${it.toMarkdown("due")} ") }
         hideUntil.map { markdownElements.add("${it.toMarkdown("hide")} ") }
