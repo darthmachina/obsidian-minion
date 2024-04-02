@@ -21,9 +21,11 @@ import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.maybeAddProperties
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.removeConfigTags
+import app.minion.shell.view.iconImportant
 import app.minion.shell.view.iconKanban
 import app.minion.shell.view.iconMenu
 import app.minion.shell.view.iconRepeat
+import app.minion.shell.view.iconUrgent
 import app.minion.shell.view.modal.KanbanStatusSelectModal
 import arrow.core.Option
 import arrow.core.toOption
@@ -168,6 +170,18 @@ interface CodeBlockTaskListView { companion object {
                     if (isNotEmpty()) {
                         outputTags(this, config)
                     }
+                }
+            }
+            if (task.important && config.properties.contains(PROPERTY_EISENHOWER)) {
+                span(classes = "mi-icon") {
+                    title = "Important"
+                    unsafe { +iconImportant }
+                }
+            }
+            if (task.urgent && config.properties.contains(PROPERTY_EISENHOWER)) {
+                span(classes = "mi-icon") {
+                    title = "Urgent"
+                    unsafe { +iconUrgent }
                 }
             }
             task.repeatInfo.map {

@@ -105,7 +105,7 @@ interface CodeBlockTaskFunctions { companion object {
     fun CodeBlockConfig.maybeAddProperties() : CodeBlockConfig {
         return if (this.properties.isEmpty()) {
             this.copy(
-                properties = listOf(PROPERTY_DUE, PROPERTY_SOURCE, PROPERTY_TAGS)
+                properties = listOf(PROPERTY_DUE, PROPERTY_SOURCE, PROPERTY_TAGS, PROPERTY_EISENHOWER)
             )
         } else {
             this
