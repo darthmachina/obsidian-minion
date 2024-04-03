@@ -12,6 +12,7 @@ import app.minion.core.model.Task
 import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions.Companion.openSourceFile
 import app.minion.shell.thunk.TaskThunks
+import app.minion.shell.view.ViewFunctions.Companion.outputCheckbox
 import app.minion.shell.view.ViewFunctions.Companion.outputDue
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputGroupLabel
@@ -144,20 +145,7 @@ interface CodeBlockTaskListView { companion object {
     }
 
     fun FlowContent.outputTask(task: Task, store: MinionStore, config: CodeBlockConfig) {
-        checkBoxInput {
-            task.tags
-                .intersect(store.store.state.settings.lifeAreas.keys.map { Tag(it) }.toSet())
-                .let {
-                    if (it.isNotEmpty()) {
-                        logger.debug { "Applying style to checkbox: $it" }
-                        attributes["style"] = "border: 1px solid ${store.store.state.settings.lifeAreas[it.first().v]!!}"
-                    }
-                }
-
-            onClickFunction = {
-                store.dispatch(TaskThunks.completeTask(store.store.state.plugin.app, task))
-            }
-        }
+        outputCheckbox(task, store)
         outputContent(task, store, config)
         outputSubtasks(task, store)
         outputNotes(task, store)

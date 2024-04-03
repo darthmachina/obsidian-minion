@@ -6,10 +6,12 @@ import app.minion.core.functions.TaskTagFunctions.Companion.collectTags
 import app.minion.core.model.Content
 import app.minion.core.model.DataviewField
 import app.minion.core.model.FileData
+import app.minion.core.model.Tag
 import app.minion.core.model.Task
 import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions
 import app.minion.shell.thunk.TaskThunks
+import app.minion.shell.view.ViewFunctions.Companion.outputCheckbox
 import app.minion.shell.view.ViewFunctions.Companion.outputDue
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.codeblock.CodeBlockConfig
@@ -137,11 +139,7 @@ interface CodeBlockCard { companion object {
 
         outputCard(
             {
-                checkBoxInput {
-                    onClickFunction = {
-                        store.dispatch(TaskThunks.completeTask(store.store.state.plugin.app, task))
-                    }
-                }
+                outputCheckbox(task, store)
                 outputStyledContent(task.content, store)
             },
             { outputSubtasks(task, store) },
