@@ -145,6 +145,16 @@ interface CodeBlockTaskListView { companion object {
 
     fun FlowContent.outputTask(task: Task, store: MinionStore, config: CodeBlockConfig) {
         checkBoxInput {
+            task.tags
+                .union( store.store.state.settings.lifeAreas.keys.map { Tag(it) })
+                .let {
+                    if (it.isNotEmpty()) {
+                        style {
+                            store.store.state.settings.lifeAreas[it.first().v]!!
+                        }
+                    }
+                }
+
             onClickFunction = {
                 store.dispatch(TaskThunks.completeTask(store.store.state.plugin.app, task))
             }

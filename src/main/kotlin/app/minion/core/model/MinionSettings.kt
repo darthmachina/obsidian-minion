@@ -27,11 +27,11 @@ data class MinionSettings2(
             "2",
             KotlinLoggingLevel.DEBUG,
             mapOf(
-                "personal" to Color("#13088C"),
-                "home" to Color("#460A60"),
-                "marriage" to Color("#196515"),
-                "family" to Color("#8E791C"),
-                "work" to Color("#D34807")
+                "area/personal" to Color("#13088C"),
+                "area/home" to Color("#460A60"),
+                "area/marriage" to Color("#196515"),
+                "area/family" to Color("#8E791C"),
+                "area/work" to Color("#D34807")
             ),
             setOf(),
             listOf()
