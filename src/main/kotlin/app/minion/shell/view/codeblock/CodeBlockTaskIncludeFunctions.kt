@@ -1,6 +1,7 @@
 package app.minion.shell.view.codeblock
 
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByAnyTag
+import app.minion.core.functions.TaskFilterFunctions.Companion.filterBySource
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByTags
 import app.minion.core.model.Tag
 import app.minion.core.model.Task
@@ -31,7 +32,9 @@ interface CodeBlockTaskIncludeFunctions { companion object {
             } else if (include.or.isNotEmpty()) {
                 filteredTasks.applyIncludeOr(include.or)
             } else {
-                filteredTasks.applyIncludeTagsAnd(include)
+                filteredTasks
+                    .applyIncludeTagsAnd(include)
+                    .applyIncludeSourceAnd(include)
             }
         }
         return filteredTasks
@@ -62,6 +65,14 @@ interface CodeBlockTaskIncludeFunctions { companion object {
     fun List<Task>.applyIncludeTagsOr(include: IncludeExcludeOptions) : List<Task> {
         return if (include.tags.isNotEmpty()) {
             this.filterByAnyTag(include.tags.map { Tag(it) })
+        } else {
+            this
+        }
+    }
+
+    fun List<Task>.applyIncludeSourceAnd(include: IncludeExcludeOptions) : List<Task> {
+        return if (include.source.isNotEmpty()) {
+            this.filterBySource(include.source)
         } else {
             this
         }
