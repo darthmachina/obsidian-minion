@@ -4,6 +4,7 @@ import app.minion.core.MinionError
 import app.minion.core.functions.PageFilterFunctions.Companion.filterByAnyDataview
 import app.minion.core.functions.PageFilterFunctions.Companion.filterByAnyTag
 import app.minion.core.functions.PageFilterFunctions.Companion.filterByDataview
+import app.minion.core.functions.PageFilterFunctions.Companion.filterBySource
 import app.minion.core.functions.PageFilterFunctions.Companion.filterByTags
 import app.minion.core.model.DataviewField
 import app.minion.core.model.DataviewValue
@@ -22,10 +23,12 @@ interface CodeBlockPageIncludeFunctions { companion object {
             this@applyInclude
                 .applyIncludeTagsAnd(include).bind()
                 .applyIncludeDataviewAnd(include).bind()
+                .applyIncludeSourceAnd(include).bind()
         }
     }
 
-    fun List<FileData>.applyIncludeAnd(includeList: List<IncludeExcludeOptions>) : Either<MinionError, List<FileData>> = either {
+    fun List<FileData>.applyIncludeAnd(includeList: List<IncludeExcludeOptions>)
+    : Either<MinionError, List<FileData>> = either {
         var filteredPages = this@applyIncludeAnd
         includeList.forEach { include ->
             filteredPages = if (include.and.isNotEmpty()) {
@@ -41,7 +44,8 @@ interface CodeBlockPageIncludeFunctions { companion object {
         filteredPages
     }
 
-    fun List<FileData>.applyIncludeOr(includeList: List<IncludeExcludeOptions>) : Either<MinionError, List<FileData>> = either {
+    fun List<FileData>.applyIncludeOr(includeList: List<IncludeExcludeOptions>)
+    : Either<MinionError, List<FileData>> = either {
         var filteredPages = this@applyIncludeOr
         includeList.forEach { include ->
             filteredPages = if (include.and.isNotEmpty()) {
@@ -57,7 +61,8 @@ interface CodeBlockPageIncludeFunctions { companion object {
         filteredPages
     }
 
-    fun List<FileData>.applyIncludeTagsAnd(include: IncludeExcludeOptions) : Either<MinionError, List<FileData>> = either {
+    fun List<FileData>.applyIncludeTagsAnd(include: IncludeExcludeOptions)
+    : Either<MinionError, List<FileData>> = either {
         if (include.tags.isNotEmpty()) {
             this@applyIncludeTagsAnd.filterByTags(include.tags.map { Tag(it) })
         } else {
@@ -65,7 +70,8 @@ interface CodeBlockPageIncludeFunctions { companion object {
         }
     }
 
-    fun List<FileData>.applyIncludeTagsOr(include: IncludeExcludeOptions) : Either<MinionError, List<FileData>> = either {
+    fun List<FileData>.applyIncludeTagsOr(include: IncludeExcludeOptions)
+    : Either<MinionError, List<FileData>> = either {
         if (include.tags.isNotEmpty()) {
             this@applyIncludeTagsOr.filterByAnyTag(include.tags.map { Tag(it) })
         } else {
@@ -73,7 +79,8 @@ interface CodeBlockPageIncludeFunctions { companion object {
         }
     }
 
-    fun List<FileData>.applyIncludeDataviewAnd(include: IncludeExcludeOptions) : Either<MinionError, List<FileData>> = either {
+    fun List<FileData>.applyIncludeDataviewAnd(include: IncludeExcludeOptions)
+    : Either<MinionError, List<FileData>> = either {
         if (include.dataview.isNotEmpty()) {
             this@applyIncludeDataviewAnd.filterByDataview(include.dataview.toDataviewPair().bind())
         } else {
@@ -81,11 +88,21 @@ interface CodeBlockPageIncludeFunctions { companion object {
         }
     }
 
-    fun List<FileData>.applyIncludeDataviewOr(include: IncludeExcludeOptions) : Either<MinionError, List<FileData>> = either {
+    fun List<FileData>.applyIncludeDataviewOr(include: IncludeExcludeOptions)
+    : Either<MinionError, List<FileData>> = either {
         if (include.dataview.isNotEmpty()) {
             this@applyIncludeDataviewOr.filterByAnyDataview(include.dataview.toDataviewPair().bind())
         } else {
             this@applyIncludeDataviewOr
+        }
+    }
+
+    fun List<FileData>.applyIncludeSourceAnd(include: IncludeExcludeOptions)
+    : Either<MinionError, List<FileData>> = either {
+        if (include.source.isNotEmpty()) {
+            this@applyIncludeSourceAnd.filterBySource(include.source)
+        } else {
+            this@applyIncludeSourceAnd
         }
     }
 

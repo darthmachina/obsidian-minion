@@ -37,4 +37,20 @@ interface PageFilterFunctions { companion object {
                     .any { values.contains(it) }
             }
     }
+
+    fun List<FileData>.filterBySource(values: List<String>) : List<FileData> {
+        return this
+            .filter { page ->
+                values.all { search ->
+                    if (search.startsWith("/")) {
+                        search
+                            .replace("/", "")
+                            .toRegex()
+                            .matches(page.name.v)
+                    } else {
+                        values.contains(page.name.v)
+                    }
+                }
+            }
+    }
 }}

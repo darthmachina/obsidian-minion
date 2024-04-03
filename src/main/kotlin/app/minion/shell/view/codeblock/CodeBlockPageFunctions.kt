@@ -68,7 +68,8 @@ interface CodeBlockPageFunctions { companion object {
             .toSet()
     }
 
-    fun List<FileData>.applyGroupBy(config: CodeBlockConfig) : Either<MinionError, Map<String, List<FileData>>> = either {
+    fun List<FileData>.applyGroupBy(config: CodeBlockConfig)
+    : Either<MinionError, Map<String, List<FileData>>> = either {
         if (config.groupBy == GroupByOptions.NONE) {
             mapOf(GROUP_BY_SINGLE to this@applyGroupBy)
         } else {
