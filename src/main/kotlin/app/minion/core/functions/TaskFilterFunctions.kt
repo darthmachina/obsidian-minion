@@ -80,6 +80,22 @@ interface TaskFilterFunctions { companion object {
             }
     }
 
+    fun List<Task>.filterBySource(sources: List<String>) : List<Task> {
+        return this
+            .filter { task ->
+                sources.all { search ->
+                    if (search.startsWith("/")) {
+                        search
+                            .replace("/", "")
+                            .toRegex()
+                            .matches(task.fileInfo.file.v)
+                    } else {
+                        search == task.fileInfo.file.v
+                    }
+                }
+            }
+    }
+
     fun List<Task>.excludeByTags(tags: Iterable<Tag>) : List<Task> {
         return this
             .filter { task ->
