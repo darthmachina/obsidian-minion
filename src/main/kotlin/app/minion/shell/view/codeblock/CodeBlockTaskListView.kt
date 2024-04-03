@@ -146,12 +146,11 @@ interface CodeBlockTaskListView { companion object {
     fun FlowContent.outputTask(task: Task, store: MinionStore, config: CodeBlockConfig) {
         checkBoxInput {
             task.tags
-                .union( store.store.state.settings.lifeAreas.keys.map { Tag(it) })
+                .intersect(store.store.state.settings.lifeAreas.keys.map { Tag(it) }.toSet())
                 .let {
                     if (it.isNotEmpty()) {
-                        style {
-                            store.store.state.settings.lifeAreas[it.first().v]!!
-                        }
+                        logger.debug { "Applying style to checkbox: $it" }
+                        attributes["style"] = "border: 1px solid ${store.store.state.settings.lifeAreas[it.first().v]!!}"
                     }
                 }
 
