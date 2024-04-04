@@ -68,6 +68,25 @@ interface CodeBlockPageFunctions { companion object {
             .toSet()
     }
 
+    fun List<FileData>.applySort(config: CodeBlockConfig) : Either<MinionError, List<FileData>> = either {
+        if (config.sort.isNotEmpty()) {
+            if (config.sort.contains(SORT_BY_EISENHOWER)) {
+                raise(MinionError.ConfigError("$SORT_BY_EISENHOWER is not a valid page sort"))
+            }
+
+            // For now assume that any sort options are properties, as that is all to sort on for now.
+            // Applies sorting in order defined in the sort list
+            this@applySort.sortedWith(
+                compareBy<FileData, DataviewValue?>(nullsLast()) {
+
+                }
+            )
+        } else {
+            sortedWith(compareBy { it.name.v })
+        }
+        this@applySort
+    }
+
     fun List<FileData>.applyGroupBy(config: CodeBlockConfig)
     : Either<MinionError, Map<String, List<FileData>>> = either {
         if (config.groupBy == GroupByOptions.NONE) {
