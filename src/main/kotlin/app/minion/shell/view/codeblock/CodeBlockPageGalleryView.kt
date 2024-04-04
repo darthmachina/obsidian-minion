@@ -4,7 +4,9 @@ import app.minion.core.MinionError
 import app.minion.core.functions.StatisticsFunctions.Companion.calculateTotalCount
 import app.minion.core.model.FileData
 import app.minion.core.store.MinionStore
+import app.minion.shell.view.ViewFunctions.Companion.maybeOutputHeading
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputGroupLabel
+import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputHeading
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockTaskGalleryView.Companion.outputGroupWithLabel
@@ -45,11 +47,7 @@ interface CodeBlockPageGalleryView { companion object {
         config: CodeBlockConfig
     ) {
         element.clear()
-        if (config.heading.isNotEmpty()) {
-            element.append.div(classes = "mi-codeblock-heading") {
-                +config.heading
-            }
-        }
+        element.maybeOutputHeading(config)
 
         if (fileDataMap.isNotEmpty()) {
             element.append.div {

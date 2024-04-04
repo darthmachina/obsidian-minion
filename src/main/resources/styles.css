@@ -267,3 +267,33 @@ input[type=checkbox] {
 .mi-codeblock-menu-container:hover button {
     background-color: #3e8e41;
 }
+
+.mi-codeblock-table {
+    border: 0 !important;
+    width: 90%;
+}
+
+.mi-codeblock-table-group-header {
+
+}
+
+.mi-codeblock-table-header {
+    border-bottom: 2px double;
+}
+
+.mi-codeblock-table-header-cell {
+    border: 0 !important;
+    max-width: 100%;
+}
+
+.mi-codeblock-table-page-column {
+
+}
+
+.mi-codeblock-table-data-row {
+
+}
+
+.mi-codeblock-table-data-cell {
+    border: 0 !important;
+}

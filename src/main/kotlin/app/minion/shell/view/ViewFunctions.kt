@@ -19,20 +19,32 @@ import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions.Companion.openSourceFile
 import app.minion.shell.functions.VaultFunctions.Companion.sourceFileExists
 import app.minion.shell.thunk.TaskThunks
+import app.minion.shell.view.codeblock.CodeBlockConfig
 import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.toOption
 import kotlinx.html.FlowContent
 import kotlinx.html.FlowOrPhrasingContent
 import kotlinx.html.checkBoxInput
+import kotlinx.html.div
+import kotlinx.html.dom.append
 import kotlinx.html.js.onClickFunction
 import kotlinx.html.span
 import kotlinx.html.style
 import mu.KotlinLogging
+import org.w3c.dom.HTMLElement
 
 private val logger = KotlinLogging.logger("ViewFunctions")
 
 interface ViewFunctions { companion object {
+    fun HTMLElement.maybeOutputHeading(config: CodeBlockConfig) {
+        if (config.heading.isNotEmpty()) {
+            append.div(classes = "mi-codeblock-heading") {
+                +config.heading
+            }
+        }
+    }
+
     fun FlowOrPhrasingContent.outputStyledContent(content: Content, store: MinionStore) {
         content.tokenize()
             .forEach { token ->
@@ -79,6 +91,15 @@ interface ViewFunctions { companion object {
 
             onClickFunction = {
                 store.dispatch(TaskThunks.completeTask(store.store.state.plugin.app, task))
+            }
+        }
+    }
+
+    fun FlowContent.outputSourceLink(filename: Filename, store: MinionStore) {
+        span(classes = "mi-codeblock-source-link") {
+            +filename.v
+            onClickFunction = {
+                openSourceFile(filename, store.store.state.plugin.app)
             }
         }
     }
