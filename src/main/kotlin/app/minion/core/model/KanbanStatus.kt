@@ -9,10 +9,12 @@ import arrow.core.toOption
 enum class KanbanStatus(val tag: String, val display: String) {
     ICEBOX("icebox", "Icebox"),
     BACKLOG("backlog", "Backlog"),
-    NEXT("next", "Next"),
-    PRIORITY("priority", "Priority"),
-    SCHEDULED("scheduled", "Scheduled"),
+    NEXT_MONTH("nextmonth", "Next Month"),
+    THIS_MONTH("thismonth", "This Month"),
+    NEXT_WEEK("nextweek", "Next Week"),
+    THIS_WEEK("thisweek", "This Week"),
     IN_PROGRESS("inprogress", "In Progress"),
+    SCHEDULED("scheduled", "Scheduled"),
     WAITING("waiting", "Waiting");
 
     companion object {
