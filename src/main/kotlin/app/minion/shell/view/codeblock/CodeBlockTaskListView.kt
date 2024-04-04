@@ -6,6 +6,7 @@ import app.minion.core.functions.DateTimeFunctions.Companion.isInPast
 import app.minion.core.functions.TaskStatisticsFunctions.Companion.completedSubtaskPercent
 import app.minion.core.functions.TaskTagFunctions.Companion.collectTags
 import app.minion.core.model.DateTime
+import app.minion.core.model.Filename
 import app.minion.core.model.ListItemFileInfo
 import app.minion.core.model.Tag
 import app.minion.core.model.Task
@@ -14,6 +15,7 @@ import app.minion.shell.functions.VaultFunctions.Companion.openSourceFile
 import app.minion.shell.thunk.TaskThunks
 import app.minion.shell.view.ViewFunctions.Companion.outputCheckbox
 import app.minion.shell.view.ViewFunctions.Companion.outputDue
+import app.minion.shell.view.ViewFunctions.Companion.outputSourceLink
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputGroupLabel
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputHeading
@@ -188,7 +190,7 @@ interface CodeBlockTaskListView { companion object {
                 }
             }
             if (config.properties.contains(PROPERTY_SOURCE)) {
-                outputSource(task.fileInfo, store)
+                outputSource(task.fileInfo.file, store)
             }
             task.completedSubtaskPercent()
                 .map { percent ->
@@ -226,15 +228,10 @@ interface CodeBlockTaskListView { companion object {
         }
     }
 
-    fun FlowContent.outputSource(fileInfo: ListItemFileInfo, store: MinionStore) {
+    fun FlowContent.outputSource(fileInfo: Filename, store: MinionStore) {
         span(classes = "mi-codeblock-task-source") {
             span { +"(" }
-            span(classes = "mi-codeblock-source-link") {
-                +fileInfo.file.v
-                onClickFunction = {
-                    openSourceFile(fileInfo.file, store.store.state.plugin.app)
-                }
-            }
+            outputSourceLink(fileInfo, store)
             span { +")" }
         }
     }

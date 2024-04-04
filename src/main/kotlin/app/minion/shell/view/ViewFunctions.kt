@@ -95,6 +95,15 @@ interface ViewFunctions { companion object {
         }
     }
 
+    fun FlowContent.outputSourceLink(filename: Filename, store: MinionStore) {
+        span(classes = "mi-codeblock-source-link") {
+            +filename.v
+            onClickFunction = {
+                openSourceFile(filename, store.store.state.plugin.app)
+            }
+        }
+    }
+
     fun Content.tokenize() : List<String> {
         return v.parseMarkdownLinks()
             .flatMap { it.parseBold() }

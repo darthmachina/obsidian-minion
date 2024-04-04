@@ -9,6 +9,7 @@ import app.minion.shell.view.codeblock.CodeBlockDisplay
 import app.minion.shell.view.codeblock.CodeBlockErrorView.Companion.addErrorView
 import app.minion.shell.view.codeblock.CodeBlockPageGalleryView.Companion.addPageGalleryView
 import app.minion.shell.view.codeblock.CodeBlockPageListView.Companion.addPageListView
+import app.minion.shell.view.codeblock.CodeBlockPageTableView.Companion.addPageTableView
 import app.minion.shell.view.codeblock.CodeBlockQuery
 import app.minion.shell.view.codeblock.CodeBlockTaskGalleryView.Companion.addTaskGalleryView
 import app.minion.shell.view.codeblock.CodeBlockTaskListView.Companion.addTaskListView
@@ -55,7 +56,7 @@ interface CodeBlockView { companion object {
             CodeBlockDisplay.list -> element.addPageListView(config, store)
             CodeBlockDisplay.gallery -> element.addPageGalleryView(config, store)
             CodeBlockDisplay.kanban -> TODO()
-            CodeBlockDisplay.table -> TODO()
+            CodeBlockDisplay.table -> element.addPageTableView(config, store)
         }
     }
 }}
