@@ -13,14 +13,18 @@ import app.minion.core.functions.WIKILINK_REGEX
 import app.minion.core.model.Content
 import app.minion.core.model.DateTime
 import app.minion.core.model.Filename
+import app.minion.core.model.Tag
+import app.minion.core.model.Task
 import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions.Companion.openSourceFile
 import app.minion.shell.functions.VaultFunctions.Companion.sourceFileExists
+import app.minion.shell.thunk.TaskThunks
 import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.toOption
 import kotlinx.html.FlowContent
 import kotlinx.html.FlowOrPhrasingContent
+import kotlinx.html.checkBoxInput
 import kotlinx.html.js.onClickFunction
 import kotlinx.html.span
 import kotlinx.html.style
@@ -62,6 +66,22 @@ interface ViewFunctions { companion object {
             }
     }
 
+    fun FlowContent.outputCheckbox(task: Task, store: MinionStore) {
+        checkBoxInput {
+            task.tags
+                .intersect(store.store.state.settings.lifeAreas.keys.map { Tag(it) }.toSet())
+                .let {
+                    if (it.isNotEmpty()) {
+                        logger.debug { "Applying style to checkbox: $it" }
+                        attributes["style"] = "border: 1px solid ${store.store.state.settings.lifeAreas[it.first().v]!!}"
+                    }
+                }
+
+            onClickFunction = {
+                store.dispatch(TaskThunks.completeTask(store.store.state.plugin.app, task))
+            }
+        }
+    }
 
     fun Content.tokenize() : List<String> {
         return v.parseMarkdownLinks()

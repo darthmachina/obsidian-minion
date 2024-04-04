@@ -13,8 +13,11 @@ import app.minion.shell.view.codeblock.CodeBlockQuery
 import app.minion.shell.view.codeblock.CodeBlockTaskGalleryView.Companion.addTaskGalleryView
 import app.minion.shell.view.codeblock.CodeBlockTaskListView.Companion.addTaskListView
 import arrow.core.toOption
+import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
 import org.w3c.dom.HTMLElement
+
+private val logger = KotlinLogging.logger("CodeBlockView")
 
 interface CodeBlockView { companion object {
     fun processCodeBlock(store: MinionStore)
@@ -29,7 +32,8 @@ interface CodeBlockView { companion object {
                 }
             }
                 .onFailure {
-                    MinionError.ConfigParseError("Error parsing config", it.toOption())
+                    logger.error { it }
+                    MinionError.ConfigParseError("Error loading code block view", it.toOption())
                         .let {
                             element.addErrorView(it)
                         }
