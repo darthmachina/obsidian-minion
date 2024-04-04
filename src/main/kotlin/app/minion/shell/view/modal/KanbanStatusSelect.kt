@@ -19,8 +19,7 @@ class KanbanStatusSelectModal(val store: MinionStore, val task: Task, override v
         Setting(contentEl)
             .setName("Status")
             .addDropdown { dropdown ->
-                KanbanStatus
-                    .values()
+                KanbanStatus.entries
                     .forEach {
                         dropdown.addOption(it.tag, it.display)
                     }
