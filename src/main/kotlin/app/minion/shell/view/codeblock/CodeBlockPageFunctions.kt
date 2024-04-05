@@ -24,7 +24,7 @@ interface CodeBlockPageFunctions { companion object {
             .files
             .map { it.value }
             .applyInclude(config.include).bind()
-            .sortedWith(compareBy { it.name.v })
+            .applySort(config).bind()
             .applyGroupBy(config).bind()
     }
 
@@ -76,15 +76,20 @@ interface CodeBlockPageFunctions { companion object {
 
             // For now assume that any sort options are properties, as that is all to sort on for now.
             // Applies sorting in order defined in the sort list
-            this@applySort.sortedWith(
-                compareBy<FileData, DataviewValue?>(nullsLast()) {
-
+            var comparator = compareBy<FileData, DataviewValue?>(nullsLast()) {
+                it.dataview[DataviewField(config.sort.first())]
+            }
+            if (config.sort.size > 1) {
+                for(i in 1..<config.sort.size) {
+                    comparator = comparator.thenBy {
+                        it.dataview[DataviewField(config.sort[i])]
+                    }
                 }
-            )
+            }
+            this@applySort.sortedWith(comparator)
         } else {
             sortedWith(compareBy { it.name.v })
         }
-        this@applySort
     }
 
     fun List<FileData>.applyGroupBy(config: CodeBlockConfig)
