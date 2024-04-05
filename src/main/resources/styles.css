@@ -270,7 +270,7 @@ input[type=checkbox] {
 
 .mi-codeblock-table {
     border: 0 !important;
-    width: 90%;
+    width: 100%;
 }
 
 .mi-codeblock-table-group-header {
