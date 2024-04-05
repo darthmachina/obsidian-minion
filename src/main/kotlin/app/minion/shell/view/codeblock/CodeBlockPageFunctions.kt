@@ -81,10 +81,13 @@ interface CodeBlockPageFunctions { companion object {
             }
             if (config.sort.size > 1) {
                 for(i in 1..<config.sort.size) {
-                    comparator = comparator.thenBy {
+                    comparator = comparator.thenBy(nullsLast()) {
                         it.dataview[DataviewField(config.sort[i])]
                     }
                 }
+            }
+            comparator = comparator.thenBy {
+                it.name.v
             }
             this@applySort.sortedWith(comparator)
         } else {
