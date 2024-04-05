@@ -52,7 +52,7 @@ interface CodeBlockTaskFunctions { companion object {
     }
 
     fun List<Task>.applySort(config: CodeBlockConfig) : Either<MinionError, List<Task>> = either {
-        if (config.sort.contains("eisenhower")) {
+        if (config.sort.contains(SORT_BY_EISENHOWER)) {
             // Sort by due date then important/urgent
             // 3 -> important && urgent
             // 2 -> urgent

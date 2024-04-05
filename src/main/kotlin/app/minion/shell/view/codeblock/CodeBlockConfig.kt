@@ -81,3 +81,5 @@ const val FIELD_IMAGE = "Image"
 
 const val GROUP_BY_SINGLE = "!!single!!"
 const val GROUP_BY_UNKNOWN = "Not Grouped"
+
+const val SORT_BY_EISENHOWER = "eisenhower"

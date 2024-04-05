@@ -18,7 +18,18 @@ value class Content(val v: String)
     }
 }
 @Serializable value class DataviewField(val v: String)
-value class DataviewValue(val v: String)
+value class DataviewValue(val v: String) : Comparable<DataviewValue> {
+    override fun compareTo(other: DataviewValue): Int {
+        val numThis = v.toDoubleOrNull()
+        val numOther = other.v.toDoubleOrNull()
+        return if (numThis != null && numOther != null) {
+            numThis.compareTo(numOther)
+        } else {
+            v.compareTo(other.v)
+        }
+    }
+
+}
 
 enum class TagType {
     TASK,
