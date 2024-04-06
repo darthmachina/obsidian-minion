@@ -274,7 +274,7 @@ input[type=checkbox] {
 }
 
 .mi-codeblock-table-group-header {
-
+    border-top: 1px solid;
 }
 
 .mi-codeblock-table-header {
