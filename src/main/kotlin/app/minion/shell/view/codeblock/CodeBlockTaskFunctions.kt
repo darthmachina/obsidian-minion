@@ -63,6 +63,9 @@ interface CodeBlockTaskFunctions { companion object {
                     .thenByDescending {
                         0 + (if (it.important) 1 else 0) + (if (it.urgent) 2 else 0)
                     }
+                    .thenBy {
+                        it.content.v
+                    }
             )
         } else {
             this@applySort.sortedWith(
