@@ -12,6 +12,7 @@ import app.minion.shell.view.codeblock.CodeBlockPageListView.Companion.outputSta
 import arrow.core.toOption
 import io.kvision.state.sub
 import kotlinx.dom.clear
+import kotlinx.html.Entities
 import kotlinx.html.TABLE
 import kotlinx.html.dom.append
 import kotlinx.html.table
@@ -119,7 +120,8 @@ interface CodeBlockPageTableView { companion object {
 
     fun TABLE.outputGroupHeader(label: String, config: CodeBlockConfig) {
         tr(classes = "mi-codeblock-table-group-header") {
-            td {
+            th(classes = "mi-codeblock-table-header-cell mi-codeblock-table-page-column") {
+                colSpan = "${1 + config.properties.size}"
                 +label
             }
         }
