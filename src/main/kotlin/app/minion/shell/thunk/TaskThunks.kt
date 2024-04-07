@@ -9,12 +9,14 @@ import app.minion.core.functions.TaskFunctions.Companion.completeSubtask
 import app.minion.core.functions.TaskTagFunctions.Companion.addTag
 import app.minion.core.functions.TaskTagFunctions.Companion.findTagWithPrefix
 import app.minion.core.functions.TaskTagFunctions.Companion.replaceTag
+import app.minion.core.model.DateTime
 import app.minion.core.model.Tag
 import app.minion.core.model.Task
 import app.minion.core.store.Action
 import app.minion.core.store.State
 import app.minion.shell.functions.VaultWriteFunctions.Companion.writeLine
 import arrow.core.flatMap
+import arrow.core.some
 import io.kvision.redux.ActionCreator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,8 +32,6 @@ interface TaskThunks { companion object {
             CoroutineScope(Dispatchers.Unconfined).launch {
                 task.complete()
                     .map { completedPair ->
-                        logger.info { "post complete() map: ${completedPair.first.fileInfo.file}" }
-                        logger.info { "${app.metadataCache.getFirstLinkpathDest(completedPair.first.fileInfo.file.v, "")!!::class}" }
                         (app.metadataCache.getFirstLinkpathDest(completedPair.first.fileInfo.file.v, "") as TFile)
                             .writeLine(app.vault, completedPair.toMarkdown(), completedPair.first.fileInfo.line)
                         logger.info { "dispath(TaskComplete)" }
@@ -63,7 +63,7 @@ interface TaskThunks { companion object {
      * Replaces the tag with a #kanban/ prefix and replaces the subtag with the updated one
      */
     fun changeKanbanStatus(app: App, task: Task, updatedStatus: String) : ActionCreator<Action, State> {
-        logger.debug { "changeKanbanStatus(${updatedStatus}" }
+        logger.debug { "changeKanbanStatus(${updatedStatus})" }
         return { dispatch, _ ->
             CoroutineScope(Dispatchers.Unconfined).launch {
                 task
@@ -86,6 +86,21 @@ interface TaskThunks { companion object {
                             .mapLeft {
                                 dispatch(Action.DisplayError(it))
                             }
+                    }
+            }
+        }
+    }
+
+    fun changeDate(task: Task, app: App, dateTime: DateTime) : ActionCreator<Action, State> {
+        logger.debug { "changeDate($dateTime)" }
+        return { dispatch, _ ->
+            CoroutineScope(Dispatchers.Unconfined).launch {
+                task
+                    .copy(dueDate = dateTime.some())
+                    .let {
+                        (app.metadataCache.getFirstLinkpathDest(task.fileInfo.file.v, "") as TFile)
+                            .writeLine(app.vault, it.toMarkdown(), task.fileInfo.line)
+                        dispatch(Action.TaskUpdated(task))
                     }
             }
         }

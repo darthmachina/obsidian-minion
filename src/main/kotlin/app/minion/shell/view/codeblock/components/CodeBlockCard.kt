@@ -1,16 +1,13 @@
 package app.minion.shell.view.codeblock.components
 
-import app.minion.core.functions.DateTimeFunctions.Companion.asString
 import app.minion.core.functions.TaskTagFunctions.Companion.asString
 import app.minion.core.functions.TaskTagFunctions.Companion.collectTags
 import app.minion.core.model.Content
 import app.minion.core.model.DataviewField
 import app.minion.core.model.FileData
-import app.minion.core.model.Tag
 import app.minion.core.model.Task
 import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions
-import app.minion.shell.thunk.TaskThunks
 import app.minion.shell.view.ViewFunctions.Companion.outputCheckbox
 import app.minion.shell.view.ViewFunctions.Companion.outputDue
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
@@ -27,14 +24,13 @@ import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Compani
 import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Companion.getImagePath
 import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Companion.outputCardMenu
 import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Companion.outputSubtasks
-import app.minion.shell.view.iconImportant
-import app.minion.shell.view.iconRepeat
-import app.minion.shell.view.iconUrgent
+import app.minion.shell.view.ICON_IMPORTANT
+import app.minion.shell.view.ICON_REPEAT
+import app.minion.shell.view.ICON_URGENT
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.toOption
 import kotlinx.html.FlowContent
-import kotlinx.html.checkBoxInput
 import kotlinx.html.div
 import kotlinx.html.img
 import kotlinx.html.js.onClickFunction
@@ -96,7 +92,7 @@ interface CodeBlockCard { companion object {
                                     task.repeatInfo.map {
                                         span(classes = "mi-icon") {
                                             title = it.asString()
-                                            unsafe { +iconRepeat }
+                                            unsafe { +ICON_REPEAT }
                                         }
                                     }
                                 }
@@ -122,10 +118,10 @@ interface CodeBlockCard { companion object {
                         "Eisenhower" to {
                             span {
                                 if (task.important) {
-                                    span(classes = "mi-icon") { unsafe { +iconImportant } }
+                                    span(classes = "mi-icon") { unsafe { +ICON_IMPORTANT } }
                                 }
                                 if (task.urgent) {
-                                    span(classes = "mi-icon") { unsafe { +iconUrgent } }
+                                    span(classes = "mi-icon") { unsafe { +ICON_URGENT } }
                                 }
                             }
                         }

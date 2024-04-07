@@ -8,9 +8,7 @@ import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputGroupLabel
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.applyCodeBlockConfig
-import app.minion.shell.view.codeblock.CodeBlockPageGalleryView.Companion.outputGroupDiv
-import app.minion.shell.view.codeblock.CodeBlockTaskGalleryView.Companion.outputGroupWithLabel
-import app.minion.shell.view.iconHash
+import app.minion.shell.view.ICON_HASH
 import app.minion.shell.view.modal.UpdateDataviewValue
 import arrow.core.toOption
 import io.kvision.state.sub
@@ -132,7 +130,7 @@ interface CodeBlockPageListView { companion object {
                     if (config.groupBy == GroupByOptions.dataview) {
                         span(classes = "mi-icon mi-button") {
                             title = "Change group"
-                            unsafe { +iconHash }
+                            unsafe { +ICON_HASH }
                             onClickFunction = {
                                 UpdateDataviewValue(
                                     fileData,

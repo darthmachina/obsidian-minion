@@ -10,9 +10,9 @@ import app.minion.shell.view.ViewFunctions.Companion.getWikilinkResourcePath
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.codeblock.CodeBlockConfig
 import app.minion.shell.view.codeblock.FIELD_IMAGE
-import app.minion.shell.view.iconGroup
-import app.minion.shell.view.iconKanban
-import app.minion.shell.view.iconMenu
+import app.minion.shell.view.ICON_GROUP
+import app.minion.shell.view.ICON_KANBAN
+import app.minion.shell.view.ICON_MENU
 import app.minion.shell.view.modal.KanbanStatusSelectModal
 import app.minion.shell.view.modal.UpdateDataviewValue
 import arrow.core.Either
@@ -68,7 +68,7 @@ interface CodeBlockCardFunctions { companion object {
     fun FlowContent.outputCardMenu(menuItems: List<FlowContent.() -> Unit> ) {
         div(classes = "mi-codeblock-menu-container") {
             span(classes = "mi-icon mi-button") {
-                unsafe { +iconMenu }
+                unsafe { +ICON_MENU }
             }
             div(classes = "mi-codeblock-menu") {
                 menuItems.forEach { item ->
@@ -83,7 +83,7 @@ interface CodeBlockCardFunctions { companion object {
         return {
             a {
                 title = "Change group value"
-                unsafe { +iconGroup }
+                unsafe { +ICON_GROUP }
                 onClickFunction = {
                     UpdateDataviewValue(
                         fileData,
@@ -103,7 +103,7 @@ interface CodeBlockCardFunctions { companion object {
         return {
             a {
                 title = "Change kanban status"
-                unsafe { +iconKanban }
+                unsafe { +ICON_KANBAN }
                 onClickFunction = {
                     KanbanStatusSelectModal(store, task, store.store.state.plugin.app).open()
                 }

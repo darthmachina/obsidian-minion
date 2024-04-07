@@ -1,18 +1,14 @@
 package app.minion.shell.view.codeblock
 
 import app.minion.core.MinionError
-import app.minion.core.functions.DateTimeFunctions.Companion.asString
-import app.minion.core.functions.DateTimeFunctions.Companion.isInPast
 import app.minion.core.functions.TaskStatisticsFunctions.Companion.completedSubtaskPercent
 import app.minion.core.functions.TaskTagFunctions.Companion.collectTags
-import app.minion.core.model.DateTime
 import app.minion.core.model.Filename
-import app.minion.core.model.ListItemFileInfo
 import app.minion.core.model.Tag
 import app.minion.core.model.Task
 import app.minion.core.store.MinionStore
-import app.minion.shell.functions.VaultFunctions.Companion.openSourceFile
 import app.minion.shell.thunk.TaskThunks
+import app.minion.shell.view.ICON_DATE
 import app.minion.shell.view.ViewFunctions.Companion.outputCheckbox
 import app.minion.shell.view.ViewFunctions.Companion.outputDue
 import app.minion.shell.view.ViewFunctions.Companion.outputSourceLink
@@ -24,13 +20,13 @@ import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.maybeAddProperties
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.removeConfigTags
-import app.minion.shell.view.iconImportant
-import app.minion.shell.view.iconKanban
-import app.minion.shell.view.iconMenu
-import app.minion.shell.view.iconRepeat
-import app.minion.shell.view.iconUrgent
+import app.minion.shell.view.ICON_IMPORTANT
+import app.minion.shell.view.ICON_KANBAN
+import app.minion.shell.view.ICON_MENU
+import app.minion.shell.view.ICON_REPEAT
+import app.minion.shell.view.ICON_URGENT
+import app.minion.shell.view.modal.ChangeTaskDateModal
 import app.minion.shell.view.modal.KanbanStatusSelectModal
-import arrow.core.Option
 import arrow.core.toOption
 import io.kvision.state.sub
 import kotlinx.dom.clear
@@ -39,8 +35,6 @@ import kotlinx.html.a
 import kotlinx.html.checkBoxInput
 import kotlinx.html.div
 import kotlinx.html.dom.append
-import kotlinx.html.h3
-import kotlinx.html.h4
 import kotlinx.html.hr
 import kotlinx.html.js.onClickFunction
 import kotlinx.html.li
@@ -115,7 +109,13 @@ interface CodeBlockTaskListView { companion object {
         element.outputTaskStats(tasks)
     }
 
-    fun FlowContent.outputGroupWithLabel(group: String, label: String, tasks: Map<String, List<Task>>, config: CodeBlockConfig, store: MinionStore) {
+    fun FlowContent.outputGroupWithLabel(
+        group: String,
+        label: String,
+        tasks: Map<String, List<Task>>,
+        config: CodeBlockConfig,
+        store: MinionStore
+    ) {
         logger.debug { "outputGroupWithLabel: $group, $label" }
         tasks[group]
             .toOption().toEither {
@@ -174,19 +174,19 @@ interface CodeBlockTaskListView { companion object {
             if (task.important && config.properties.contains(PROPERTY_EISENHOWER)) {
                 span(classes = "mi-icon") {
                     title = "Important"
-                    unsafe { +iconImportant }
+                    unsafe { +ICON_IMPORTANT }
                 }
             }
             if (task.urgent && config.properties.contains(PROPERTY_EISENHOWER)) {
                 span(classes = "mi-icon") {
                     title = "Urgent"
-                    unsafe { +iconUrgent }
+                    unsafe { +ICON_URGENT }
                 }
             }
             task.repeatInfo.map {
                 span(classes = "mi-icon") {
                     title = it.asString()
-                    unsafe { +iconRepeat }
+                    unsafe { +ICON_REPEAT }
                 }
             }
             if (config.properties.contains(PROPERTY_SOURCE)) {
@@ -203,14 +203,21 @@ interface CodeBlockTaskListView { companion object {
                 }
             div(classes = "mi-codeblock-menu-container") {
                 span(classes = "mi-icon mi-button") {
-                    unsafe { +iconMenu }
+                    unsafe { +ICON_MENU }
                 }
                 div(classes = "mi-codeblock-menu") {
                     a {
                         title = "Change kanban status"
-                        unsafe { +iconKanban }
+                        unsafe { +ICON_KANBAN }
                         onClickFunction = {
                             KanbanStatusSelectModal(store, task, store.store.state.plugin.app).open()
+                        }
+                    }
+                    a {
+                        title = "Change date"
+                        unsafe { +ICON_DATE }
+                        onClickFunction = {
+                            ChangeTaskDateModal(task, store, store.store.state.plugin.app).open()
                         }
                     }
                 }
