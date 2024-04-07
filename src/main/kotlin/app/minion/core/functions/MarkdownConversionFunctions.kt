@@ -29,7 +29,6 @@ interface MarkdownConversionFunctions { companion object {
                 .filter { it.type == TagType.TASK }
                 .toSet()
                 .let {
-                    logger.debug { "Outputting tags $it" }
                     markdownElements.add(it.asString())
                 }
         }

@@ -246,11 +246,12 @@ input[type=checkbox] {
     display: none;
     position: absolute;
     background-color: #252525;
-    min-width: 25px;
+    min-width: 40px;
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
     z-index: 1;
     right: 15px;
-    top: 1px
+    top: 1px;
+    flex-direction: row-reverse;
 }
 
 .mi-codeblock-menu a {
@@ -261,7 +262,7 @@ input[type=checkbox] {
 }
 
 .mi-codeblock-menu-container:hover .mi-codeblock-menu {
-    display: block;
+    display: flex;
 }
 
 .mi-codeblock-menu-container:hover button {
