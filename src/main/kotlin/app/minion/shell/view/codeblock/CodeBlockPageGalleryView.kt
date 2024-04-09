@@ -115,7 +115,7 @@ interface CodeBlockPageGalleryView { companion object {
             outputFileDataSet(config, fileDataSet, store)
         } else {
             div {
-                outputGroupLabel(label)
+                outputGroupLabel(label, store)
                 outputFileDataSet(config, fileDataSet, store)
             }
         }

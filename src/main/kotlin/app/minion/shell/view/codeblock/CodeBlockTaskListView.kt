@@ -130,7 +130,7 @@ interface CodeBlockTaskListView { companion object {
             outputTaskList(tasks, config, store)
         } else {
             div {
-                outputGroupLabel(label)
+                outputGroupLabel(label, store)
                 outputTaskList(tasks, config, store)
             }
         }
