@@ -3,7 +3,10 @@ package app.minion.shell.view.codeblock
 import app.minion.core.MinionError
 import app.minion.core.functions.PARENT_TAG_REGEX
 import app.minion.core.functions.StatisticsFunctions.Companion.calculateTotalCount
+import app.minion.core.model.Content
 import app.minion.core.model.Task
+import app.minion.core.store.MinionStore
+import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import kotlinx.dom.clear
 import kotlinx.html.FlowContent
 import kotlinx.html.div
@@ -29,15 +32,15 @@ interface CodeBlockFunctions { companion object {
         }
     }
 
-    fun FlowContent.outputGroupLabel(label: String) {
+    fun FlowContent.outputGroupLabel(label: String, store: MinionStore) {
         h4(classes = "mi-codeblock-group-label") {
             if (label.contains(":")) {
-                +label.split(":")[1]
+                outputStyledContent(Content(label.split(":")[1]), store)
             } else {
-                +label
+                outputStyledContent(Content(label
                     .replace(PARENT_TAG_REGEX, "")
                     .replace("#", "")
-                    .replaceFirstChar(Char::uppercaseChar)
+                    .replaceFirstChar(Char::uppercaseChar)), store)
             }
         }
     }

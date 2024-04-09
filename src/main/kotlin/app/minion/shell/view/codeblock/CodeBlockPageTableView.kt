@@ -1,11 +1,13 @@
 package app.minion.shell.view.codeblock
 
 import app.minion.core.MinionError
+import app.minion.core.model.Content
 import app.minion.core.model.DataviewField
 import app.minion.core.model.FileData
 import app.minion.core.store.MinionStore
 import app.minion.shell.view.ViewFunctions.Companion.maybeOutputHeading
 import app.minion.shell.view.ViewFunctions.Companion.outputSourceLink
+import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockPageListView.Companion.outputStats
@@ -113,16 +115,16 @@ interface CodeBlockPageTableView { companion object {
         if (label == GROUP_BY_SINGLE) {
             outputFileData(fileDataset, config, store)
         } else {
-            outputGroupHeader(label, config)
+            outputGroupHeader(label, config, store)
             outputFileData(fileDataset, config, store)
         }
     }
 
-    fun TABLE.outputGroupHeader(label: String, config: CodeBlockConfig) {
+    fun TABLE.outputGroupHeader(label: String, config: CodeBlockConfig, store: MinionStore) {
         tr(classes = "mi-codeblock-table-group-header") {
             th(classes = "mi-codeblock-table-header-cell mi-codeblock-table-page-column") {
                 colSpan = "${1 + config.properties.size}"
-                +label
+                outputStyledContent(Content(label), store)
             }
         }
     }
