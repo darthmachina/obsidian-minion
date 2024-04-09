@@ -161,9 +161,11 @@ interface CodeBlockTaskListView { companion object {
                     outputDue(due)
                 }
             }
+            span { +" " }
             span {
                 outputStyledContent(task.content, store)
             }
+            span { +" " }
             if (config.properties.contains(PROPERTY_TAGS)) {
                 with(task.collectTags()) {
                     if (isNotEmpty()) {
@@ -171,6 +173,7 @@ interface CodeBlockTaskListView { companion object {
                     }
                 }
             }
+            span { +" " }
             if (task.important && config.properties.contains(PROPERTY_EISENHOWER)) {
                 span(classes = "mi-icon") {
                     title = "Important"
