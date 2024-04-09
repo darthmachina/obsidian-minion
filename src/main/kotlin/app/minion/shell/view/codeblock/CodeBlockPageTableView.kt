@@ -147,7 +147,9 @@ interface CodeBlockPageTableView { companion object {
                 config.properties.forEach { field ->
                     fileData.dataview[DataviewField(field)]
                         .toOption()
-                        .onSome { td(classes = "mi-codeblock-table-data-cell") { +it.v } }
+                        .onSome { td(classes = "mi-codeblock-table-data-cell") {
+                            outputStyledContent(Content(it.v), store)
+                        } }
                         .onNone { td(classes = "mi-codeblock-table-data-cell") {  } }
                 }
             }
