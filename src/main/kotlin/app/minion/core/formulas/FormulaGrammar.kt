@@ -1,22 +1,22 @@
 package app.minion.core.formulas
 
-import me.alllex.parsus.parser.Grammar
-import me.alllex.parsus.parser.choose
-import me.alllex.parsus.parser.map
-import me.alllex.parsus.parser.parser
-import me.alllex.parsus.parser.reduce
-import me.alllex.parsus.parser.skip
-import me.alllex.parsus.token.literalToken
-import me.alllex.parsus.token.regexToken
+import com.github.h0tk3y.betterParse.combinators.and
+import com.github.h0tk3y.betterParse.combinators.map
+import com.github.h0tk3y.betterParse.combinators.skip
+import com.github.h0tk3y.betterParse.grammar.Grammar
+import com.github.h0tk3y.betterParse.lexer.literalToken
+import com.github.h0tk3y.betterParse.lexer.regexToken
+import com.github.h0tk3y.betterParse.parser.Parser
 
 sealed class FormulaResult {
     data class DecimalResult(val value: Double) : FormulaResult()
     data class StringResult(val value: String): FormulaResult()
+    data class BooleanResult(val value: Boolean): FormulaResult()
 }
 
 sealed class FormulaExpression {
-    data class Int(val value: Long) : FormulaExpression()
-    data class Num(val value: Double) : FormulaExpression()
+    data class Num(val value: Long) : FormulaExpression()
+    data class Dec(val value: Double) : FormulaExpression()
     data class Neg(val expr: FormulaExpression) : FormulaExpression()
     data class Add(val left: FormulaExpression, val right: FormulaExpression) : FormulaExpression()
     data class Sub(val left: FormulaExpression, val right: FormulaExpression) : FormulaExpression()
@@ -26,39 +26,16 @@ sealed class FormulaExpression {
     data class Field(val field: String) : FormulaExpression()
 }
 
-class MinionFormulaGrammar : Grammar<FormulaResult>() {
-    init {
-        regexToken("\\s+", ignored = true)
-    }
+class MinionFormulaGrammar : Grammar<String>() {
+    @Suppress("unused")
+    val ws by regexToken("\\s+", ignore = true)
 
-    val tokenLPar by literalToken("(")
-    val tokenRPar by literalToken(")")
+    val tokenInt by regexToken("\\d+")
+    val tokenNum by regexToken("[+-]?(\\d*\\.)?\\d+")
     val tokenPlus by literalToken("+")
-    val tokenMinus by literalToken("-")
-    val tokenMultiply by literalToken("*")
-    val tokenDivide by literalToken("/")
 
-    val tokenField by regexToken("""\{([a-zA-z]*)\}""")
+    val addition by tokenInt and skip(tokenPlus) and tokenInt map { (l, r) -> "${l.text} + ${r.text}" }
+    val number by tokenInt map {  }
 
-    val tokenNum by regexToken("-?\\d+\\.\\d+")
-    val tokenInt by regexToken("-?\\d+")
-
-    val integer by parser { tokenInt() } map { FormulaExpression.Int(it.text.toLong()) }
-    val number by parser { tokenNum() } map { FormulaExpression.Num(it.text.toDouble()) }
-
-    val add by parser {
-        val first = choose(integer, number)
-        tokenPlus
-        val second = choose(integer, number)
-        FormulaExpression.Add(first, second)
-    }
-
-    override val root by parser {
-
-        val num1 = tokenInt().text.toInt()
-        tokenPlus()
-        val num2 = tokenInt().text.toInt()
-
-        FormulaResult.DecimalResult(num1 + num2 * 1.0)
-    }
+    override val rootParser: Parser<String> by addition
 }

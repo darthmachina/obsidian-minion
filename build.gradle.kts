@@ -29,6 +29,7 @@ dependencies {
     val yamlktVersion = "0.13.0"
     val uuidVersion = "0.0.22"
     val parsusVersion = "0.6.1"
+    val betterParseVersion = "0.4.4"
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesCoreVersion")
@@ -40,7 +41,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:$datetimeVersion")
     implementation(npm("@js-joda/timezone", "2.3.0"))
     implementation("app.softwork:kotlinx-uuid-core:$uuidVersion")
-    implementation("me.alllex.parsus:parsus:$parsusVersion")
+    implementation("com.github.h0tk3y.betterParse:better-parse:$betterParseVersion")
 
     implementation("io.kvision:kvision:$kvisionVersion")
     implementation("io.kvision:kvision-fontawesome:$kvisionVersion")
