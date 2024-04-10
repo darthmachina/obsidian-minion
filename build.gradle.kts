@@ -11,7 +11,6 @@ version = "0.31.0-SNAPSHOT"
 repositories {
     mavenCentral()
     maven { url = uri("https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven") }
-    maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
@@ -29,7 +28,7 @@ dependencies {
     val kotestAssertionsArrowVersion = "1.4.0"
     val yamlktVersion = "0.13.0"
     val uuidVersion = "0.0.22"
-    val konbiniVersion = "0.1.3"
+    val parsusVersion = "0.6.1"
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesCoreVersion")
@@ -41,7 +40,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:$datetimeVersion")
     implementation(npm("@js-joda/timezone", "2.3.0"))
     implementation("app.softwork:kotlinx-uuid-core:$uuidVersion")
-    implementation("cc.ekblad.konbini:konbini:$konbiniVersion")
+    implementation("me.alllex.parsus:parsus:$parsusVersion")
 
     implementation("io.kvision:kvision:$kvisionVersion")
     implementation("io.kvision:kvision-fontawesome:$kvisionVersion")
