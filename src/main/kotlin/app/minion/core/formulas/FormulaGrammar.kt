@@ -18,23 +18,24 @@ sealed class FormulaResult {
     data class BooleanResult(val value: Boolean): FormulaResult()
 }
 
-sealed interface FormulaExpression {
-    sealed interface NumericFormulaExpression : FormulaExpression
-    sealed interface UnaryFormulaExpression : FormulaExpression
-    sealed interface BinaryFormulaExpression : FormulaExpression
-    data class Num(val value: Long) : NumericFormulaExpression, UnaryFormulaExpression
-    data class Neg(val expr: NumericFormulaExpression) : NumericFormulaExpression, UnaryFormulaExpression
+sealed class FormulaExpression {
+    sealed class NumericFormulaExpression : FormulaExpression()
+    sealed class ValueNumericFormulaExpression(value: Long) : NumericFormulaExpression()
+    sealed class UnaryNumericFormulaExpression(value: NumericFormulaExpression) : NumericFormulaExpression()
+    sealed class BinaryNumericFormulaExpression(left: NumericFormulaExpression, right: NumericFormulaExpression) : NumericFormulaExpression()
+    data class Num(val value: Long) : ValueNumericFormulaExpression(value)
+    data class Neg(val expr: NumericFormulaExpression) : UnaryNumericFormulaExpression(expr)
     data class Add(val left: NumericFormulaExpression, val right: NumericFormulaExpression)
-        : NumericFormulaExpression, BinaryFormulaExpression
+        : BinaryNumericFormulaExpression(left, right)
     data class Sub(val left: NumericFormulaExpression, val right: NumericFormulaExpression)
-        : NumericFormulaExpression, BinaryFormulaExpression
+        : BinaryNumericFormulaExpression(left, right)
     data class Mul(val left: NumericFormulaExpression, val right: NumericFormulaExpression)
-        : NumericFormulaExpression, BinaryFormulaExpression
+        : BinaryNumericFormulaExpression(left, right)
     data class Div(val left: NumericFormulaExpression, val right: NumericFormulaExpression)
-        : NumericFormulaExpression, BinaryFormulaExpression
+        : BinaryNumericFormulaExpression(left, right)
 
     // Special case, neither Numeric, String nor Boolean
-    data class NumericField(val field: String) : NumericFormulaExpression, UnaryFormulaExpression
+    data class NumericField(val field: String) : NumericFormulaExpression()
 }
 
 class MinionFormulaGrammar : Grammar<FormulaExpression>() {

@@ -5,16 +5,20 @@ interface FormulaEvaluator { companion object {
         return FormulaResult.DecimalResult(1)
     }
 
-    fun FormulaExpression.UnaryFormulaExpression.eval() : FormulaResult {
+    fun FormulaExpression.NumericFormulaExpression.eval() : FormulaResult.DecimalResult = when(this) {
+        is FormulaExpression.UnaryNumericFormulaExpression -> this.eval()
+        is FormulaExpression.BinaryNumericFormulaExpression -> this.eval()
+        is FormulaExpression.ValueNumericFormulaExpression -> this.eval()
+        is FormulaExpression.NumericField -> TODO()
+    }
+
+    fun FormulaExpression.UnaryNumericFormulaExpression.eval() : FormulaResult.DecimalResult {
         return when (this) {
-            is FormulaExpression.Num -> FormulaResult.DecimalResult(value)
-            is FormulaExpression.Neg -> {
-                expr
-                    .eval()
-
-            }
-
-            is FormulaExpression.NumericField -> TODO()
+            is FormulaExpression.Neg -> FormulaResult.DecimalResult(-expr.eval().value)
         }
+    }
+
+    fun FormulaExpression.ValueNumericFormulaExpression.eval() : FormulaResult.DecimalResult = when(this) {
+        is FormulaExpression.Num -> FormulaResult.DecimalResult(value)
     }
 }}
