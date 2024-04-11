@@ -1,41 +1,65 @@
 package app.minion.core.formulas
 
 import com.github.h0tk3y.betterParse.combinators.and
+import com.github.h0tk3y.betterParse.combinators.leftAssociative
 import com.github.h0tk3y.betterParse.combinators.map
+import com.github.h0tk3y.betterParse.combinators.or
 import com.github.h0tk3y.betterParse.combinators.skip
+import com.github.h0tk3y.betterParse.combinators.use
 import com.github.h0tk3y.betterParse.grammar.Grammar
+import com.github.h0tk3y.betterParse.grammar.parser
 import com.github.h0tk3y.betterParse.lexer.literalToken
 import com.github.h0tk3y.betterParse.lexer.regexToken
 import com.github.h0tk3y.betterParse.parser.Parser
 
 sealed class FormulaResult {
-    data class DecimalResult(val value: Double) : FormulaResult()
+    data class DecimalResult(val value: Long) : FormulaResult()
     data class StringResult(val value: String): FormulaResult()
     data class BooleanResult(val value: Boolean): FormulaResult()
 }
 
 sealed class FormulaExpression {
-    data class Num(val value: Long) : FormulaExpression()
-    data class Dec(val value: Double) : FormulaExpression()
-    data class Neg(val expr: FormulaExpression) : FormulaExpression()
-    data class Add(val left: FormulaExpression, val right: FormulaExpression) : FormulaExpression()
-    data class Sub(val left: FormulaExpression, val right: FormulaExpression) : FormulaExpression()
-    data class Mul(val left: FormulaExpression, val right: FormulaExpression) : FormulaExpression()
-    data class Div(val left: FormulaExpression, val right: FormulaExpression) : FormulaExpression()
+    sealed class NumericFormulaExpression : FormulaExpression()
+    data class Num(val value: Long) : NumericFormulaExpression()
+    data class Neg(val expr: FormulaExpression) : NumericFormulaExpression()
+    data class Add(val left: FormulaExpression, val right: FormulaExpression) : NumericFormulaExpression()
+    data class Sub(val left: FormulaExpression, val right: FormulaExpression) : NumericFormulaExpression()
+    data class Mul(val left: FormulaExpression, val right: FormulaExpression) : NumericFormulaExpression()
+    data class Div(val left: FormulaExpression, val right: FormulaExpression) : NumericFormulaExpression()
+
 
     data class Field(val field: String) : FormulaExpression()
 }
 
-class MinionFormulaGrammar : Grammar<String>() {
+class MinionFormulaGrammar : Grammar<FormulaExpression>() {
     @Suppress("unused")
     val ws by regexToken("\\s+", ignore = true)
 
     val tokenInt by regexToken("\\d+")
     val tokenNum by regexToken("[+-]?(\\d*\\.)?\\d+")
     val tokenPlus by literalToken("+")
+    val tokenMinus by literalToken("-")
+    val tokenMult by literalToken("*")
+    val tokenDiv by literalToken("/")
 
-    val addition by tokenInt and skip(tokenPlus) and tokenInt map { (l, r) -> "${l.text} + ${r.text}" }
-    val number by tokenInt map {  }
+    val term: Parser<FormulaExpression> by
+        (tokenInt use { FormulaExpression.Num(text.toLong()) }) or
+        (skip(tokenMinus) and parser(this::term) map { FormulaExpression.Neg(it)})
 
-    override val rootParser: Parser<String> by addition
+    val mulDiv by leftAssociative(term, tokenMult or tokenDiv use { type } ) { l, op, r ->
+        if (op == tokenMult) {
+            FormulaExpression.Mul(l, r)
+        } else {
+            FormulaExpression.Div(l, r)
+        }
+    }
+    val addSub by leftAssociative(mulDiv, tokenPlus or tokenMinus use { type }) { l, op, r ->
+        if (op == tokenPlus) {
+            FormulaExpression.Add(l, r)
+        } else {
+            FormulaExpression.Sub(l, r)
+        }
+    }
+
+    override val rootParser: Parser<FormulaExpression> by addSub
 }
