@@ -81,7 +81,7 @@ class FormulaGrammarTest : StringSpec({
 
         actual shouldBeEqual
                 FormulaExpression.Add(
-                    FormulaExpression.Field("Field"),
+                    FormulaExpression.NumericField("Field"),
                     FormulaExpression.Num(2)
                 )
     }

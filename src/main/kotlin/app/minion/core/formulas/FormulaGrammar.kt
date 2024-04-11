@@ -18,17 +18,23 @@ sealed class FormulaResult {
     data class BooleanResult(val value: Boolean): FormulaResult()
 }
 
-sealed class FormulaExpression {
-    sealed class NumericFormulaExpression : FormulaExpression()
-    data class Num(val value: Long) : NumericFormulaExpression()
-    data class Neg(val expr: FormulaExpression) : NumericFormulaExpression()
-    data class Add(val left: FormulaExpression, val right: FormulaExpression) : NumericFormulaExpression()
-    data class Sub(val left: FormulaExpression, val right: FormulaExpression) : NumericFormulaExpression()
-    data class Mul(val left: FormulaExpression, val right: FormulaExpression) : NumericFormulaExpression()
-    data class Div(val left: FormulaExpression, val right: FormulaExpression) : NumericFormulaExpression()
+sealed interface FormulaExpression {
+    sealed interface NumericFormulaExpression : FormulaExpression
+    sealed interface UnaryFormulaExpression : FormulaExpression
+    sealed interface BinaryFormulaExpression : FormulaExpression
+    data class Num(val value: Long) : NumericFormulaExpression, UnaryFormulaExpression
+    data class Neg(val expr: NumericFormulaExpression) : NumericFormulaExpression, UnaryFormulaExpression
+    data class Add(val left: NumericFormulaExpression, val right: NumericFormulaExpression)
+        : NumericFormulaExpression, BinaryFormulaExpression
+    data class Sub(val left: NumericFormulaExpression, val right: NumericFormulaExpression)
+        : NumericFormulaExpression, BinaryFormulaExpression
+    data class Mul(val left: NumericFormulaExpression, val right: NumericFormulaExpression)
+        : NumericFormulaExpression, BinaryFormulaExpression
+    data class Div(val left: NumericFormulaExpression, val right: NumericFormulaExpression)
+        : NumericFormulaExpression, BinaryFormulaExpression
 
-
-    data class Field(val field: String) : FormulaExpression()
+    // Special case, neither Numeric, String nor Boolean
+    data class NumericField(val field: String) : NumericFormulaExpression, UnaryFormulaExpression
 }
 
 class MinionFormulaGrammar : Grammar<FormulaExpression>() {
@@ -49,22 +55,28 @@ class MinionFormulaGrammar : Grammar<FormulaExpression>() {
 
     val term: Parser<FormulaExpression> by
         (tokenInt use { FormulaExpression.Num(text.toLong()) }) or
-        (skip(tokenMinus) and parser(this::term) map { FormulaExpression.Neg(it)}) or
+        (skip(tokenMinus) and parser(this::term) map {
+            FormulaExpression.Neg(it as FormulaExpression.NumericFormulaExpression)
+        }) or
         (skip(tokenLPar) and parser(this::rootParser) and skip(tokenRPar)) or
-        (skip(tokenLBrace) and tokenField and skip(tokenRBrace) use { FormulaExpression.Field(text)})
+        (skip(tokenLBrace) and tokenField and skip(tokenRBrace) use { FormulaExpression.NumericField(text)})
 
     val mulDiv by leftAssociative(term, tokenMult or tokenDiv use { type } ) { l, op, r ->
+        val left = l as FormulaExpression.NumericFormulaExpression
+        val right = r as FormulaExpression.NumericFormulaExpression
         if (op == tokenMult) {
-            FormulaExpression.Mul(l, r)
+            FormulaExpression.Mul(left, right)
         } else {
-            FormulaExpression.Div(l, r)
+            FormulaExpression.Div(left, right)
         }
     }
     val addSub by leftAssociative(mulDiv, tokenPlus or tokenMinus use { type }) { l, op, r ->
+        val left = l as FormulaExpression.NumericFormulaExpression
+        val right = r as FormulaExpression.NumericFormulaExpression
         if (op == tokenPlus) {
-            FormulaExpression.Add(l, r)
+            FormulaExpression.Add(left, right)
         } else {
-            FormulaExpression.Sub(l, r)
+            FormulaExpression.Sub(left, right)
         }
     }
 
