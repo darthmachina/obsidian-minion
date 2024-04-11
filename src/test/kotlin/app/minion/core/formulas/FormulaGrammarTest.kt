@@ -72,4 +72,17 @@ class FormulaGrammarTest : StringSpec({
                     FormulaExpression.Num(4)
                 )
     }
+
+    "Field reference is parsed" {
+        val parser = MinionFormulaGrammar()
+
+        val value = "{Field} + 2"
+        val actual = parser.parseToEnd(value)
+
+        actual shouldBeEqual
+                FormulaExpression.Add(
+                    FormulaExpression.Field("Field"),
+                    FormulaExpression.Num(2)
+                )
+    }
 })
