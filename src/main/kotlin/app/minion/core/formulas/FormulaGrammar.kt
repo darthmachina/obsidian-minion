@@ -31,45 +31,6 @@ sealed class FormulaExpression {
     data class Field(val field: String) : FormulaExpression()
 }
 
-class MinionFormulaCalcGrammar : Grammar<Long>() {
-    @Suppress("unused")
-    val ws by regexToken("\\s+", ignore = true)
-
-    val tokenInt by regexToken("\\d+")
-    val tokenNum by regexToken("[+-]?(\\d*\\.)?\\d+")
-    val tokenField by regexToken("\\w+")
-    val tokenLPar by literalToken("(")
-    val tokenRPar by literalToken(")")
-    val tokenLBrace by literalToken("{")
-    val tokenRBrace by literalToken("}")
-    val tokenPlus by literalToken("+")
-    val tokenMinus by literalToken("-")
-    val tokenMult by literalToken("*")
-    val tokenDiv by literalToken("/")
-
-    val term: Parser<Long> by
-        (tokenInt use { text.toLong() }) or
-        (skip(tokenMinus) and parser(this::term) map { -it }) or
-        (skip(tokenLPar) and parser(this::rootParser) and skip(tokenRPar))
-
-    val mulDiv by leftAssociative(term, tokenMult or tokenDiv use { type } ) { l, op, r ->
-        if (op == tokenMult) {
-            l * r
-        } else {
-            l / r
-        }
-    }
-    val addSub by leftAssociative(mulDiv, tokenPlus or tokenMinus use { type }) { l, op, r ->
-        if (op == tokenPlus) {
-            l + r
-        } else {
-            l - r
-        }
-    }
-
-    override val rootParser: Parser<Long> by addSub
-}
-
 class MinionFormulaGrammar : Grammar<FormulaExpression>() {
     @Suppress("unused")
     val ws by regexToken("\\s+", ignore = true)
