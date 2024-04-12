@@ -16,6 +16,7 @@ import arrow.core.Either
 import arrow.core.flatten
 import arrow.core.getOrElse
 import arrow.core.raise.either
+import arrow.core.some
 import arrow.core.toOption
 import mu.KotlinLogging
 
@@ -96,7 +97,7 @@ interface CodeBlockPageFunctions { companion object {
     fun List<FileData>.toItems(config: CodeBlockConfig) : Either<MinionError, List<Item>> = either {
         this@toItems
             .map { fileData ->
-                Item(ItemType.PAGE, Content(fileData.name.v), emptyList()) // TODO Process properties
+                Item(ItemType.PAGE, Content(fileData.name.v), emptyList(), fileData = fileData.some()) // TODO Process properties
             }
     }
 

@@ -1,6 +1,10 @@
 package app.minion.shell.view
 
 import app.minion.core.model.Content
+import app.minion.core.model.FileData
+import app.minion.core.model.Task
+import arrow.core.None
+import arrow.core.Option
 
 enum class ItemType {
     TASK,
@@ -19,6 +23,7 @@ enum class PropertyType {
 
 data class Property(
     val type: PropertyType,
+    val name: String,
     val value: String
 )
 
@@ -27,7 +32,9 @@ data class Item(
     val content: Content,
     val properties: List<Property>,
     val subItems: List<Item> = emptyList(),
-    val notes: List<Item> = emptyList()
+    val notes: List<Item> = emptyList(),
+    val fileData: Option<FileData> = None,
+    val task: Option<Task> = None
 )
 
 data class ViewItems(

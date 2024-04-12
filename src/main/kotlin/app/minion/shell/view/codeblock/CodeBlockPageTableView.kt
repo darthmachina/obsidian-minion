@@ -5,9 +5,11 @@ import app.minion.core.model.Content
 import app.minion.core.model.DataviewField
 import app.minion.core.model.FileData
 import app.minion.core.store.MinionStore
+import app.minion.shell.view.Item
 import app.minion.shell.view.ViewFunctions.Companion.maybeOutputHeading
 import app.minion.shell.view.ViewFunctions.Companion.outputSourceLink
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
+import app.minion.shell.view.ViewItems
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockPageListView.Companion.outputStats
@@ -45,7 +47,7 @@ interface CodeBlockPageTableView { companion object {
     }
 
     fun updatePages(
-        fileDataMap: Map<String, List<FileData>>,
+        viewItems: List<ViewItems>,
         element: HTMLElement,
         config: CodeBlockConfig,
         store: MinionStore
@@ -53,62 +55,25 @@ interface CodeBlockPageTableView { companion object {
         element.clear()
         element.maybeOutputHeading(config)
 
-        if (fileDataMap.isNotEmpty()) {
-            element.outputTable(fileDataMap, config, store)
+        if (viewItems.isNotEmpty()) {
+            element.outputTable(viewItems, config, store)
         }
 
-        element.outputStats(fileDataMap)
+        element.outputStats(viewItems)
     }
 
-    fun HTMLElement.outputTable(fileDataMap: Map<String, List<FileData>>, config: CodeBlockConfig, store: MinionStore) {
+    fun HTMLElement.outputTable(viewItems: List<ViewItems>, config: CodeBlockConfig, store: MinionStore) {
         append.table(classes = "mi-codeblock-table"){
             outputTableHeader(config)
-            if (config.groupByOrder.isEmpty()) {
-                fileDataMap.forEach { entry ->
-                    outputGroup(entry.key, entry.value, config, store)
-                }
-            } else {
-                config.groupByOrder.forEach { group ->
-                    if (group.contains(":")) {
-                        group.split(":")
-                            .let {
-                                outputGroupWithLabel(it[0], it[1], fileDataMap, config, store)
-                            }
-                    } else {
-                        outputGroupWithLabel(group, group, fileDataMap, config, store)
-                    }
-                }
-                fileDataMap
-                    .filter { entry ->
-                        !config.groupByOrder.any { group ->
-                            group.startsWith(entry.key)
-                        }
-                    }
-                    .forEach { entry ->
-                        outputGroup(entry.key, entry.value, config, store)
-                    }
+            viewItems.forEach { viewItem ->
+                outputGroup(viewItem.group, viewItem.items, config, store)
             }
         }
-    }
-
-    fun TABLE.outputGroupWithLabel(
-        group: String,
-        label: String,
-        fileDataMap: Map<String, List<FileData>>,
-        config: CodeBlockConfig,
-        store: MinionStore
-    ) {
-        fileDataMap[group]
-            .toOption().toEither {
-                MinionError.GroupByNotFoundError("$group not found in results")
-            }
-            .map { outputGroup(label, it, config, store) }
-            .mapLeft { logger.warn { it } }
     }
 
     fun TABLE.outputGroup(
         label: String,
-        fileDataset: List<FileData>,
+        items: List<Item>,
         config: CodeBlockConfig,
         store: MinionStore
     ) {
@@ -138,8 +103,8 @@ interface CodeBlockPageTableView { companion object {
         }
     }
 
-    fun TABLE.outputFileData(fileDataset: List<FileData>, config: CodeBlockConfig, store: MinionStore) {
-        fileDataset.forEach { fileData ->
+    fun TABLE.outputItems(items: List<Item>, config: CodeBlockConfig, store: MinionStore) {
+        items.forEach { item ->
             tr(classes = "mi-codeblock-table-data-row") {
                 td(classes = "mi-codeblock-table-data-cell") {
                     outputSourceLink(fileData.name, store)

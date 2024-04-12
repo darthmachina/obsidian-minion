@@ -1,19 +1,14 @@
 package app.minion.shell.view.codeblock
 
-import app.minion.core.MinionError
 import app.minion.core.functions.StatisticsFunctions.Companion.calculateTotalCount
-import app.minion.core.model.FileData
 import app.minion.core.store.MinionStore
 import app.minion.shell.view.Item
 import app.minion.shell.view.ViewFunctions.Companion.maybeOutputHeading
 import app.minion.shell.view.ViewItems
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputGroupLabel
-import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputHeading
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.applyCodeBlockConfig
-import app.minion.shell.view.codeblock.CodeBlockTaskGalleryView.Companion.outputGroupWithLabel
 import app.minion.shell.view.codeblock.components.CodeBlockCard.Companion.outputPageCard
-import arrow.core.toOption
 import io.kvision.state.sub
 import kotlinx.dom.clear
 import kotlinx.html.FlowContent

@@ -28,6 +28,7 @@ import app.minion.shell.view.ICON_IMPORTANT
 import app.minion.shell.view.ICON_REPEAT
 import app.minion.shell.view.ICON_URGENT
 import app.minion.shell.view.Item
+import app.minion.shell.view.PropertyType
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.toOption
@@ -53,31 +54,38 @@ interface CodeBlockCard { companion object {
             .map { it }
             .mapLeft { logger.warn { it } }
             .getOrNone()
-        val properties = config
-            .properties
-            .mapNotNull { field ->
-                item.dataview[DataviewField(field)]
-                    .toOption()
-                    .map { field to { span {
-                        outputStyledContent(Content(it.v), store)
-                    } } }
-                    .getOrNull()
-            }
-
-        outputCard(
-            {
-                span(classes = "mi-codeblock-source-link") {
-                +fileData.name.v
-                onClickFunction = {
-                    VaultFunctions.openSourceFile(fileData.name, store.store.state.plugin.app)
+        val properties = item.properties.map {property ->
+            when (property.type) {
+                PropertyType.DATAVIEW -> {
+                    property.name to { span {
+                        outputStyledContent(Content(property.value), store)
+                    } }
                 }
-            }},
-            {},
-            properties,
-            image,
-            listOf(createChangeGroupMenuItem(fileData, config, store)),
-            config,
-        )
+                PropertyType.DUE -> TODO()
+                PropertyType.TAGS -> TODO()
+                PropertyType.SOURCE -> TODO()
+                PropertyType.IMAGE -> TODO()
+                PropertyType.FORMULA -> TODO()
+            }
+        }
+
+        item.fileData.map {fileData ->
+            outputCard(
+                {
+                    span(classes = "mi-codeblock-source-link") {
+                        +item.content.v
+                        onClickFunction = {
+                            VaultFunctions.openSourceFile(fileData.name, store.store.state.plugin.app)
+                        }
+                    }
+                },
+                {},
+                properties,
+                image,
+                listOf(createChangeGroupMenuItem(fileData, config, store)),
+                config,
+            )
+        }
     }
 
     fun FlowContent.outputTaskCard(task: Task, config: CodeBlockConfig, store: MinionStore) {
