@@ -1,6 +1,8 @@
 package app.minion.shell.view.codeblock
 
 import app.minion.core.model.Tag
+import arrow.core.None
+import arrow.core.Option
 import kotlinx.serialization.Serializable
 
 // NOTE: Enums are lowercase, so they can be deserialized easily
@@ -20,6 +22,11 @@ data class CodeBlockConfig(
     val groupByField: String = "",
     val groupByOrder: List<String> = emptyList(),
     val options: List<CodeBlockOptions> = emptyList()
+)
+
+data class PropertyConfig(
+    val name : String,
+    val formula : Option<String> = None
 )
 
 @Serializable

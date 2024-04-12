@@ -27,6 +27,7 @@ import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Compani
 import app.minion.shell.view.ICON_IMPORTANT
 import app.minion.shell.view.ICON_REPEAT
 import app.minion.shell.view.ICON_URGENT
+import app.minion.shell.view.Item
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.toOption
@@ -43,11 +44,11 @@ private val logger = KotlinLogging.logger("CodeBlockCard")
 
 interface CodeBlockCard { companion object {
     fun FlowContent.outputPageCard(
-        fileData: FileData,
+        item: Item,
         config: CodeBlockConfig,
         store: MinionStore
     ) {
-        val image = fileData
+        val image = item
             .getImagePath(store)
             .map { it }
             .mapLeft { logger.warn { it } }
@@ -55,7 +56,7 @@ interface CodeBlockCard { companion object {
         val properties = config
             .properties
             .mapNotNull { field ->
-                fileData.dataview[DataviewField(field)]
+                item.dataview[DataviewField(field)]
                     .toOption()
                     .map { field to { span {
                         outputStyledContent(Content(it.v), store)

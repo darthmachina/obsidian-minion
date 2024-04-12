@@ -1,12 +1,16 @@
 package app.minion.shell.view.codeblock
 
 import app.minion.core.MinionError
+import app.minion.core.model.Content
 import app.minion.core.model.DataviewField
 import app.minion.core.model.DataviewValue
 import app.minion.core.model.FileData
 import app.minion.core.model.Filename
 import app.minion.core.model.Tag
 import app.minion.core.store.State
+import app.minion.shell.view.Item
+import app.minion.shell.view.ItemType
+import app.minion.shell.view.ViewItems
 import app.minion.shell.view.codeblock.CodeBlockPageIncludeFunctions.Companion.applyInclude
 import arrow.core.Either
 import arrow.core.flatten
@@ -19,7 +23,7 @@ private val logger = KotlinLogging.logger("CodeBlockPageFunctions")
 
 interface CodeBlockPageFunctions { companion object {
     fun State.applyCodeBlockConfig(config: CodeBlockConfig)
-    : Either<MinionError, Map<String, List<FileData>>> = either {
+    : Either<MinionError, List<ViewItems>> = either {
         this@applyCodeBlockConfig
             .files
             .map { it.value }
@@ -35,12 +39,6 @@ interface CodeBlockPageFunctions { companion object {
             }
             .values
             .toSet()
-    }
-
-    fun Set<Filename>.applyIncludeWithCache(tagCache: Map<Tag, Set<Filename>>, config: CodeBlockConfig)
-    : Either<MinionError, Set<Filename>> = either {
-        this@applyIncludeWithCache
-            .applyIncludeTags(tagCache, config).bind()
     }
 
     fun Set<Filename>.applyIncludeTags(tagCache: Map<Tag, Set<Filename>>, config: CodeBlockConfig)
@@ -95,16 +93,24 @@ interface CodeBlockPageFunctions { companion object {
         }
     }
 
+    fun List<FileData>.toItems(config: CodeBlockConfig) : Either<MinionError, List<Item>> = either {
+        this@toItems
+            .map { fileData ->
+                Item(ItemType.PAGE, Content(fileData.name.v), emptyList()) // TODO Process properties
+            }
+    }
+
     fun List<FileData>.applyGroupBy(config: CodeBlockConfig)
-    : Either<MinionError, Map<String, List<FileData>>> = either {
+    : Either<MinionError, List<ViewItems>> = either {
         if (config.groupBy == GroupByOptions.NONE) {
-            mapOf(GROUP_BY_SINGLE to this@applyGroupBy)
+            listOf(ViewItems(GROUP_BY_SINGLE, this@applyGroupBy.toItems(config).bind()))
         } else {
-            when(config.groupBy) {
+            when (config.groupBy) {
                 GroupByOptions.dataview -> {
                     this@applyGroupBy
                         .applyGroupByForDataview(config).bind()
-                        .mapKeys { it.key.v }
+                        .map { entry -> ViewItems(entry.key.v, entry.value.toItems(config).bind()) }
+                        // TODO Sort by groupByOrder
                 }
                 else -> raise(MinionError.ConfigError("${config.groupBy} not implement yet"))
             }
