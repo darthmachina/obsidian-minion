@@ -14,11 +14,16 @@ enum class ItemType {
 
 enum class PropertyType {
     DUE,
+    DUE_IN_PAST,
     TAGS,
     SOURCE,
     DATAVIEW,
     IMAGE,
-    FORMULA
+    FORMULA,
+    LIFE_AREA_COLOR,
+    EISENHOWER,
+    REPEAT_INFO,
+    COMPLETED_SUBTASK_PERCENT
 }
 
 data class Property(

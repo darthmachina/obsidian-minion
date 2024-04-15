@@ -8,6 +8,7 @@ import app.minion.shell.view.ViewItems
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputGroupLabel
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.applyCodeBlockConfig
+import app.minion.shell.view.codeblock.CodeBlockPageListView.Companion.outputStats
 import app.minion.shell.view.codeblock.components.CodeBlockCard.Companion.outputPageCard
 import io.kvision.state.sub
 import kotlinx.dom.clear
@@ -78,12 +79,6 @@ interface CodeBlockPageGalleryView { companion object {
             items.forEach { item ->
                 outputPageCard(item, config, store)
             }
-        }
-    }
-
-    fun HTMLElement.outputStats(viewItems: List<ViewItems>) {
-        this.append.div(classes = "mi-codeblock-item-count") {
-            +"Page Count: ${viewItems.calculateTotalCount()}"
         }
     }
 }}

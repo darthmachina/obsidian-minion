@@ -29,8 +29,11 @@ import app.minion.shell.view.ICON_REPEAT
 import app.minion.shell.view.ICON_URGENT
 import app.minion.shell.view.Item
 import app.minion.shell.view.PropertyType
+import app.minion.shell.view.ViewFunctions.Companion.outputIcon
+import app.minion.shell.view.ViewModelFunctions.Companion.getPropertyValue
 import arrow.core.None
 import arrow.core.Option
+import arrow.core.getOrElse
 import arrow.core.toOption
 import kotlinx.html.FlowContent
 import kotlinx.html.div
@@ -66,6 +69,11 @@ interface CodeBlockCard { companion object {
                 PropertyType.SOURCE -> TODO()
                 PropertyType.IMAGE -> TODO()
                 PropertyType.FORMULA -> TODO()
+                PropertyType.DUE_IN_PAST -> TODO()
+                PropertyType.LIFE_AREA_COLOR -> TODO()
+                PropertyType.EISENHOWER -> TODO()
+                PropertyType.REPEAT_INFO -> TODO()
+                PropertyType.COMPLETED_SUBTASK_PERCENT -> TODO()
             }
         }
 
@@ -88,71 +96,74 @@ interface CodeBlockCard { companion object {
         }
     }
 
-    fun FlowContent.outputTaskCard(task: Task, config: CodeBlockConfig, store: MinionStore) {
-        val properties = config
-            .properties
-            .mapNotNull { field ->
-                when(field) {
-                    PROPERTY_DUE -> {
-                        task.dueDate.map {due ->
-                            "Due" to {
-                                span {
-                                    outputDue(due)
-                                    task.repeatInfo.map {
-                                        span(classes = "mi-icon") {
-                                            title = it.asString()
-                                            unsafe { +ICON_REPEAT }
-                                        }
-                                    }
-                                }
-                            }
-                        }.getOrNull()
-                    }
-                    PROPERTY_TAGS -> {
-                        "Tags" to {
-                            span {
-                                +task.collectTags().removeConfigTags(config).asString()
+    fun FlowContent.outputTaskCard(item: Item, config: CodeBlockConfig, store: MinionStore) {
+        val properties = item.properties.mapNotNull { property ->
+            when (property.type) {
+                PropertyType.DUE -> {
+                    property.name to {
+                        span {
+                            outputDue(
+                                property.value,
+                                item.getPropertyValue(PropertyType.DUE_IN_PAST).map { it == "true" }.getOrElse { false }
+                            )
+                            item.getPropertyValue(PropertyType.REPEAT_INFO).map {
+                                outputIcon(ICON_REPEAT, it)
                             }
                         }
-                    }
-                    PROPERTY_SOURCE -> {
-                        "Source" to {
-                            span {
-                                outputStyledContent(Content("[[${task.fileInfo.file.v}]]"), store)
-                            }
-
-                        }
-                    }
-                    PROPERTY_EISENHOWER -> {
-                        "Eisenhower" to {
-                            span {
-                                if (task.important) {
-                                    span(classes = "mi-icon") { unsafe { +ICON_IMPORTANT } }
-                                }
-                                if (task.urgent) {
-                                    span(classes = "mi-icon") { unsafe { +ICON_URGENT } }
-                                }
-                            }
-                        }
-                    }
-                    else -> {
-                        logger.debug { "Property $field not supported yet" }
-                        null
                     }
                 }
-            }
 
-        outputCard(
-            {
-                outputCheckbox(task, store)
-                outputStyledContent(task.content, store)
-            },
-            { outputSubtasks(task, store) },
-            properties,
-            None,
-            listOf(createChangeKanbanMenuItem(task, config, store)),
-            config,
-        )
+                PropertyType.TAGS -> {
+                    property.name to {
+                        span {
+                            +property.value
+                        }
+                    }
+                }
+                PropertyType.SOURCE -> {
+                    property.name to {
+                        span {
+                            outputStyledContent(Content(property.value), store)
+                        }
+                    }
+                }
+                PropertyType.DATAVIEW -> TODO()
+                PropertyType.IMAGE -> TODO()
+                PropertyType.FORMULA -> TODO()
+                PropertyType.LIFE_AREA_COLOR -> TODO()
+                PropertyType.EISENHOWER -> {
+                    "Eisenhower" to {
+                        span {
+                            if (property.value.contains("i")) {
+                                outputIcon(ICON_IMPORTANT, "Important")
+                            }
+                            if (property.value.contains("u")) {
+                                outputIcon(ICON_URGENT, "Urgent")
+                            }
+                        }
+                    }
+                }
+                PropertyType.COMPLETED_SUBTASK_PERCENT -> TODO()
+                PropertyType.REPEAT_INFO -> null // Included in other Property output
+                PropertyType.DUE_IN_PAST -> null // Included in other Property output
+            }
+        }
+
+        item.task.map { task ->
+            outputCard(
+                {
+                    outputCheckbox(item, store)
+                    outputStyledContent(item.content, store)
+                },
+                { outputSubtasks(item, store) },
+                properties,
+                None,
+                listOf(createChangeKanbanMenuItem(task, config, store)),
+                config,
+            )
+        }.onNone {
+            logger.error { "No task set for item ${item.content.v}" }
+        }
     }
 
     /**

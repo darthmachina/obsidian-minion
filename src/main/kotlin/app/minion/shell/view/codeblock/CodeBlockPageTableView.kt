@@ -1,9 +1,6 @@
 package app.minion.shell.view.codeblock
 
-import app.minion.core.MinionError
 import app.minion.core.model.Content
-import app.minion.core.model.DataviewField
-import app.minion.core.model.FileData
 import app.minion.core.store.MinionStore
 import app.minion.shell.view.Item
 import app.minion.shell.view.ViewFunctions.Companion.maybeOutputHeading
@@ -13,10 +10,8 @@ import app.minion.shell.view.ViewItems
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockPageListView.Companion.outputStats
-import arrow.core.toOption
 import io.kvision.state.sub
 import kotlinx.dom.clear
-import kotlinx.html.Entities
 import kotlinx.html.TABLE
 import kotlinx.html.dom.append
 import kotlinx.html.table
@@ -78,10 +73,10 @@ interface CodeBlockPageTableView { companion object {
         store: MinionStore
     ) {
         if (label == GROUP_BY_SINGLE) {
-            outputFileData(fileDataset, config, store)
+            outputItems(items, config, store)
         } else {
             outputGroupHeader(label, config, store)
-            outputFileData(fileDataset, config, store)
+            outputItems(items, config, store)
         }
     }
 
@@ -107,15 +102,16 @@ interface CodeBlockPageTableView { companion object {
         items.forEach { item ->
             tr(classes = "mi-codeblock-table-data-row") {
                 td(classes = "mi-codeblock-table-data-cell") {
-                    outputSourceLink(fileData.name, store)
+                    item.fileData.map { fileData ->
+                        outputSourceLink(fileData.name, store)
+                    }.onNone {
+                        +item.content.v
+                    }
                 }
-                config.properties.forEach { field ->
-                    fileData.dataview[DataviewField(field)]
-                        .toOption()
-                        .onSome { td(classes = "mi-codeblock-table-data-cell") {
-                            outputStyledContent(Content(it.v), store)
-                        } }
-                        .onNone { td(classes = "mi-codeblock-table-data-cell") {  } }
+                item.properties.forEach { property ->
+                    td(classes = "mi-codeblock-table-data-cell") {
+                        outputStyledContent(Content(property.value), store)
+                    }
                 }
             }
         }

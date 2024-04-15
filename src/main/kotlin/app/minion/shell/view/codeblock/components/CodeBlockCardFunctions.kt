@@ -42,23 +42,25 @@ interface CodeBlockCardFunctions { companion object {
             }.bind()
     }
 
-    fun FlowContent.outputSubtasks(task: Task, store: MinionStore) {
-        task.subtasks.forEach { subtask ->
-            if (!subtask.completed) {
-                div(classes = "mi-codeblock-task-subtask") {
-                    checkBoxInput {
-                        onClickFunction = {
-                            store.dispatch(
-                                (TaskThunks.completeSubtask(
-                                    store.store.state.plugin.app,
-                                    task,
-                                    subtask
-                                ))
-                            )
+    fun FlowContent.outputSubtasks(item: Item, store: MinionStore) {
+        item.task.map { task ->
+            task.subtasks.forEach { subtask ->
+                if (!subtask.completed) {
+                    div(classes = "mi-codeblock-task-subtask") {
+                        checkBoxInput {
+                            onClickFunction = {
+                                store.dispatch(
+                                    (TaskThunks.completeSubtask(
+                                        store.store.state.plugin.app,
+                                        task,
+                                        subtask
+                                    ))
+                                )
+                            }
                         }
-                    }
-                    span(classes = "mi-codeblock-task-subtask-content") {
-                        outputStyledContent(subtask.content, store)
+                        span(classes = "mi-codeblock-task-subtask-content") {
+                            outputStyledContent(subtask.content, store)
+                        }
                     }
                 }
             }

@@ -4,9 +4,9 @@ import app.minion.core.MinionError
 import app.minion.core.functions.PARENT_TAG_REGEX
 import app.minion.core.functions.StatisticsFunctions.Companion.calculateTotalCount
 import app.minion.core.model.Content
-import app.minion.core.model.Task
 import app.minion.core.store.MinionStore
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
+import app.minion.shell.view.ViewItems
 import kotlinx.dom.clear
 import kotlinx.html.FlowContent
 import kotlinx.html.div
@@ -26,9 +26,9 @@ interface CodeBlockFunctions { companion object {
         }
     }
 
-    fun HTMLElement.outputTaskStats(tasks: Map<String, List<Task>>) {
+    fun HTMLElement.outputItemStats(items: List<ViewItems>) {
         this.append.div(classes = "mi-codeblock-item-count") {
-            +"Task Count: ${tasks.calculateTotalCount()}"
+            +"Task Count: ${items.calculateTotalCount()}"
         }
     }
 

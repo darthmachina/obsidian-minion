@@ -10,7 +10,10 @@ import app.minion.core.model.Tag
 import app.minion.core.store.State
 import app.minion.shell.view.Item
 import app.minion.shell.view.ItemType
+import app.minion.shell.view.Property
+import app.minion.shell.view.PropertyType
 import app.minion.shell.view.ViewItems
+import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.toItems
 import app.minion.shell.view.codeblock.CodeBlockPageIncludeFunctions.Companion.applyInclude
 import arrow.core.Either
 import arrow.core.flatten
@@ -31,6 +34,7 @@ interface CodeBlockPageFunctions { companion object {
             .applyInclude(config.include).bind()
             .applySort(config).bind()
             .applyGroupBy(config).bind()
+            .map { entry -> ViewItems(entry.key, entry.value.toItems(config).bind()) }
     }
 
     fun Set<Filename>.getFileData(fileData: Map<Filename, FileData>) : Either<MinionError, Set<FileData>> = either {
@@ -97,24 +101,53 @@ interface CodeBlockPageFunctions { companion object {
     fun List<FileData>.toItems(config: CodeBlockConfig) : Either<MinionError, List<Item>> = either {
         this@toItems
             .map { fileData ->
-                Item(ItemType.PAGE, Content(fileData.name.v), emptyList(), fileData = fileData.some()) // TODO Process properties
+                Item(
+                    ItemType.PAGE,
+                    Content(fileData.name.v),
+                    fileData.toPropertyList(config).bind(),
+                    fileData = fileData.some()
+                ) // TODO Process properties
             }
     }
 
+    fun FileData.toPropertyList(config: CodeBlockConfig) : Either<MinionError, List<Property>> = either {
+        config.properties.map { configProperty ->
+            when (configProperty) {
+                else -> {
+                    this@toPropertyList.dataview[DataviewField(configProperty)]
+                        .toOption()
+                        .map {
+                            Property(
+                                PropertyType.DATAVIEW,
+                                configProperty,
+                                it.v
+                            )
+                        }.getOrElse {
+                            Property(
+                                PropertyType.DATAVIEW,
+                                configProperty,
+                                "-"
+                            )
+                        }
+                }
+            }
+        }
+    }
+
     fun List<FileData>.applyGroupBy(config: CodeBlockConfig)
-    : Either<MinionError, List<ViewItems>> = either {
+    : Either<MinionError, Map<String, List<FileData>>> = either {
         if (config.groupBy == GroupByOptions.NONE) {
-            listOf(ViewItems(GROUP_BY_SINGLE, this@applyGroupBy.toItems(config).bind()))
+            mapOf(GROUP_BY_SINGLE to this@applyGroupBy)
         } else {
             when (config.groupBy) {
                 GroupByOptions.dataview -> {
                     this@applyGroupBy
                         .applyGroupByForDataview(config).bind()
-                        .map { entry -> ViewItems(entry.key.v, entry.value.toItems(config).bind()) }
-                        // TODO Sort by groupByOrder
+                        .mapKeys { it.key.v }
                 }
                 else -> raise(MinionError.ConfigError("${config.groupBy} not implement yet"))
             }
+            // TODO Sort by groupByOrder
         }
     }
 

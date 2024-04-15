@@ -3,9 +3,11 @@ package app.minion.shell.view.codeblock
 import app.minion.core.MinionError
 import app.minion.core.model.Task
 import app.minion.core.store.MinionStore
+import app.minion.shell.view.Item
+import app.minion.shell.view.ViewItems
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputGroupLabel
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputHeading
-import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputTaskStats
+import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputItemStats
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.maybeAddProperties
@@ -43,75 +45,38 @@ interface CodeBlockTaskGalleryView { companion object {
             }
     }
 
-    fun HTMLElement.updateTasks(tasks: Map<String, List<Task>>, store: MinionStore, config: CodeBlockConfig) {
+    fun HTMLElement.updateTasks(viewItems: List<ViewItems>, store: MinionStore, config: CodeBlockConfig) {
         this.clear()
         if (config.heading.isNotEmpty()) {
             this.outputHeading(config.heading)
         }
 
-        if (tasks.isNotEmpty()) {
+        if (viewItems.isNotEmpty()) {
             this.append.div {
-                if (config.groupByOrder.isEmpty()) {
-                    tasks.forEach { entry ->
-                        outputGroupDiv(entry.key, entry.value, config, store)
-                    }
-                } else {
-                    config.groupByOrder.forEach { group ->
-                        if (group.contains(":")) {
-                            group.split(":")
-                                .let {
-                                    outputGroupWithLabel(it[0], it[1], tasks, config, store)
-                                }
-                        } else {
-                            outputGroupWithLabel(group, group, tasks, config, store)
-                        }
-                    }
-                    tasks
-                        .filter { entry ->
-                            !config.groupByOrder.any { group ->
-                                group.startsWith(entry.key)
-                            }
-                        }
-                        .forEach { entry ->
-                            outputGroupDiv(entry.key, entry.value, config, store)
-                        }
+                viewItems.forEach { viewItem ->
+                    outputGroupDiv(viewItem.group, viewItem.items, config, store)
                 }
             }
         }
 
-        this.outputTaskStats(tasks)
+        this.outputItemStats(viewItems)
     }
 
-    fun FlowContent.outputGroupWithLabel(
-        group: String,
-        label: String,
-        tasks: Map<String, List<Task>>,
-        config: CodeBlockConfig,
-        store: MinionStore
-    ) {
-        tasks[group]
-            .toOption().toEither {
-                MinionError.GroupByNotFoundError("$group not found in results")
-            }
-            .map { outputGroupDiv(label, it, config, store) }
-            .mapLeft { logger.warn { "$it" } }
-    }
-
-    fun FlowContent.outputGroupDiv(label: String, tasks: List<Task>, config: CodeBlockConfig, store: MinionStore) {
+    fun FlowContent.outputGroupDiv(label: String, items: List<Item>, config: CodeBlockConfig, store: MinionStore) {
         if (label == GROUP_BY_SINGLE) {
-            outputTaskList(tasks, config, store)
+            outputItemList(items, config, store)
         } else {
             div {
                 outputGroupLabel(label, store)
-                outputTaskList(tasks, config, store)
+                outputItemList(items, config, store)
             }
         }
     }
 
-    fun FlowContent.outputTaskList(tasks: List<Task>, config: CodeBlockConfig, store: MinionStore) {
+    fun FlowContent.outputItemList(items: List<Item>, config: CodeBlockConfig, store: MinionStore) {
         div(classes = "mi-codeblock-page-gallery") {
-            tasks.forEach { task ->
-                outputTaskCard(task, config, store)
+            items.forEach { item ->
+                outputTaskCard(item, config, store)
             }
         }
     }

@@ -5,20 +5,16 @@ import Vault
 import app.minion.core.MinionError
 import app.minion.core.functions.BOLD_REGEX
 import app.minion.core.functions.CODE_REGEX
-import app.minion.core.functions.DateTimeFunctions.Companion.asString
-import app.minion.core.functions.DateTimeFunctions.Companion.isInPast
 import app.minion.core.functions.ITALIC_REGEX
 import app.minion.core.functions.ImageFunctions.Companion.getImageName
 import app.minion.core.functions.WIKILINK_REGEX
 import app.minion.core.model.Content
-import app.minion.core.model.DateTime
 import app.minion.core.model.Filename
-import app.minion.core.model.Tag
-import app.minion.core.model.Task
 import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions.Companion.openSourceFile
 import app.minion.shell.functions.VaultFunctions.Companion.sourceFileExists
 import app.minion.shell.thunk.TaskThunks
+import app.minion.shell.view.ViewModelFunctions.Companion.getPropertyValue
 import app.minion.shell.view.codeblock.CodeBlockConfig
 import arrow.core.Either
 import arrow.core.raise.either
@@ -31,6 +27,8 @@ import kotlinx.html.dom.append
 import kotlinx.html.js.onClickFunction
 import kotlinx.html.span
 import kotlinx.html.style
+import kotlinx.html.title
+import kotlinx.html.unsafe
 import mu.KotlinLogging
 import org.w3c.dom.HTMLElement
 
@@ -78,20 +76,21 @@ interface ViewFunctions { companion object {
             }
     }
 
-    fun FlowContent.outputCheckbox(task: Task, store: MinionStore) {
+    fun FlowContent.outputCheckbox(item: Item, store: MinionStore) {
         checkBoxInput {
-            task.tags
-                .intersect(store.store.state.settings.lifeAreas.keys.map { Tag(it) }.toSet())
-                .let {
-                    if (it.isNotEmpty()) {
-                        logger.debug { "Applying style to checkbox: $it" }
-                        attributes["style"] = "border: 1px solid ${store.store.state.settings.lifeAreas[it.first().v]!!}"
-                    }
-                }
-
-            onClickFunction = {
-                store.dispatch(TaskThunks.completeTask(store.store.state.plugin.app, task))
+            item.getPropertyValue(PropertyType.LIFE_AREA_COLOR).map { lifeAreaColor ->
+                logger.debug { "Applying style to checkbox: $lifeAreaColor" }
+                attributes["style"] = "border: 1px solid $lifeAreaColor"
             }
+
+            item.task
+                .onSome { task ->
+                    onClickFunction = {
+                        store.dispatch(TaskThunks.completeTask(store.store.state.plugin.app, task))
+                    }
+                }.onNone {
+                    logger.error { "No task set on item ${item.content.v}" }
+                }
         }
     }
 
@@ -154,12 +153,19 @@ interface ViewFunctions { companion object {
             .bind()
     }
 
-    fun FlowContent.outputDue(due: DateTime) {
+    fun FlowContent.outputDue(due: String, inPast: Boolean) {
         span(classes = "mi-codeblock-task-content-due") {
-            if (due.isInPast()) {
+            if (inPast) {
                 style = "color: crimson"
             }
-            +"[${due.asString()}]"
+            +"[${due}]"
+        }
+    }
+
+    fun FlowContent.outputIcon(icon: String, tooltip: String) {
+        span(classes = "mi-icon") {
+            title = tooltip
+            unsafe { +icon }
         }
     }
 }}
