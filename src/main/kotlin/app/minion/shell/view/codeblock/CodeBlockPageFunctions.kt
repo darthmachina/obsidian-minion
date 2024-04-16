@@ -1,6 +1,8 @@
 package app.minion.shell.view.codeblock
 
 import app.minion.core.MinionError
+import app.minion.core.formulas.FormulaExpression
+import app.minion.core.formulas.MinionFormulaGrammar
 import app.minion.core.model.Content
 import app.minion.core.model.DataviewField
 import app.minion.core.model.DataviewValue
@@ -23,6 +25,7 @@ import arrow.core.getOrElse
 import arrow.core.raise.either
 import arrow.core.some
 import arrow.core.toOption
+import com.github.h0tk3y.betterParse.grammar.parseToEnd
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger("CodeBlockPageFunctions")
@@ -114,16 +117,31 @@ interface CodeBlockPageFunctions { companion object {
 
     fun FileData.toPropertyList(config: CodeBlockConfig) : Either<MinionError, List<Property>> = either {
         optionsToProperties(config).bind()
-            .plus(populateProperties(config).bind())
+            .plus(populateProperties(config, config.createFormulas().bind()).bind())
     }
 
-    fun FileData.populateProperties(config: CodeBlockConfig) : Either<MinionError, List<Property>> = either {
+    fun CodeBlockConfig.createFormulas() : Either<MinionError, Map<String, FormulaExpression>> = either {
+        val parser = MinionFormulaGrammar()
+        properties
+            .filter { it.contains(PROPERTY_FORMULA_TOKEN) }
+            .map { it.split(PROPERTY_FORMULA_TOKEN) }
+            .groupBy(keySelector = { it[0] }, valueTransform = { parser.parseToEnd(it[1]) })
+            .mapValues { entry ->
+                if (entry.value.size != 1) {
+                    raise(MinionError.ConfigError("FormulaExpression issue for ${entry.key}"))
+                } else {
+                    entry.value.first()
+                }
+            }
+    }
+
+    fun FileData.populateProperties(config: CodeBlockConfig, formulas: Map<String, FormulaExpression>) : Either<MinionError, List<Property>> = either {
         config.properties.map { configProperty ->
             when (configProperty) {
                 else -> {
-                    if (configProperty.contains(" =")) {
+                    if (configProperty.contains(PROPERTY_FORMULA_TOKEN)) {
                         configProperty
-                            .split(" =")
+                            .split(PROPERTY_FORMULA_TOKEN)
                             .let {
                                 Property(
                                     PropertyType.FORMULA,

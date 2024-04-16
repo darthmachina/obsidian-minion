@@ -84,6 +84,7 @@ const val PROPERTY_SOURCE = "source"
 const val PROPERTY_TAGS = "tags"
 const val PROPERTY_DUE = "due"
 const val PROPERTY_EISENHOWER = "eisenhower"
+const val PROPERTY_FORMULA_TOKEN = " = "
 const val FIELD_IMAGE = "Image"
 
 const val GROUP_BY_SINGLE = "!!single!!"
