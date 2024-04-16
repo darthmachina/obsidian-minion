@@ -182,8 +182,18 @@ interface CodeBlockTaskFunctions { companion object {
                         )
                     )
                 }
-                PROPERTY_EISENHOWER -> TODO()
-                else -> TODO()
+                PROPERTY_EISENHOWER -> {
+                    listOf(
+                        if (this@toPropertyList.important) "i" else "",
+                        if (this@toPropertyList.urgent) "u" else ""
+                    ).joinToString("")
+                        .let {
+                            listOf(
+                                Property(PropertyType.EISENHOWER, "Eisenhower", it)
+                            )
+                        }
+                }
+                else -> TODO("$configProperty not implemented")
             }
         }
     }

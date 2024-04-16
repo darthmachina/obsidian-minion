@@ -14,6 +14,7 @@ import app.minion.shell.view.Property
 import app.minion.shell.view.PropertyType
 import app.minion.shell.view.ViewItems
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.toItems
+import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.toPropertyList
 import app.minion.shell.view.codeblock.CodeBlockPageIncludeFunctions.Companion.applyInclude
 import arrow.core.Either
 import arrow.core.flatten
@@ -111,10 +112,15 @@ interface CodeBlockPageFunctions { companion object {
     }
 
     fun FileData.toPropertyList(config: CodeBlockConfig) : Either<MinionError, List<Property>> = either {
+        optionsToProperties(config).bind()
+            .plus(populateProperties(config).bind())
+    }
+
+    fun FileData.populateProperties(config: CodeBlockConfig) : Either<MinionError, List<Property>> = either {
         config.properties.map { configProperty ->
             when (configProperty) {
                 else -> {
-                    this@toPropertyList.dataview[DataviewField(configProperty)]
+                    this@populateProperties.dataview[DataviewField(configProperty)]
                         .toOption()
                         .map {
                             Property(
@@ -129,6 +135,25 @@ interface CodeBlockPageFunctions { companion object {
                                 "-"
                             )
                         }
+                }
+            }
+        }
+    }
+
+    fun FileData.optionsToProperties(config: CodeBlockConfig) : Either<MinionError, List<Property>> = either {
+        config.options.mapNotNull { option ->
+            when (option) {
+                CodeBlockOptions.image_on_cover -> {
+                    this@optionsToProperties.dataview[DataviewField(FIELD_IMAGE)]
+                        .toOption()
+                        .map {
+                            Property(
+                                PropertyType.IMAGE,
+                                "Image",
+                                it.v
+                            )
+                        }
+                        .getOrNull()
                 }
             }
         }

@@ -33,6 +33,7 @@ import app.minion.shell.view.ViewFunctions.Companion.outputIcon
 import app.minion.shell.view.ViewModelFunctions.Companion.getPropertyValue
 import arrow.core.None
 import arrow.core.Option
+import arrow.core.flatMap
 import arrow.core.getOrElse
 import arrow.core.toOption
 import kotlinx.html.FlowContent
@@ -54,26 +55,25 @@ interface CodeBlockCard { companion object {
     ) {
         val image = item
             .getImagePath(store)
-            .map { it }
             .mapLeft { logger.warn { it } }
             .getOrNone()
-        val properties = item.properties.map {property ->
+        val properties = item.properties.mapNotNull { property ->
             when (property.type) {
                 PropertyType.DATAVIEW -> {
                     property.name to { span {
                         outputStyledContent(Content(property.value), store)
                     } }
                 }
-                PropertyType.DUE -> TODO()
-                PropertyType.TAGS -> TODO()
-                PropertyType.SOURCE -> TODO()
-                PropertyType.IMAGE -> TODO()
-                PropertyType.FORMULA -> TODO()
-                PropertyType.DUE_IN_PAST -> TODO()
-                PropertyType.LIFE_AREA_COLOR -> TODO()
-                PropertyType.EISENHOWER -> TODO()
-                PropertyType.REPEAT_INFO -> TODO()
-                PropertyType.COMPLETED_SUBTASK_PERCENT -> TODO()
+                PropertyType.DUE -> TODO("PropertyType.DUE")
+                PropertyType.TAGS -> TODO("PropertyType.TAGS")
+                PropertyType.SOURCE -> TODO("PropertyType.SOURCE")
+                PropertyType.IMAGE -> null // Processed separately
+                PropertyType.FORMULA -> TODO("PropertyType.FORMULA")
+                PropertyType.DUE_IN_PAST -> TODO("PropertyType.DUE_IN_PAST")
+                PropertyType.LIFE_AREA_COLOR -> TODO("PropertyType.LIFE_AREA_COLOR")
+                PropertyType.EISENHOWER -> TODO("PropertyType.EISENHOWER")
+                PropertyType.REPEAT_INFO -> TODO("PropertyType.REPEAT_INFO")
+                PropertyType.COMPLETED_SUBTASK_PERCENT -> TODO("PropertyType.COMPLETE_SUBTASK_PERCENT")
             }
         }
 
