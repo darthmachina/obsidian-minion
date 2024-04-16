@@ -23,7 +23,7 @@ enum class PropertyType {
     LIFE_AREA_COLOR,
     EISENHOWER,
     REPEAT_INFO,
-    COMPLETED_SUBTASK_PERCENT
+    COMPLETED_SUBTASK_PERCENT,
 }
 
 data class Property(

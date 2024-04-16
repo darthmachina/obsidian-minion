@@ -13,6 +13,7 @@ import app.minion.shell.view.ItemType
 import app.minion.shell.view.Property
 import app.minion.shell.view.PropertyType
 import app.minion.shell.view.ViewItems
+import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.populateProperties
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.toItems
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.toPropertyList
 import app.minion.shell.view.codeblock.CodeBlockPageIncludeFunctions.Companion.applyInclude
@@ -120,24 +121,40 @@ interface CodeBlockPageFunctions { companion object {
         config.properties.map { configProperty ->
             when (configProperty) {
                 else -> {
-                    this@populateProperties.dataview[DataviewField(configProperty)]
-                        .toOption()
-                        .map {
-                            Property(
-                                PropertyType.DATAVIEW,
-                                configProperty,
-                                it.v
-                            )
-                        }.getOrElse {
-                            Property(
-                                PropertyType.DATAVIEW,
-                                configProperty,
-                                "-"
-                            )
-                        }
+                    if (configProperty.contains(" =")) {
+                        configProperty
+                            .split(" =")
+                            .let {
+                                Property(
+                                    PropertyType.FORMULA,
+                                    it[0],
+                                    it[1]
+                                )
+                            }
+                    } else {
+                        getDataviewProperty(configProperty, config).bind()
+                    }
                 }
             }
         }
+    }
+
+    fun FileData.getDataviewProperty(property: String, config: CodeBlockConfig) : Either<MinionError, Property> = either {
+        this@getDataviewProperty.dataview[DataviewField(property)]
+            .toOption()
+            .map {
+                Property(
+                    PropertyType.DATAVIEW,
+                    property,
+                    it.v
+                )
+            }.getOrElse {
+                Property(
+                    PropertyType.DATAVIEW,
+                    property,
+                    "-"
+                )
+            }
     }
 
     fun FileData.optionsToProperties(config: CodeBlockConfig) : Either<MinionError, List<Property>> = either {

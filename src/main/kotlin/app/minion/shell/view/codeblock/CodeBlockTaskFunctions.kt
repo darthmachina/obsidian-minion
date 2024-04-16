@@ -2,6 +2,7 @@ package app.minion.shell.view.codeblock
 
 import app.minion.core.MinionError
 import app.minion.core.functions.DateTimeFunctions.Companion.asString
+import app.minion.core.functions.DateTimeFunctions.Companion.isInPast
 import app.minion.core.functions.TaskFilterFunctions.Companion.excludeByTags
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByOverdue
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByToday
@@ -179,6 +180,11 @@ interface CodeBlockTaskFunctions { companion object {
                             PropertyType.DUE,
                             "Due",
                             this@toPropertyList.dueDate.map { it.asString() }.getOrElse { "-" }
+                        ),
+                        Property(
+                            PropertyType.DUE_IN_PAST,
+                            "Due in Past",
+                            this@toPropertyList.dueDate.map { "${it.isInPast()}" }.getOrElse { "false" }
                         )
                     )
                 }

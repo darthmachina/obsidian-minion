@@ -33,10 +33,14 @@ interface FormulaEvaluator { companion object {
     fun FormulaExpression.BinaryNumericFormulaExpression.eval(fields: Map<String, String>)
     : Either<MinionError, FormulaResult.DecimalResult> = either {
         when (this@eval) {
-            is FormulaExpression.Add -> FormulaResult.DecimalResult(left.eval(fields).bind().value + right.eval(fields).bind().value)
-            is FormulaExpression.Sub -> FormulaResult.DecimalResult(left.eval(fields).bind().value - right.eval(fields).bind().value)
-            is FormulaExpression.Mul -> FormulaResult.DecimalResult(left.eval(fields).bind().value * right.eval(fields).bind().value)
-            is FormulaExpression.Div -> FormulaResult.DecimalResult(left.eval(fields).bind().value / right.eval(fields).bind().value)
+            is FormulaExpression.Add ->
+                FormulaResult.DecimalResult(left.eval(fields).bind().value + right.eval(fields).bind().value)
+            is FormulaExpression.Sub ->
+                FormulaResult.DecimalResult(left.eval(fields).bind().value - right.eval(fields).bind().value)
+            is FormulaExpression.Mul ->
+                FormulaResult.DecimalResult(left.eval(fields).bind().value * right.eval(fields).bind().value)
+            is FormulaExpression.Div ->
+                FormulaResult.DecimalResult(left.eval(fields).bind().value / right.eval(fields).bind().value)
         }
     }
 
