@@ -59,7 +59,7 @@ interface CodeBlockCard { companion object {
             .getOrNone()
         val properties = item.properties.mapNotNull { property ->
             when (property.type) {
-                PropertyType.DATAVIEW -> {
+                PropertyType.DATAVIEW, PropertyType.FORMULA -> {
                     property.name to { span {
                         outputStyledContent(Content(property.value), store)
                     } }
@@ -68,7 +68,6 @@ interface CodeBlockCard { companion object {
                 PropertyType.TAGS -> TODO("PropertyType.TAGS")
                 PropertyType.SOURCE -> TODO("PropertyType.SOURCE")
                 PropertyType.IMAGE -> null // Processed separately
-                PropertyType.FORMULA -> TODO("PropertyType.FORMULA")
                 PropertyType.DUE_IN_PAST -> TODO("PropertyType.DUE_IN_PAST")
                 PropertyType.LIFE_AREA_COLOR -> TODO("PropertyType.LIFE_AREA_COLOR")
                 PropertyType.EISENHOWER -> TODO("PropertyType.EISENHOWER")

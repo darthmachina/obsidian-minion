@@ -162,7 +162,7 @@ interface CodeBlockPageFunctions { companion object {
                         Property(
                             PropertyType.FORMULA,
                             propertySplit[0],
-                            expression.eval(emptyMap()).toString()
+                            expression.eval(emptyMap()).map { it.toString() }.getOrElse { "<ERROR>" }
                         )
                     }
                     .getOrElse {

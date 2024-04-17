@@ -13,9 +13,21 @@ import com.github.h0tk3y.betterParse.lexer.regexToken
 import com.github.h0tk3y.betterParse.parser.Parser
 
 sealed class FormulaResult {
-    data class DecimalResult(val value: Long) : FormulaResult()
-    data class StringResult(val value: String): FormulaResult()
-    data class BooleanResult(val value: Boolean): FormulaResult()
+    data class DecimalResult(val value: Long) : FormulaResult() {
+        override fun toString(): String {
+            return value.toString()
+        }
+    }
+    data class StringResult(val value: String): FormulaResult() {
+        override fun toString(): String {
+            return value.toString()
+        }
+    }
+    data class BooleanResult(val value: Boolean): FormulaResult() {
+        override fun toString(): String {
+            return value.toString()
+        }
+    }
 }
 
 sealed class FormulaExpression {

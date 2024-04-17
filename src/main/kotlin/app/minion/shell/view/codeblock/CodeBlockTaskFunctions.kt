@@ -175,18 +175,20 @@ interface CodeBlockTaskFunctions { companion object {
                     )
                 }
                 PROPERTY_DUE -> {
-                    listOf(
-                        Property(
-                            PropertyType.DUE,
-                            "Due",
-                            this@toPropertyList.dueDate.map { it.asString() }.getOrElse { "-" }
-                        ),
-                        Property(
-                            PropertyType.DUE_IN_PAST,
-                            "Due in Past",
-                            this@toPropertyList.dueDate.map { "${it.isInPast()}" }.getOrElse { "false" }
+                    this@toPropertyList.dueDate.map { dueDate ->
+                        listOf(
+                            Property(
+                                PropertyType.DUE,
+                                "Due",
+                                dueDate.asString()
+                            ),
+                            Property(
+                                PropertyType.DUE_IN_PAST,
+                                "Due in Past",
+                                "${dueDate.isInPast()}"
+                            )
                         )
-                    )
+                    }.getOrElse { emptyList() }
                 }
                 PROPERTY_EISENHOWER -> {
                     listOf(
