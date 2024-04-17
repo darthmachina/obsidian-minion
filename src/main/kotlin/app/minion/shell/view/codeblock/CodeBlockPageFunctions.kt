@@ -1,6 +1,7 @@
 package app.minion.shell.view.codeblock
 
 import app.minion.core.MinionError
+import app.minion.core.formulas.FormulaEvaluator.Companion.eval
 import app.minion.core.formulas.FormulaExpression
 import app.minion.core.formulas.MinionFormulaGrammar
 import app.minion.core.model.Content
@@ -111,7 +112,7 @@ interface CodeBlockPageFunctions { companion object {
                     Content(fileData.name.v),
                     fileData.toPropertyList(config).bind(),
                     fileData = fileData.some()
-                ) // TODO Process properties
+                )
             }
     }
 
@@ -135,20 +136,13 @@ interface CodeBlockPageFunctions { companion object {
             }
     }
 
-    fun FileData.populateProperties(config: CodeBlockConfig, formulas: Map<String, FormulaExpression>) : Either<MinionError, List<Property>> = either {
+    fun FileData.populateProperties(config: CodeBlockConfig, formulas: Map<String, FormulaExpression>)
+    : Either<MinionError, List<Property>> = either {
         config.properties.map { configProperty ->
             when (configProperty) {
                 else -> {
                     if (configProperty.contains(PROPERTY_FORMULA_TOKEN)) {
-                        configProperty
-                            .split(PROPERTY_FORMULA_TOKEN)
-                            .let {
-                                Property(
-                                    PropertyType.FORMULA,
-                                    it[0],
-                                    it[1]
-                                )
-                            }
+                        getFormulaResultProperty(configProperty, formulas).bind()
                     } else {
                         getDataviewProperty(configProperty, config).bind()
                     }
@@ -157,7 +151,28 @@ interface CodeBlockPageFunctions { companion object {
         }
     }
 
-    fun FileData.getDataviewProperty(property: String, config: CodeBlockConfig) : Either<MinionError, Property> = either {
+    fun FileData.getFormulaResultProperty(property: String, formulas: Map<String, FormulaExpression>)
+    : Either<MinionError, Property> = either {
+        property
+            .split(PROPERTY_FORMULA_TOKEN)
+            .let { propertySplit ->
+                formulas[propertySplit[0]]
+                    .toOption()
+                    .map { expression ->
+                        Property(
+                            PropertyType.FORMULA,
+                            propertySplit[0],
+                            expression.eval(emptyMap()).toString()
+                        )
+                    }
+                    .getOrElse {
+                        raise(MinionError.ConfigError("Cannot find formula for $propertySplit[0]"))
+                    }
+            }
+    }
+
+    fun FileData.getDataviewProperty(property: String, config: CodeBlockConfig)
+    : Either<MinionError, Property> = either {
         this@getDataviewProperty.dataview[DataviewField(property)]
             .toOption()
             .map {
