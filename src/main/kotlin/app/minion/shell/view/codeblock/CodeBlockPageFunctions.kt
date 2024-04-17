@@ -11,6 +11,7 @@ import app.minion.core.model.FileData
 import app.minion.core.model.Filename
 import app.minion.core.model.Tag
 import app.minion.core.store.State
+import app.minion.shell.functions.LogFunctions.Companion.logLeft
 import app.minion.shell.view.Item
 import app.minion.shell.view.ItemType
 import app.minion.shell.view.Property
@@ -162,7 +163,13 @@ interface CodeBlockPageFunctions { companion object {
                         Property(
                             PropertyType.FORMULA,
                             propertySplit[0],
-                            expression.eval(emptyMap()).map { it.toString() }.getOrElse { "<ERROR>" }
+                            expression
+                                .eval(
+                                    this@getFormulaResultProperty.toFormulaFieldMap().bind()
+                                )
+                                .map { it.toString() }
+                                .logLeft(logger)
+                                .getOrElse { "-" }
                         )
                     }
                     .getOrElse {
@@ -188,6 +195,13 @@ interface CodeBlockPageFunctions { companion object {
                     "-"
                 )
             }
+    }
+
+    fun FileData.toFormulaFieldMap() : Either<MinionError, Map<String, String>> = either {
+        this@toFormulaFieldMap
+            .dataview
+            .mapKeys { it.key.v }
+            .mapValues { it.value.v }
     }
 
     fun FileData.optionsToProperties(config: CodeBlockConfig) : Either<MinionError, List<Property>> = either {

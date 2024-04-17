@@ -8,7 +8,7 @@ interface LogFunctions { companion object {
     fun <E, T> Either<E, T>.logLeft(logger: KLogger) : Either<E, T> {
         this
             .mapLeft {
-                logger.error { "Error: $it" }
+                logger.warn { "Error: $it" }
             }
         return this
     }
