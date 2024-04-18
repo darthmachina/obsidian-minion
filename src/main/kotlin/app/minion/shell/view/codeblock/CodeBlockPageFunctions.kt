@@ -1,31 +1,47 @@
 package app.minion.shell.view.codeblock
 
 import app.minion.core.MinionError
+import app.minion.core.formulas.FormulaEvaluator.Companion.eval
+import app.minion.core.formulas.FormulaExpression
+import app.minion.core.formulas.MinionFormulaGrammar
+import app.minion.core.model.Content
 import app.minion.core.model.DataviewField
 import app.minion.core.model.DataviewValue
 import app.minion.core.model.FileData
 import app.minion.core.model.Filename
 import app.minion.core.model.Tag
 import app.minion.core.store.State
+import app.minion.shell.functions.LogFunctions.Companion.logLeft
+import app.minion.shell.view.Item
+import app.minion.shell.view.ItemType
+import app.minion.shell.view.Property
+import app.minion.shell.view.PropertyType
+import app.minion.shell.view.ViewItems
+import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.populateProperties
+import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.toItems
+import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.toPropertyList
 import app.minion.shell.view.codeblock.CodeBlockPageIncludeFunctions.Companion.applyInclude
 import arrow.core.Either
 import arrow.core.flatten
 import arrow.core.getOrElse
 import arrow.core.raise.either
+import arrow.core.some
 import arrow.core.toOption
+import com.github.h0tk3y.betterParse.grammar.parseToEnd
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger("CodeBlockPageFunctions")
 
 interface CodeBlockPageFunctions { companion object {
     fun State.applyCodeBlockConfig(config: CodeBlockConfig)
-    : Either<MinionError, Map<String, List<FileData>>> = either {
+    : Either<MinionError, List<ViewItems>> = either {
         this@applyCodeBlockConfig
             .files
             .map { it.value }
             .applyInclude(config.include).bind()
             .applySort(config).bind()
             .applyGroupBy(config).bind()
+            .map { entry -> ViewItems(entry.key, entry.value.toItems(config).bind()) }
     }
 
     fun Set<Filename>.getFileData(fileData: Map<Filename, FileData>) : Either<MinionError, Set<FileData>> = either {
@@ -35,12 +51,6 @@ interface CodeBlockPageFunctions { companion object {
             }
             .values
             .toSet()
-    }
-
-    fun Set<Filename>.applyIncludeWithCache(tagCache: Map<Tag, Set<Filename>>, config: CodeBlockConfig)
-    : Either<MinionError, Set<Filename>> = either {
-        this@applyIncludeWithCache
-            .applyIncludeTags(tagCache, config).bind()
     }
 
     fun Set<Filename>.applyIncludeTags(tagCache: Map<Tag, Set<Filename>>, config: CodeBlockConfig)
@@ -95,12 +105,130 @@ interface CodeBlockPageFunctions { companion object {
         }
     }
 
+    fun List<FileData>.toItems(config: CodeBlockConfig) : Either<MinionError, List<Item>> = either {
+        this@toItems
+            .map { fileData ->
+                Item(
+                    ItemType.PAGE,
+                    Content(fileData.name.v),
+                    fileData.toPropertyList(config).bind(),
+                    fileData = fileData.some()
+                )
+            }
+    }
+
+    fun FileData.toPropertyList(config: CodeBlockConfig) : Either<MinionError, List<Property>> = either {
+        optionsToProperties(config).bind()
+            .plus(populateProperties(config, config.createFormulas().bind()).bind())
+    }
+
+    fun CodeBlockConfig.createFormulas() : Either<MinionError, Map<String, FormulaExpression>> = either {
+        val parser = MinionFormulaGrammar()
+        properties
+            .filter { it.contains(PROPERTY_FORMULA_TOKEN) }
+            .map { it.split(PROPERTY_FORMULA_TOKEN) }
+            .groupBy(keySelector = { it[0] }, valueTransform = { parser.parseToEnd(it[1]) })
+            .mapValues { entry ->
+                if (entry.value.size != 1) {
+                    raise(MinionError.ConfigError("FormulaExpression issue for ${entry.key}"))
+                } else {
+                    entry.value.first()
+                }
+            }
+    }
+
+    fun FileData.populateProperties(config: CodeBlockConfig, formulas: Map<String, FormulaExpression>)
+    : Either<MinionError, List<Property>> = either {
+        config.properties.map { configProperty ->
+            when (configProperty) {
+                else -> {
+                    if (configProperty.contains(PROPERTY_FORMULA_TOKEN)) {
+                        getFormulaResultProperty(configProperty, formulas).bind()
+                    } else {
+                        getDataviewProperty(configProperty, config).bind()
+                    }
+                }
+            }
+        }
+    }
+
+    fun FileData.getFormulaResultProperty(property: String, formulas: Map<String, FormulaExpression>)
+    : Either<MinionError, Property> = either {
+        property
+            .split(PROPERTY_FORMULA_TOKEN)
+            .let { propertySplit ->
+                formulas[propertySplit[0]]
+                    .toOption()
+                    .map { expression ->
+                        Property(
+                            PropertyType.FORMULA,
+                            propertySplit[0],
+                            expression
+                                .eval(
+                                    this@getFormulaResultProperty.toFormulaFieldMap().bind()
+                                )
+                                .map { it.toString() }
+                                .logLeft(logger)
+                                .getOrElse { "-" }
+                        )
+                    }
+                    .getOrElse {
+                        raise(MinionError.ConfigError("Cannot find formula for $propertySplit[0]"))
+                    }
+            }
+    }
+
+    fun FileData.getDataviewProperty(property: String, config: CodeBlockConfig)
+    : Either<MinionError, Property> = either {
+        this@getDataviewProperty.dataview[DataviewField(property)]
+            .toOption()
+            .map {
+                Property(
+                    PropertyType.DATAVIEW,
+                    property,
+                    it.v
+                )
+            }.getOrElse {
+                Property(
+                    PropertyType.DATAVIEW,
+                    property,
+                    "-"
+                )
+            }
+    }
+
+    fun FileData.toFormulaFieldMap() : Either<MinionError, Map<String, String>> = either {
+        this@toFormulaFieldMap
+            .dataview
+            .mapKeys { it.key.v }
+            .mapValues { it.value.v }
+    }
+
+    fun FileData.optionsToProperties(config: CodeBlockConfig) : Either<MinionError, List<Property>> = either {
+        config.options.mapNotNull { option ->
+            when (option) {
+                CodeBlockOptions.image_on_cover -> {
+                    this@optionsToProperties.dataview[DataviewField(FIELD_IMAGE)]
+                        .toOption()
+                        .map {
+                            Property(
+                                PropertyType.IMAGE,
+                                "Image",
+                                it.v
+                            )
+                        }
+                        .getOrNull()
+                }
+            }
+        }
+    }
+
     fun List<FileData>.applyGroupBy(config: CodeBlockConfig)
     : Either<MinionError, Map<String, List<FileData>>> = either {
         if (config.groupBy == GroupByOptions.NONE) {
             mapOf(GROUP_BY_SINGLE to this@applyGroupBy)
         } else {
-            when(config.groupBy) {
+            when (config.groupBy) {
                 GroupByOptions.dataview -> {
                     this@applyGroupBy
                         .applyGroupByForDataview(config).bind()
@@ -108,6 +236,7 @@ interface CodeBlockPageFunctions { companion object {
                 }
                 else -> raise(MinionError.ConfigError("${config.groupBy} not implement yet"))
             }
+            // TODO Sort by groupByOrder
         }
     }
 

@@ -1,5 +1,7 @@
 package app.minion.core.functions
 
+import app.minion.shell.view.ViewItems
+
 interface StatisticsFunctions { companion object {
     fun Map<String, Set<Any>>.calculateTotalCount() : Int {
         return this
@@ -13,5 +15,9 @@ interface StatisticsFunctions { companion object {
             .mapValues { it.value.size }
             .map { it.value }
             .sum()
+    }
+
+    fun List<ViewItems>.calculateTotalCount() : Int {
+        return this.sumOf { it.items.size }
     }
 }}

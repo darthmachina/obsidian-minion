@@ -1,32 +1,52 @@
 package app.minion.shell.view.codeblock
 
 import app.minion.core.MinionError
+import app.minion.core.functions.DateTimeFunctions.Companion.asString
+import app.minion.core.functions.DateTimeFunctions.Companion.isInPast
 import app.minion.core.functions.TaskFilterFunctions.Companion.excludeByTags
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByOverdue
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByToday
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByTodayOrOverdue
 import app.minion.core.functions.TaskFilterFunctions.Companion.filterByUpcoming
+import app.minion.core.functions.TaskTagFunctions.Companion.collectTags
 import app.minion.core.functions.TaskTagFunctions.Companion.findTagWithPrefix
 import app.minion.core.model.DateTime
 import app.minion.core.model.Tag
 import app.minion.core.model.Task
+import app.minion.shell.view.Item
+import app.minion.shell.view.ItemType
+import app.minion.shell.view.Property
+import app.minion.shell.view.PropertyType
+import app.minion.shell.view.ViewItems
+import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.toItems
 import app.minion.shell.view.codeblock.CodeBlockTaskIncludeFunctions.Companion.applyInclude
 import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.raise.either
+import arrow.core.some
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger("CodeBlockTaskFunctions")
 
 interface CodeBlockTaskFunctions { companion object {
     fun List<Task>.applyCodeBlockConfig(config: CodeBlockConfig)
-    : Either<MinionError, Map<String, List<Task>>> = either {
+    : Either<MinionError, List<ViewItems>> = either {
         this@applyCodeBlockConfig
             .applyDue(config)
             .applyInclude(config.include)
             .applyExcludeTags(config)
             .applySort(config).bind()
             .applyGroupBy(config).bind()
+            .toViewItems(config).bind()
+    }
+
+    fun Map<String, List<Task>>.toViewItems(config: CodeBlockConfig)
+    : Either<MinionError, List<ViewItems>> = either {
+        this@toViewItems
+            .map { entry ->
+                // TODO swap entry.key for display value in config
+                ViewItems(entry.key, entry.value.toItems(config).bind())
+            }
     }
 
     fun List<Task>.applyDue(config: CodeBlockConfig) : List<Task> {
@@ -75,7 +95,8 @@ interface CodeBlockTaskFunctions { companion object {
         }
     }
 
-    fun List<Task>.applyGroupBy(config: CodeBlockConfig) : Either<MinionError, Map<String, List<Task>>> = either {
+    fun List<Task>.applyGroupBy(config: CodeBlockConfig)
+    : Either<MinionError, Map<String, List<Task>>> = either {
         if (config.groupBy== GroupByOptions.NONE) {
             mapOf(GROUP_BY_SINGLE to this@applyGroupBy)
         } else {
@@ -118,6 +139,71 @@ interface CodeBlockTaskFunctions { companion object {
             .groupBy { task ->
                 task.fileInfo.file.v
             }
+    }
+
+    fun List<Task>.toItems(config: CodeBlockConfig) : Either<MinionError, List<Item>> = either {
+        this@toItems
+            .map { task ->
+                Item(
+                    ItemType.TASK,
+                    task.content,
+                    task.toPropertyList(config).bind(),
+                    task = task.some()
+                )
+            }
+    }
+
+    fun Task.toPropertyList(config: CodeBlockConfig) : Either<MinionError, List<Property>> = either {
+        config.properties.flatMap { configProperty ->
+            when (configProperty) {
+                PROPERTY_TAGS -> {
+                    listOf(
+                        Property(
+                            PropertyType.TAGS,
+                            "Tags",
+                            this@toPropertyList.collectTags().joinToString(" ") { it.v }
+                        )
+                    )
+                }
+                PROPERTY_SOURCE -> {
+                    listOf(
+                        Property(
+                            PropertyType.SOURCE,
+                            "Source",
+                            this@toPropertyList.fileInfo.file.v
+                        )
+                    )
+                }
+                PROPERTY_DUE -> {
+                    this@toPropertyList.dueDate.map { dueDate ->
+                        listOf(
+                            Property(
+                                PropertyType.DUE,
+                                "Due",
+                                dueDate.asString()
+                            ),
+                            Property(
+                                PropertyType.DUE_IN_PAST,
+                                "Due in Past",
+                                "${dueDate.isInPast()}"
+                            )
+                        )
+                    }.getOrElse { emptyList() }
+                }
+                PROPERTY_EISENHOWER -> {
+                    listOf(
+                        if (this@toPropertyList.important) "i" else "",
+                        if (this@toPropertyList.urgent) "u" else ""
+                    ).joinToString("")
+                        .let {
+                            listOf(
+                                Property(PropertyType.EISENHOWER, "Eisenhower", it)
+                            )
+                        }
+                }
+                else -> TODO("$configProperty not implemented")
+            }
+        }
     }
 
     fun Set<Tag>.removeConfigTags(config: CodeBlockConfig) : Set<Tag> {

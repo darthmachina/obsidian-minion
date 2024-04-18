@@ -13,6 +13,9 @@ import app.minion.shell.view.codeblock.FIELD_IMAGE
 import app.minion.shell.view.ICON_GROUP
 import app.minion.shell.view.ICON_KANBAN
 import app.minion.shell.view.ICON_MENU
+import app.minion.shell.view.Item
+import app.minion.shell.view.PropertyType
+import app.minion.shell.view.ViewModelFunctions.Companion.getPropertyValue
 import app.minion.shell.view.modal.KanbanStatusSelectModal
 import app.minion.shell.view.modal.UpdateDataviewValue
 import arrow.core.Either
@@ -28,37 +31,36 @@ import kotlinx.html.title
 import kotlinx.html.unsafe
 
 interface CodeBlockCardFunctions { companion object {
-    fun FileData.getImagePath(store: MinionStore) : Either<MinionError, String> = either {
-        this@getImagePath.dataview[DataviewField(FIELD_IMAGE)]
-            .toOption()
-            .toEither { MinionError.ImageNotFoundError("No image specified for ${this@getImagePath.name.v}") }
+    fun Item.getImagePath(store: MinionStore) : Either<MinionError, String> = either {
+        this@getImagePath
+            .getPropertyValue(PropertyType.IMAGE)
             .map {
-                it.v
-                    .getWikilinkResourcePath(
-                        store.store.state.plugin.app.vault,
-                        store.store.state.plugin.app.metadataCache
-                    )
-                    .bind()
+                it.getWikilinkResourcePath(
+                    store.store.state.plugin.app.vault,
+                    store.store.state.plugin.app.metadataCache
+                ).bind()
             }.bind()
     }
 
-    fun FlowContent.outputSubtasks(task: Task, store: MinionStore) {
-        task.subtasks.forEach { subtask ->
-            if (!subtask.completed) {
-                div(classes = "mi-codeblock-task-subtask") {
-                    checkBoxInput {
-                        onClickFunction = {
-                            store.dispatch(
-                                (TaskThunks.completeSubtask(
-                                    store.store.state.plugin.app,
-                                    task,
-                                    subtask
-                                ))
-                            )
+    fun FlowContent.outputSubtasks(item: Item, store: MinionStore) {
+        item.task.map { task ->
+            task.subtasks.forEach { subtask ->
+                if (!subtask.completed) {
+                    div(classes = "mi-codeblock-task-subtask") {
+                        checkBoxInput {
+                            onClickFunction = {
+                                store.dispatch(
+                                    (TaskThunks.completeSubtask(
+                                        store.store.state.plugin.app,
+                                        task,
+                                        subtask
+                                    ))
+                                )
+                            }
                         }
-                    }
-                    span(classes = "mi-codeblock-task-subtask-content") {
-                        outputStyledContent(subtask.content, store)
+                        span(classes = "mi-codeblock-task-subtask-content") {
+                            outputStyledContent(subtask.content, store)
+                        }
                     }
                 }
             }
