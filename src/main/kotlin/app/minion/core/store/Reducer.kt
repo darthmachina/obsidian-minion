@@ -67,6 +67,10 @@ fun reducer(state: State, action: Action) : State =
             logger.debug { "TaskUpdated: ${a.task}" }
             s.replaceTask(a.task)
         }
+        is Action.TodoistUpdated -> handleError(state, action) { s, a ->
+            logger.debug { "TodoistUpdated" }
+            s.right()
+        }
     }
 
 inline fun <A> handleError(state: State, action: A, block: (State, A) -> Either<MinionError, State>) : State =

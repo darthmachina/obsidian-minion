@@ -11,6 +11,8 @@ import app.minion.shell.view.MinionSettingsTab
 import app.minion.shell.view.codeblock.CodeBlockConfig
 import arrow.core.None
 import arrow.core.toOption
+import io.ktor.client.*
+import io.ktor.client.engine.js.*
 import io.kvision.redux.createTypedReduxStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,12 +40,15 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
             this,
             MinionSettings.default(),
             None,
+            emptyMap(),
+            emptyMap(),
+            emptyMap(),
+            emptyMap(),
+            emptyMap(),
+            HttpClient(Js),
+            "*", // Start with a full sync
             emptyList(),
-            emptyMap(),
-            emptyMap(),
-            emptyMap(),
-            emptyMap(),
-            emptyMap()
+            emptyList()
         )
     )
 

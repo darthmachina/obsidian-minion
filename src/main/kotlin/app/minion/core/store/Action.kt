@@ -7,6 +7,8 @@ import app.minion.core.model.Filename
 import app.minion.core.model.MinionSettings
 import app.minion.core.model.PageTaskField
 import app.minion.core.model.Task
+import app.minion.core.model.todoist.Project
+import app.minion.core.model.todoist.TodoistTask
 import arrow.core.None
 import arrow.core.Option
 import io.kvision.core.Color
@@ -29,4 +31,8 @@ sealed interface Action : RAction {
     data class TaskCompleted(val task: Task) : Action
     data class SubtaskCompleted(val task: Task, val subtask: Task) : Action
     data class TaskUpdated(val task: Task) : Action
+    data class TodoistUpdated(
+        val syncToken: String,
+        val updatedProjects: List<Project>,
+        val updatedTasks: List<TodoistTask>) : Action
 }
