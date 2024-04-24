@@ -23,7 +23,7 @@ private val logger = KotlinLogging.logger("TodoistThunks")
 const val TODOIST_BASE_URL = "https://api.todoist.com/sync/v9/"
 
 interface TodoistThunks { companion object {
-    fun sync(client: HttpClient, syncToken: String) : ActionCreator<Action, State> {
+    fun syncTodoistTasks(client: HttpClient, syncToken: String) : ActionCreator<Action, State> {
         return { dispatch, _ ->
             CoroutineScope(Dispatchers.Unconfined).launch {
                 client.executeTodoistRequest("sync", syncToken)

@@ -22,13 +22,13 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger("VaultThunks")
 
 interface VaultThunks { companion object {
-    fun loadInitialState(plugin: MinionPlugin, settings: MinionSettings) : ActionCreator<Action, State> {
+    fun loadInitialState(plugin: MinionPlugin, settings: MinionSettings, state: State) : ActionCreator<Action, State> {
         logger.debug { "loadVault()" }
 
         return { dispatch, _ ->
             CoroutineScope(Dispatchers.Unconfined).launch {
                 plugin.app.vault
-                    .processIntoState(plugin, settings)
+                    .processIntoState(plugin, settings, state)
                     .map { dispatch(Action.LoadInitialState(it)) }
                     .mapLeft {
                         logger.error { "Error loading initial state: $it" }

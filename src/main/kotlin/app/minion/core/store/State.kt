@@ -23,5 +23,6 @@ data class State(
     val todoistClient: HttpClient,
     val todoistSyncToken: String,
     val projects: List<Project>,
-    val tasks: List<TodoistTask>
+    val tasks: List<TodoistTask>,
+    val oldtasks: List<Task> = emptyList()
 )

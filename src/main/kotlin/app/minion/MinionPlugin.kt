@@ -5,6 +5,7 @@ import app.minion.core.model.MinionSettings1
 import app.minion.core.store.Action
 import app.minion.core.store.State
 import app.minion.core.store.reducer
+import app.minion.shell.thunk.TodoistThunks
 import app.minion.shell.thunk.VaultThunks
 import app.minion.shell.view.CodeBlockView
 import app.minion.shell.view.MinionSettingsTab
@@ -62,7 +63,11 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
             logger.debug { "onLayoutReady()" }
             CoroutineScope(Dispatchers.Unconfined).launch {
                 loadSettings()
-                store.dispatch(VaultThunks.loadInitialState(this@MinionPlugin, store.store.state.settings))
+                store.dispatch(VaultThunks.loadInitialState(
+                    this@MinionPlugin,
+                    store.store.state.settings,
+                    store.store.state
+                ))
             }
 
             registerEvent(
@@ -85,7 +90,18 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
                 }
             )
 
+            addCommand(MinionCommand(
+                "minion-pull-tasks",
+                "Pull Todoist Tasks") {
+                pullTasks()
+            })
         }
+    }
+
+    private fun pullTasks() {
+        store.dispatch(TodoistThunks.syncTodoistTasks(
+            store.store.state.todoistClient,
+            store.store.state.todoistSyncToken))
     }
 
     private suspend fun loadSettings() {
@@ -95,3 +111,9 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
         }.await()
     }
 }
+
+class MinionCommand(
+    override var id: String,
+    override var name: String,
+    override var callback: (() -> Any)?
+) : Command

@@ -22,7 +22,8 @@ sealed interface Action : RAction {
         val lifeAreas: Option<Map<String, Color>> = None,
         val excludeFolders: Option<Set<String>> = None,
         val logLevel: Option<KotlinLoggingLevel> = None,
-        val pageTaskFields: Option<List<PageTaskField>> = None
+        val pageTaskFields: Option<List<PageTaskField>> = None,
+        val todoistApiToken: Option<String> = None
     ) : Action
     data class LoadInitialState(val state: State) : Action
     data class LoadDataForFile(val fileData: FileData) : Action

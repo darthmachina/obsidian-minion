@@ -12,7 +12,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import mu.KotlinLoggingLevel
 
-typealias MinionSettings = MinionSettings2
+typealias MinionSettings = MinionSettings3
 
 @Serializable
 data class MinionSettings3(
