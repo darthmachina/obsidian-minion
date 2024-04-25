@@ -20,7 +20,6 @@ data class State(
     val dataviewCache: Map<Pair<DataviewField, DataviewValue>, Set<Filename>>,
     val dataviewValueCache: Map<DataviewField, Set<DataviewValue>>,
     val backlinkCache: Map<Filename, Set<Filename>>,
-    val todoistClient: HttpClient,
     val todoistSyncToken: String,
     val projects: List<Project>,
     val tasks: List<TodoistTask>,

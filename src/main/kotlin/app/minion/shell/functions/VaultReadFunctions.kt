@@ -262,7 +262,6 @@ data class StateAccumulator(
             dataviewCache,
             dataviewCache.keys.mapToFieldCache().bind(),
             backlinkCache,
-            starting.todoistClient,
             starting.todoistSyncToken,
             starting.projects,
             starting.tasks

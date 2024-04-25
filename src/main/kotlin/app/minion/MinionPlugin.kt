@@ -46,7 +46,6 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
             emptyMap(),
             emptyMap(),
             emptyMap(),
-            HttpClient(Js),
             "*", // Start with a full sync
             emptyList(),
             emptyList()
@@ -100,7 +99,7 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
 
     private fun pullTasks() {
         store.dispatch(TodoistThunks.syncTodoistTasks(
-            store.store.state.todoistClient,
+            store.store.state.settings.todoistApiToken,
             store.store.state.todoistSyncToken))
     }
 

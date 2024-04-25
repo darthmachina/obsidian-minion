@@ -30,6 +30,7 @@ dependencies {
     val uuidVersion = "0.0.22"
     val betterParseVersion = "0.4.4"
     val ktorVersion = "2.3.10"
+    val axiosVersion = "1.6.8"
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesCoreVersion")
@@ -44,6 +45,7 @@ dependencies {
     implementation("com.github.h0tk3y.betterParse:better-parse:$betterParseVersion")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-js:$ktorVersion")
+    implementation(npm("axios", axiosVersion))
 
     implementation("io.kvision:kvision:$kvisionVersion")
     implementation("io.kvision:kvision-fontawesome:$kvisionVersion")
