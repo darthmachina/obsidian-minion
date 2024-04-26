@@ -7,10 +7,8 @@ import Vault
 import app.minion.core.model.File
 import app.minion.core.model.Filename
 import app.minion.core.model.MinionSettings
-import app.minion.core.model.Task
 import app.minion.core.store.Action
 import app.minion.core.store.State
-import app.minion.shell.functions.VaultReadFunctions
 import app.minion.shell.functions.VaultReadFunctions.Companion.processFile
 import app.minion.shell.functions.VaultReadFunctions.Companion.processIntoState
 import io.kvision.redux.ActionCreator

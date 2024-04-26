@@ -28,7 +28,8 @@ fun reducer(state: State, action: Action) : State =
                 lifeAreas = action.lifeAreas.getOrElse { state.settings.lifeAreas },
                 excludeFolders = action.excludeFolders.getOrElse { state.settings.excludeFolders },
                 logLevel = action.logLevel.getOrElse { state.settings.logLevel },
-                pageTaskFields = action.pageTaskFields.getOrElse { state.settings.pageTaskFields }
+                pageTaskFields = action.pageTaskFields.getOrElse { state.settings.pageTaskFields },
+                todoistApiToken = action.todoistApiToken.getOrElse { state.settings.todoistApiToken }
             )
             logger.debug { "new Settings: $newSettings" }
             action.logLevel.map {

@@ -2,7 +2,13 @@ package app.minion.core.store
 
 import MinionPlugin
 import app.minion.core.MinionError
-import app.minion.core.model.*
+import app.minion.core.model.DataviewField
+import app.minion.core.model.DataviewValue
+import app.minion.core.model.FileData
+import app.minion.core.model.Filename
+import app.minion.core.model.MinionSettings
+import app.minion.core.model.Tag
+import app.minion.core.model.Task
 import app.minion.core.model.todoist.Project
 import app.minion.core.model.todoist.TodoistTask
 import arrow.core.Option

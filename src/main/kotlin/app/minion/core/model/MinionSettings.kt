@@ -25,7 +25,7 @@ data class MinionSettings3(
 ) { companion object {
     fun default() : MinionSettings3 {
         return MinionSettings3(
-            "2",
+            "3",
             KotlinLoggingLevel.DEBUG,
             mapOf(
                 "area/personal" to Color("#13088C"),
