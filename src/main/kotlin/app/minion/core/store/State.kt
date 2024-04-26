@@ -6,7 +6,6 @@ import app.minion.core.model.*
 import app.minion.core.model.todoist.Project
 import app.minion.core.model.todoist.TodoistTask
 import arrow.core.Option
-import io.ktor.client.*
 import io.kvision.redux.TypedReduxStore
 
 typealias MinionStore = TypedReduxStore<State, Action>

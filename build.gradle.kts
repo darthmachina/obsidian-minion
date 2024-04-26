@@ -19,18 +19,16 @@ dependencies {
     val kotlinVersion = "1.9.22"
     val kotlinxHtmlVersion = "0.11.0"
     val kvisionVersion = "7.3.1"
-    val arrowVersion = "1.2.1"
+    val arrowVersion = "1.2.4"
     val serializationVersion = "1.6.3"
     val loggingVersion = "3.0.5"
     val datetimeVersion = "0.5.0"
     val coroutinesCoreVersion = "1.8.0"
-    val kotestVersion = "5.8.0"
+    val kotestVersion = "5.8.1"
     val kotestAssertionsArrowVersion = "1.4.0"
     val yamlktVersion = "0.13.0"
-    val uuidVersion = "0.0.22"
+    val uuidVersion = "0.0.24"
     val betterParseVersion = "0.4.4"
-    val ktorVersion = "2.3.10"
-    val axiosVersion = "1.6.8"
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesCoreVersion")
@@ -43,9 +41,6 @@ dependencies {
     implementation(npm("@js-joda/timezone", "2.3.0"))
     implementation("app.softwork:kotlinx-uuid-core:$uuidVersion")
     implementation("com.github.h0tk3y.betterParse:better-parse:$betterParseVersion")
-    implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-js:$ktorVersion")
-    implementation(npm("axios", axiosVersion))
 
     implementation("io.kvision:kvision:$kvisionVersion")
     implementation("io.kvision:kvision-fontawesome:$kvisionVersion")

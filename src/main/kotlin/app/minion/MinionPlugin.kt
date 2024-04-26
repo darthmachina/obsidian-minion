@@ -1,7 +1,6 @@
 import app.minion.core.JsJodaTimeZoneModule
 import app.minion.core.functions.SettingsFunctions
 import app.minion.core.model.MinionSettings
-import app.minion.core.model.MinionSettings1
 import app.minion.core.store.Action
 import app.minion.core.store.State
 import app.minion.core.store.reducer
@@ -9,11 +8,8 @@ import app.minion.shell.thunk.TodoistThunks
 import app.minion.shell.thunk.VaultThunks
 import app.minion.shell.view.CodeBlockView
 import app.minion.shell.view.MinionSettingsTab
-import app.minion.shell.view.codeblock.CodeBlockConfig
 import arrow.core.None
 import arrow.core.toOption
-import io.ktor.client.*
-import io.ktor.client.engine.js.*
 import io.kvision.redux.createTypedReduxStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +18,6 @@ import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import mu.KotlinLoggingConfiguration
 import mu.KotlinLoggingLevel
-import net.mamoe.yamlkt.Yaml
 
 private val logger = KotlinLogging.logger {  }
 

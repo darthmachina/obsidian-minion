@@ -1,12 +1,15 @@
 package app.minion.shell.thunk
 
+import RequestUrlParam
 import app.minion.core.store.Action
 import app.minion.core.store.State
 import io.kvision.redux.ActionCreator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
+import requestUrl
 
 private val logger = KotlinLogging.logger("TodoistThunks")
 
@@ -16,26 +19,28 @@ interface TodoistThunks { companion object {
     fun syncTodoistTasks(apiToken: String, syncToken: String) : ActionCreator<Action, State> {
         return { dispatch, _ ->
             CoroutineScope(Dispatchers.Unconfined).launch {
-                val axiosConfig: AxiosConfigSettings = jso {
-                    url = TODOIST_SYNC_URL
-                    method = "GET"
-                    headers = jso {
-                        "Authorization" to apiToken
+                try {
+                    val requestConfig: RequestUrlParam = jso {
+                        url = """$TODOIST_SYNC_URL?sync_token=$syncToken&resource_types=["projects"]"""
+                        method = "GET"
+                        headers = jso {
+                            Authorization = "Bearer $apiToken"
+                        }
                     }
-                    params = jso {
-                        "sync_token" to syncToken
-                        "resource_types" to """["projects"]"""
-                    }
+                    logger.debug { "Executing Todoist request:\n\t${requestConfig.url}\n\t${requestConfig.headers}" }
+                    val response = requestUrl(requestConfig).await()
+                    logger.debug { "Response: ${response.text}" }
+                }catch (ex: Exception) {
+                    logger.error(ex) { "Error connecting to Todoist: $ex" }
                 }
-                logger.debug { "Executing Todoist request" }
-                axios<TodoistResponse>(axiosConfig)
-                    .then { response ->
-                        logger.debug { "Projects: ${response.data.projects}" }
-                    }
             }
         }
     }
 }}
+
+data class TodoistHeaders(
+    var Authorization: String
+)
 
 data class TodoistResponse(
     val sync_token: String,
