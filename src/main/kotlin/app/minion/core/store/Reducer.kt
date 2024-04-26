@@ -13,7 +13,7 @@ import arrow.core.toOption
 import mu.KotlinLogging
 import mu.KotlinLoggingConfiguration
 
-private val logger = KotlinLogging.logger {  }
+private val logger = KotlinLogging.logger("Reducer")
 
 fun reducer(state: State, action: Action) : State =
     when(action) {

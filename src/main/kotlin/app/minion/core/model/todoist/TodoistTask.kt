@@ -22,7 +22,7 @@ data class TodoistTask(
     val content: String,
     val project: Project,
     val description: String,
-    val due: String,
+    val due: String, // TODO Convert to Date object
     val priority: Priority,
     val labels: List<String>,
     val subtasks: List<TodoistTask> = emptyList()
