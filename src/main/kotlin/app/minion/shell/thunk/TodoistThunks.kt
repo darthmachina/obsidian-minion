@@ -8,8 +8,10 @@ import app.minion.core.model.todoist.TodoistTask
 import app.minion.core.store.Action
 import app.minion.core.store.State
 import arrow.core.Either
+import arrow.core.None
 import arrow.core.getOrElse
 import arrow.core.raise.either
+import arrow.core.some
 import arrow.core.toOption
 import io.kvision.redux.ActionCreator
 import kotlinx.coroutines.CoroutineScope
@@ -113,7 +115,7 @@ fun TodoistResponseItem.toTask(projects: List<Project>) : Either<MinionError, To
         this@toTask.content,
         projects.findProjectById(this@toTask.project_id).bind(),
         this@toTask.description,
-        this@toTask.due.string,
+        this@toTask.due?.string?.some() ?: None,
         this@toTask.priority.toPriority().bind(),
         this@toTask.labels
     )
@@ -160,21 +162,21 @@ data class TodoistResponseItem(
     val project_id: String,
     val content: String,
     val description: String,
-    val due: TodoistDueDate,
+    val due: TodoistDueDate?,
     val priority: Int,
     val parent_id: String?,
     val child_order: Int,
     val labels: List<String>,
     val checked: Boolean,
     val is_deleted: Boolean,
-    val duration: TodoistResponseDuration
+    val duration: TodoistResponseDuration?
 )
 
 @Serializable
 data class TodoistDueDate(
     val string: String,
     val date: String,
-    val timezone: String,
+    val timezone: String?,
     val lang: String,
     val is_recurring: Boolean
 )
