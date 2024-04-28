@@ -33,6 +33,7 @@ data class PropertyConfig(
 enum class CodeBlockQuery {
     pages,
     tasks,
+    todoist
 }
 
 @Serializable
@@ -91,3 +92,4 @@ const val GROUP_BY_SINGLE = "!!single!!"
 const val GROUP_BY_UNKNOWN = "Not Grouped"
 
 const val SORT_BY_EISENHOWER = "eisenhower"
+const val SORT_BY_PRIORITY = "priority"

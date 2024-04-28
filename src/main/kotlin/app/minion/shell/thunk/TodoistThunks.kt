@@ -2,6 +2,8 @@ package app.minion.shell.thunk
 
 import RequestUrlParam
 import app.minion.core.MinionError
+import app.minion.core.model.Content
+import app.minion.core.model.Tag
 import app.minion.core.model.todoist.Priority
 import app.minion.core.model.todoist.Project
 import app.minion.core.model.todoist.TodoistTask
@@ -112,12 +114,12 @@ fun List<TodoistResponseItem>.toModel(projects: List<Project>) : Either<MinionEr
 fun TodoistResponseItem.toTask(projects: List<Project>) : Either<MinionError, TodoistTask> = either {
     TodoistTask(
         this@toTask.id,
-        this@toTask.content,
+        Content(this@toTask.content),
         projects.findProjectById(this@toTask.project_id).bind(),
         this@toTask.description,
         this@toTask.due?.string?.some() ?: None,
         this@toTask.priority.toPriority().bind(),
-        this@toTask.labels
+        this@toTask.labels.map { Tag(it) }
     )
 }
 

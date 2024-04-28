@@ -3,6 +3,7 @@ package app.minion.shell.view
 import app.minion.core.model.Content
 import app.minion.core.model.FileData
 import app.minion.core.model.Task
+import app.minion.core.model.todoist.TodoistTask
 import arrow.core.None
 import arrow.core.Option
 
@@ -39,7 +40,8 @@ data class Item(
     val subItems: List<Item> = emptyList(),
     val notes: List<Item> = emptyList(),
     val fileData: Option<FileData> = None,
-    val task: Option<Task> = None
+    val task: Option<Task> = None,
+    val todoist: Option<TodoistTask> = None
 )
 
 data class ViewItems(

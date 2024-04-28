@@ -70,7 +70,11 @@ fun reducer(state: State, action: Action) : State =
         }
         is Action.TodoistUpdated -> handleError(state, action) { s, a ->
             logger.debug { "TodoistUpdated" }
-            s.right()
+            s.copy(
+                todoistSyncToken = a.syncToken,
+                projects = a.updatedProjects,
+                tasks = a.updatedTasks
+            ).right()
         }
     }
 

@@ -97,7 +97,7 @@ interface CodeBlockTaskFunctions { companion object {
 
     fun List<Task>.applyGroupBy(config: CodeBlockConfig)
     : Either<MinionError, Map<String, List<Task>>> = either {
-        if (config.groupBy== GroupByOptions.NONE) {
+        if (config.groupBy == GroupByOptions.NONE) {
             mapOf(GROUP_BY_SINGLE to this@applyGroupBy)
         } else {
             when (config.groupBy) {

@@ -12,6 +12,7 @@ import app.minion.shell.view.codeblock.CodeBlockPageTableView.Companion.addPageT
 import app.minion.shell.view.codeblock.CodeBlockQuery
 import app.minion.shell.view.codeblock.CodeBlockTaskGalleryView.Companion.addTaskGalleryView
 import app.minion.shell.view.codeblock.CodeBlockTaskListView.Companion.addTaskListView
+import app.minion.shell.view.codeblock.CodeBlockTodoistListView.Companion.addTodoistListView
 import arrow.core.toOption
 import mu.KotlinLogging
 import net.mamoe.yamlkt.Yaml
@@ -29,6 +30,7 @@ interface CodeBlockView { companion object {
                 when(config.query) {
                     CodeBlockQuery.pages -> processPageCodeBlock(config, store, element)
                     CodeBlockQuery.tasks -> processTaskCodeBlock(config, store, element)
+                    CodeBlockQuery.todoist -> processTodoistCodeBlock(config, store, element)
                 }
             }
                 .onFailure {
@@ -38,6 +40,15 @@ interface CodeBlockView { companion object {
                             element.addErrorView(it)
                         }
                 }
+        }
+    }
+
+    fun processTodoistCodeBlock(config: CodeBlockConfig, store: MinionStore, element: HTMLElement) {
+        when(config.display) {
+            CodeBlockDisplay.list -> element.addTodoistListView(config, store)
+            CodeBlockDisplay.gallery -> TODO()
+            CodeBlockDisplay.kanban -> TODO()
+            CodeBlockDisplay.table -> TODO()
         }
     }
 
