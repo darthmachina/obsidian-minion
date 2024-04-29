@@ -1,6 +1,8 @@
 package app.minion.shell.view.codeblock
 
 import app.minion.core.MinionError
+import app.minion.core.functions.DateTimeFunctions.Companion.asString
+import app.minion.core.functions.DateTimeFunctions.Companion.isInPast
 import app.minion.core.functions.TodoistTaskFunctions.Companion.getRootTasks
 import app.minion.core.model.todoist.TodoistTask
 import app.minion.shell.view.Item
@@ -8,8 +10,10 @@ import app.minion.shell.view.ItemType
 import app.minion.shell.view.Property
 import app.minion.shell.view.PropertyType
 import app.minion.shell.view.ViewItems
+import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.toPropertyList
 import app.minion.shell.view.codeblock.CodeBlockTodoistIncludeFunctions.Companion.applyInclude
 import arrow.core.Either
+import arrow.core.getOrElse
 import arrow.core.raise.either
 import arrow.core.some
 import mu.KotlinLogging
@@ -86,6 +90,22 @@ interface CodeBlockTodoistFunctions { companion object {
                             this@toPropertyList.project.name
                         )
                     )
+                }
+                PROPERTY_DUE -> {
+                    this@toPropertyList.due.map { dueDate ->
+                        listOf(
+                            Property(
+                                PropertyType.DUE,
+                                "Due",
+                                dueDate.asString()
+                            ),
+                            Property(
+                                PropertyType.DUE_IN_PAST,
+                                "Due in Past",
+                                "${dueDate.isInPast()}"
+                            )
+                        )
+                    }.getOrElse { emptyList() }
                 }
                 else -> TODO("$configProperty not implemented")
             }

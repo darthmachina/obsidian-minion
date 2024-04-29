@@ -45,7 +45,7 @@ interface TodoistThunks { companion object {
                     either {
                         val requestConfig: RequestUrlParam = jso {
                             url = """$TODOIST_SYNC_URL?sync_token=$syncToken&resource_types=["projects", "items"]"""
-                            method = "GET"
+                            method = "POST"
                             headers = jso {
                                 Authorization = "Bearer $apiToken"
                             }
@@ -77,6 +77,25 @@ interface TodoistThunks { companion object {
                 } catch (ex: Exception) {
                     logger.error(ex) { "Error getting Todoist data: $ex" }
                 }
+            }
+        }
+    }
+
+    fun completeTask(task: TodoistTask, apiToken: String) : ActionCreator<Action, State> {
+        return { dispatch, _ ->
+            logger.debug { "TodoistTask.complete()" }
+            CoroutineScope(Dispatchers.Unconfined).launch {
+                val requestConfig: RequestUrlParam = jso {
+                    url =
+                        """$TODOIST_SYNC_URL?commands="[{"type":"item_close", "args": {"id": "${task.id}"}]""""
+                    method = "POST"
+                    headers = jso {
+                        Authorization = "Bearer $apiToken"
+                    }
+                }
+                logger.debug { "Executing Todoist request:\n\t${requestConfig.url}\n\t${requestConfig.headers}" }
+                val response = requestUrl(requestConfig).await()
+                logger.debug { "Response: ${response.text}" }
             }
         }
     }

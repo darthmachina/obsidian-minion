@@ -14,6 +14,7 @@ import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions.Companion.openSourceFile
 import app.minion.shell.functions.VaultFunctions.Companion.sourceFileExists
 import app.minion.shell.thunk.TaskThunks
+import app.minion.shell.thunk.TodoistThunks
 import app.minion.shell.view.ViewModelFunctions.Companion.getPropertyValue
 import app.minion.shell.view.codeblock.CodeBlockConfig
 import arrow.core.Either
@@ -83,10 +84,10 @@ interface ViewFunctions { companion object {
                 attributes["style"] = "border: 1px solid $lifeAreaColor"
             }
 
-            item.task
+            item.todoist
                 .onSome { task ->
                     onClickFunction = {
-                        store.dispatch(TaskThunks.completeTask(store.store.state.plugin.app, task))
+                        store.dispatch(TodoistThunks.completeTask(task, store.store.state.settings.todoistApiToken))
                     }
                 }.onNone {
                     logger.error { "No task set on item ${item.content.v}" }
