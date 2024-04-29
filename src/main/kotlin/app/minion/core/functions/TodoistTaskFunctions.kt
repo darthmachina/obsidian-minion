@@ -4,6 +4,11 @@ import app.minion.core.model.Tag
 import app.minion.core.model.todoist.TodoistTask
 
 interface TodoistTaskFunctions { companion object {
+    fun List<TodoistTask>.getRootTasks() : List<TodoistTask> {
+        return this
+            .filter { it.parentId.isNone() }
+    }
+
     fun List<TodoistTask>.filterByTags(tags: List<Tag>) : List<TodoistTask> {
         return this
             .filter { task ->

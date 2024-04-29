@@ -1,6 +1,7 @@
 package app.minion.shell.view.codeblock
 
 import app.minion.core.MinionError
+import app.minion.core.functions.TodoistTaskFunctions.Companion.getRootTasks
 import app.minion.core.model.todoist.TodoistTask
 import app.minion.shell.view.Item
 import app.minion.shell.view.ItemType
@@ -20,6 +21,7 @@ interface CodeBlockTodoistFunctions { companion object {
     : Either<MinionError, List<ViewItems>> = either {
         logger.debug { "applyCodeBlockConfig() list size: $size" }
         this@applyCodeBlockConfig
+            .getRootTasks()
             .applyInclude(config.include)
             .applySort(config).bind()
             .applyGroupBy(config).bind()

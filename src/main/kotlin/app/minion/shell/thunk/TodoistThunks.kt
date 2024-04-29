@@ -60,11 +60,10 @@ interface TodoistThunks { companion object {
                         val projects = todoistData.projects.toModel(currentState.projects).bind()
                         val items = todoistData.items.toModel(projects, currentState.tasks).bind()
                         logger.debug { "Dispatching TodoistUpdated" }
-                        if (syncToken == "*") {
-                            dispatch(Action.TodoistUpdated(todoistData.sync_token, projects, items))
-                        } else {
+                        if (syncToken != "*") {
                             logger.debug { "Updated items: ${todoistData.items}" }
                         }
+                        dispatch(Action.TodoistUpdated(todoistData.sync_token, projects, items))
                     }
                         .mapLeft {
                             logger.error { "Error getting Todoist data: $it" }
