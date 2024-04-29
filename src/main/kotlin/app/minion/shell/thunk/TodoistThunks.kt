@@ -2,7 +2,9 @@ package app.minion.shell.thunk
 
 import RequestUrlParam
 import app.minion.core.MinionError
+import app.minion.core.functions.DateTimeFunctions
 import app.minion.core.model.Content
+import app.minion.core.model.DateTime
 import app.minion.core.model.Tag
 import app.minion.core.model.todoist.Priority
 import app.minion.core.model.todoist.Project
@@ -11,6 +13,7 @@ import app.minion.core.store.Action
 import app.minion.core.store.State
 import arrow.core.Either
 import arrow.core.None
+import arrow.core.Option
 import arrow.core.getOrElse
 import arrow.core.raise.either
 import arrow.core.some
@@ -20,6 +23,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
@@ -114,7 +120,7 @@ fun TodoistResponseItem.toTask(projects: List<Project>) : Either<MinionError, To
         Content(this@toTask.content),
         projects.findProjectById(this@toTask.project_id).bind(),
         this@toTask.description,
-        this@toTask.due?.string?.some() ?: None,
+        this@toTask.due.toDateTime().bind(),
         this@toTask.priority.toPriority().bind(),
         this@toTask.labels.map { Tag(it) },
         this@toTask.parent_id?.some() ?: None
@@ -130,15 +136,6 @@ fun List<Project>.findProjectById(id: String) : Either<MinionError, Project> = e
         }
 }
 
-fun List<TodoistTask>.findById(id: String) : Either<MinionError, TodoistTask> = either {
-    this@findById
-        .find { it.id == id }
-        .toOption()
-        .getOrElse {
-            raise(MinionError.TodoistError("Cannot find Task with ID $id"))
-        }
-}
-
 fun Int.toPriority() : Either<MinionError, Priority> = either {
     when (this@toPriority) {
         1 -> Priority.ONE
@@ -146,6 +143,25 @@ fun Int.toPriority() : Either<MinionError, Priority> = either {
         3 -> Priority.THREE
         4 -> Priority.FOUR
         else -> raise(MinionError.TodoistError("Priority $this@toPriority is not a valid Priority"))
+    }
+}
+
+fun TodoistDueDate?.toDateTime() : Either<MinionError, Option<DateTime>> = either {
+    if (this@toDateTime == null) {
+        None
+    } else {
+        if (this@toDateTime.timezone == null) {
+            // Process as current timezone
+            DateTimeFunctions.parseDateTime(this@toDateTime.date).bind().some()
+        } else {
+            // Process as GMT timezone
+            Instant
+                .parse(this@toDateTime.date)
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .let {
+                    DateTime(it.date, it.time.some()).some()
+                }
+        }
     }
 }
 

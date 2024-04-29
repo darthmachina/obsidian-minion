@@ -1,6 +1,7 @@
 package app.minion.core.model.todoist
 
 import app.minion.core.model.Content
+import app.minion.core.model.DateTime
 import app.minion.core.model.Tag
 import arrow.core.None
 import arrow.core.Option
@@ -27,7 +28,7 @@ data class TodoistTask(
     val content: Content,
     val project: Project,
     val description: String,
-    val due: Option<String>, // TODO Convert to Date object
+    val due: Option<DateTime>,
     val priority: Priority,
     val labels: List<Tag>,
     val parentId: Option<String> = None,
