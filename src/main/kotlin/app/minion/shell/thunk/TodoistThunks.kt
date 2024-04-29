@@ -33,7 +33,7 @@ private val json = Json { ignoreUnknownKeys = true }
 
 interface TodoistThunks { companion object {
     fun syncTodoistTasks(apiToken: String, syncToken: String) : ActionCreator<Action, State> {
-        return { dispatch, _ ->
+        return { dispatch, state ->
             CoroutineScope(Dispatchers.Unconfined).launch {
                 try {
                     either {
@@ -55,10 +55,16 @@ interface TodoistThunks { companion object {
                         logger.debug { "project count: ${todoistData.projects.size}" }
                         logger.debug { "items count: ${todoistData.items.size}" }
 
-                        val projects = todoistData.projects.toModel().bind()
-                        val items = todoistData.items.toModel(projects).bind()
+                        val currentState = state()
+
+                        val projects = todoistData.projects.toModel(currentState.projects).bind()
+                        val items = todoistData.items.toModel(projects, currentState.tasks).bind()
                         logger.debug { "Dispatching TodoistUpdated" }
-                        dispatch(Action.TodoistUpdated(todoistData.sync_token, projects, items))
+                        if (syncToken == "*") {
+                            dispatch(Action.TodoistUpdated(todoistData.sync_token, projects, items))
+                        } else {
+                            logger.debug { "Updated items: ${todoistData.items}" }
+                        }
                     }
                         .mapLeft {
                             logger.error { "Error getting Todoist data: $it" }
@@ -71,7 +77,8 @@ interface TodoistThunks { companion object {
     }
 }}
 
-fun List<TodoistResponseProject>.toModel() : Either<MinionError, List<Project>> = either {
+fun List<TodoistResponseProject>.toModel(existingProjects: List<Project>)
+: Either<MinionError, List<Project>> = either {
     this@toModel
         .mapNotNull { responseProject ->
             if (responseProject.is_archived || responseProject.is_deleted) {
@@ -80,35 +87,22 @@ fun List<TodoistResponseProject>.toModel() : Either<MinionError, List<Project>> 
                 Project(responseProject.id, responseProject.name, responseProject.color)
             }
         }
+        .let { projects ->
+            val incomingIds = projects.map { it.id }
+            existingProjects
+                .filter { existingProject ->
+                    !incomingIds.contains(existingProject.id)
+                }
+                .plus(projects)
+        }
 }
 
-fun List<TodoistResponseItem>.toModel(projects: List<Project>) : Either<MinionError, List<TodoistTask>> = either {
-    this@toModel
-        .groupBy { it.id }
-        .mapValues { it.value.first().toTask(projects).bind() }
-        .let {
-            val taskMap = it.toMutableMap()
-            this@toModel
-                .sortedBy { it.child_order }
-                .forEach { responseTask ->
-                    if (responseTask.parent_id != null) {
-                        taskMap[responseTask.parent_id] = taskMap[responseTask.parent_id]!!.copy(
-                            subtasks = taskMap[responseTask.parent_id]!!.subtasks.plus(taskMap[responseTask.id]!!)
-                        )
-                    }
-                }
-            taskMap.toMap()
-                .entries
-                .map { it.value }
-                .filter { task ->
-                    this@toModel
-                        .find { it.id == task.id }
-                        .toOption()
-                        .map { it.parent_id == null }
-                        .getOrElse { false }
-
-                }
-        }
+fun List<TodoistResponseItem>.toModel(projects: List<Project>, existingTasks: List<TodoistTask>)
+: Either<MinionError, List<TodoistTask>> = either {
+    val incomingIds = this@toModel.map { it.id }
+    existingTasks
+        .filter { !incomingIds.contains(it.id) }
+        .plus(this@toModel.map { it.toTask(projects).bind() })
 }
 
 fun TodoistResponseItem.toTask(projects: List<Project>) : Either<MinionError, TodoistTask> = either {
@@ -119,7 +113,8 @@ fun TodoistResponseItem.toTask(projects: List<Project>) : Either<MinionError, To
         this@toTask.description,
         this@toTask.due?.string?.some() ?: None,
         this@toTask.priority.toPriority().bind(),
-        this@toTask.labels.map { Tag(it) }
+        this@toTask.labels.map { Tag(it) },
+        this@toTask.parent_id?.some() ?: None
     )
 }
 
@@ -129,6 +124,15 @@ fun List<Project>.findProjectById(id: String) : Either<MinionError, Project> = e
         .toOption()
         .getOrElse {
             raise(MinionError.TodoistError("Cannot find Project with ID $id"))
+        }
+}
+
+fun List<TodoistTask>.findById(id: String) : Either<MinionError, TodoistTask> = either {
+    this@findById
+        .find { it.id == id }
+        .toOption()
+        .getOrElse {
+            raise(MinionError.TodoistError("Cannot find Task with ID $id"))
         }
 }
 
@@ -171,7 +175,8 @@ data class TodoistResponseItem(
     val labels: List<String>,
     val checked: Boolean,
     val is_deleted: Boolean,
-    val duration: TodoistResponseDuration?
+    val duration: TodoistResponseDuration?,
+    val subItems: List<TodoistResponseItem> = emptyList()
 )
 
 @Serializable

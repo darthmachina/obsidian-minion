@@ -2,6 +2,7 @@ package app.minion.core.model.todoist
 
 import app.minion.core.model.Content
 import app.minion.core.model.Tag
+import arrow.core.None
 import arrow.core.Option
 
 enum class Priority {
@@ -29,5 +30,6 @@ data class TodoistTask(
     val due: Option<String>, // TODO Convert to Date object
     val priority: Priority,
     val labels: List<Tag>,
+    val parentId: Option<String> = None,
     val subtasks: List<TodoistTask> = emptyList()
 )
