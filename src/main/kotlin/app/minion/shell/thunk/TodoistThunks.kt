@@ -87,7 +87,7 @@ interface TodoistThunks { companion object {
             CoroutineScope(Dispatchers.Unconfined).launch {
                 val requestConfig: RequestUrlParam = jso {
                     url =
-                        """$TODOIST_SYNC_URL?commands="[{"type":"item_close", "args": {"id": "${task.id}"}]""""
+                        """$TODOIST_SYNC_URL?commands='[{"type":"item_close", "args": {"id": "${task.id}"}}]'"""
                     method = "POST"
                     headers = jso {
                         Authorization = "Bearer $apiToken"

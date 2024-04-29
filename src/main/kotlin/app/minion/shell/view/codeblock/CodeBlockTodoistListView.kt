@@ -4,6 +4,7 @@ import app.minion.core.model.Tag
 import app.minion.core.store.MinionStore
 import app.minion.shell.view.Item
 import app.minion.shell.view.PropertyType
+import app.minion.shell.view.ViewFunctions.Companion.outputCheckbox
 import app.minion.shell.view.ViewFunctions.Companion.outputDue
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.ViewItems
@@ -85,6 +86,7 @@ interface CodeBlockTodoistListView { companion object {
     }
 
     fun FlowContent.outputItem(item: Item, config: CodeBlockConfig, store: MinionStore) {
+        outputCheckbox(item, store)
         span(classes = "mi-codeblock-task-content") {
             item.getPropertyValue(PropertyType.DUE).map { due ->
                 outputDue(
