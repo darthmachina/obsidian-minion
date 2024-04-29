@@ -102,7 +102,11 @@ fun List<TodoistResponseItem>.toModel(projects: List<Project>, existingTasks: Li
     val incomingIds = this@toModel.map { it.id }
     existingTasks
         .filter { !incomingIds.contains(it.id) }
-        .plus(this@toModel.map { it.toTask(projects).bind() })
+        .plus(
+            this@toModel
+                .filter { !it.is_deleted && !it.checked }
+                .map { it.toTask(projects).bind() }
+        )
 }
 
 fun TodoistResponseItem.toTask(projects: List<Project>) : Either<MinionError, TodoistTask> = either {
