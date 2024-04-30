@@ -37,4 +37,26 @@ interface TodoistTaskFunctions { companion object {
                 }
             }
     }
+
+    /**
+     * Takes a list to maintain consistency with other filter methods, but sections are mutually exclusive so only
+     * operates on the first in the list
+     */
+    fun List<TodoistTask>.filterBySection(sections: List<String>) : List<TodoistTask> {
+        return this
+            .filter { task ->
+                task.section.map { it.name == sections.first() }.getOrElse { false }
+            }
+    }
+
+    fun List<TodoistTask>.filterByAnySection(sections: List<String>) : List<TodoistTask> {
+        return this
+            .filter { task ->
+                task.section
+                    .map {
+                        sections.contains(it.name)
+                    }
+                    .getOrElse { false }
+            }
+    }
 }}

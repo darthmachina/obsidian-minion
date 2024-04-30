@@ -60,6 +60,7 @@ data class IncludeExcludeOptions(
     val dateModified: String = "",
     val dataview: List<String> = emptyList(),
     val source: List<String> = emptyList(),
+    val section: List<String> = emptyList(),
     val and: List<IncludeExcludeOptions> = emptyList(),
     val or: List<IncludeExcludeOptions> = emptyList()
 )

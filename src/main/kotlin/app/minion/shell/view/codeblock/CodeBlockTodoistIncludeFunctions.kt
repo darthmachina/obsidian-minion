@@ -1,6 +1,8 @@
 package app.minion.shell.view.codeblock
 
+import app.minion.core.functions.TodoistTaskFunctions.Companion.filterByAnySection
 import app.minion.core.functions.TodoistTaskFunctions.Companion.filterByAnyTag
+import app.minion.core.functions.TodoistTaskFunctions.Companion.filterBySection
 import app.minion.core.functions.TodoistTaskFunctions.Companion.filterBySource
 import app.minion.core.functions.TodoistTaskFunctions.Companion.filterByTags
 import app.minion.core.model.Tag
@@ -28,6 +30,7 @@ interface CodeBlockTodoistIncludeFunctions { companion object {
                 filteredTasks
                     .applyIncludeTagsAnd(include)
                     .applyIncludeSourceAnd(include)
+                    .applyIncludeSectionAnd(include)
             }
         }
         return filteredTasks
@@ -41,7 +44,9 @@ interface CodeBlockTodoistIncludeFunctions { companion object {
             } else if (include.or.isNotEmpty()) {
                 filteredTasks.applyIncludeOr(include.or)
             } else {
-                filteredTasks.applyIncludeTagsOr(include)
+                filteredTasks
+                    .applyIncludeTagsOr(include)
+                    .applyIncludeSectionOr(include)
             }
         }
         return filteredTasks
@@ -66,6 +71,22 @@ interface CodeBlockTodoistIncludeFunctions { companion object {
     fun List<TodoistTask>.applyIncludeSourceAnd(include: IncludeExcludeOptions) : List<TodoistTask> {
         return if (include.source.isNotEmpty()) {
             this.filterBySource(include.source)
+        } else {
+            this
+        }
+    }
+
+    fun List<TodoistTask>.applyIncludeSectionAnd(include: IncludeExcludeOptions) : List<TodoistTask> {
+        return if (include.section.isNotEmpty()) {
+            this.filterBySection(include.section)
+        } else {
+            this
+        }
+    }
+
+    fun List<TodoistTask>.applyIncludeSectionOr(include: IncludeExcludeOptions) : List<TodoistTask> {
+        return if (include.section.isNotEmpty()) {
+            this.filterByAnySection(include.section)
         } else {
             this
         }
