@@ -15,6 +15,7 @@ import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.raise.either
 import arrow.core.some
+import arrow.core.toOption
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger("CodeBlockTodoistFunctions")
@@ -33,10 +34,18 @@ interface CodeBlockTodoistFunctions { companion object {
 
     fun Map<String, List<TodoistTask>>.toViewItems(config: CodeBlockConfig)
     : Either<MinionError, List<ViewItems>> = either {
-        this@toViewItems
-            .map { entry ->
-                ViewItems(entry.key, entry.value.toItems(config).bind())
+        config.groupByOrder
+            .map { order ->
+                this@toViewItems[order]
+                .toOption()
+                .map { ViewItems(order, it.toItems(config).bind()) }
+                .getOrElse { ViewItems(order, emptyList()) }
             }
+            .plus(
+                this@toViewItems
+                    .filter { entry -> !config.groupByOrder.contains(entry.key) }
+                    .map { entry -> ViewItems(entry.key, entry.value.toItems(config).bind()) }
+            )
     }
 
     fun List<TodoistTask>.applySort(config: CodeBlockConfig) : Either<MinionError, List<TodoistTask>> = either {
