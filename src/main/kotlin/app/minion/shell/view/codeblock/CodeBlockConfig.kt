@@ -68,6 +68,7 @@ data class IncludeExcludeOptions(
 enum class GroupByOptions {
     NONE,
     source,
+    section,
     parent_tag,
     due,
     dataview

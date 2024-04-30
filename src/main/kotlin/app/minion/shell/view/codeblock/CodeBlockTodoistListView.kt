@@ -2,7 +2,6 @@ package app.minion.shell.view.codeblock
 
 import app.minion.core.model.Filename
 import app.minion.core.model.Tag
-import app.minion.core.model.todoist.Section
 import app.minion.core.store.MinionStore
 import app.minion.shell.thunk.TodoistThunks
 import app.minion.shell.view.Item
@@ -19,7 +18,6 @@ import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputItemSt
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockTaskListView.Companion.outputTags
 import app.minion.shell.view.codeblock.CodeBlockTodoistFunctions.Companion.applyCodeBlockConfig
-import arrow.core.Option
 import arrow.core.getOrElse
 import io.kvision.state.sub
 import kotlinx.dom.clear

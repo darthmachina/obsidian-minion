@@ -53,8 +53,20 @@ interface CodeBlockTodoistFunctions { companion object {
         if (config.groupBy == GroupByOptions.NONE) {
             mapOf(GROUP_BY_SINGLE to this@applyGroupBy)
         } else {
-            mapOf(GROUP_BY_SINGLE to this@applyGroupBy)
+            when (config.groupBy) {
+                GroupByOptions.section -> {
+                    this@applyGroupBy.applyGroupByForSection().bind()
+                }
+                else -> raise(MinionError.ConfigError("${config.groupBy} not implemented yet"))
+            }
         }
+    }
+
+    fun List<TodoistTask>.applyGroupByForSection() : Either<MinionError, Map<String, List<TodoistTask>>> = either {
+        this@applyGroupByForSection
+            .groupBy { task ->
+                task.section.map { it.name }.getOrElse { GROUP_BY_UNKNOWN }
+            }
     }
 
     fun List<TodoistTask>.toItems(config: CodeBlockConfig) : Either<MinionError, List<Item>> = either {
