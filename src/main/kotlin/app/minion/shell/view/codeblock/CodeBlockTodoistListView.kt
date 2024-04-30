@@ -2,6 +2,8 @@ package app.minion.shell.view.codeblock
 
 import app.minion.core.model.Tag
 import app.minion.core.store.MinionStore
+import app.minion.shell.thunk.TaskThunks
+import app.minion.shell.thunk.TodoistThunks
 import app.minion.shell.view.Item
 import app.minion.shell.view.PropertyType
 import app.minion.shell.view.ViewFunctions.Companion.outputCheckbox
@@ -20,8 +22,10 @@ import arrow.core.getOrElse
 import io.kvision.state.sub
 import kotlinx.dom.clear
 import kotlinx.html.FlowContent
+import kotlinx.html.checkBoxInput
 import kotlinx.html.div
 import kotlinx.html.dom.append
+import kotlinx.html.js.onClickFunction
 import kotlinx.html.span
 import mu.KotlinLogging
 import org.w3c.dom.HTMLElement
@@ -86,6 +90,11 @@ interface CodeBlockTodoistListView { companion object {
 
     fun FlowContent.outputItem(item: Item, config: CodeBlockConfig, store: MinionStore) {
         outputCheckbox(item, store)
+        outputContent(item, config, store)
+        outputSubtasks(item, store)
+    }
+
+    fun FlowContent.outputContent(item: Item, config: CodeBlockConfig, store: MinionStore) {
         span(classes = "mi-codeblock-task-content") {
             item.getPropertyValue(PropertyType.DUE).map { due ->
                 outputDue(
@@ -116,6 +125,28 @@ interface CodeBlockTodoistListView { companion object {
 
             item.getPropertyValue(PropertyType.SOURCE).map {
                 outputSource(it, store)
+            }
+        }
+    }
+
+    fun FlowContent.outputSubtasks(item: Item, store: MinionStore) {
+        item.todoist.map { task ->
+            task.subtasks.forEach { subtask ->
+                div(classes = "mi-codeblock-task-subtask") {
+                    checkBoxInput {
+                        onClickFunction = {
+                            store.dispatch(
+                                (TodoistThunks.completeTask(
+                                    subtask,
+                                    store.store.state.settings.todoistApiToken
+                                ))
+                            )
+                        }
+                    }
+                    span(classes = "mi-codeblock-task-subtask-content") {
+                        outputStyledContent(subtask.content, store)
+                    }
+                }
             }
         }
     }

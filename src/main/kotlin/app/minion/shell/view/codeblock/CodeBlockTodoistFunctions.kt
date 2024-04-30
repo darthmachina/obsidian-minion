@@ -10,7 +10,6 @@ import app.minion.shell.view.ItemType
 import app.minion.shell.view.Property
 import app.minion.shell.view.PropertyType
 import app.minion.shell.view.ViewItems
-import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.toPropertyList
 import app.minion.shell.view.codeblock.CodeBlockTodoistIncludeFunctions.Companion.applyInclude
 import arrow.core.Either
 import arrow.core.getOrElse
