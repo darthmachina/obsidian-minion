@@ -87,11 +87,4 @@ interface StateFunctions { companion object {
     fun Map<Filename, Set<Filename>>.removeFor(name: Filename) : Map<Filename, Set<Filename>> {
         return this.mapValues { it.value.minus(name) }
     }
-
-    fun List<Project>.update(updated: List<Project>) : Either<MinionError, List<Project>> = either {
-        val updatedIds = updated.map { it.id }
-        this@update
-            .filter { task -> !updatedIds.contains(task.id) }
-            .plus(updated)
-    }
 }}

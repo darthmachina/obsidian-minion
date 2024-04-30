@@ -90,6 +90,15 @@ interface CodeBlockTodoistFunctions { companion object {
                         )
                     )
                 }
+                PROPERTY_SECTION -> {
+                    listOf(
+                        Property(
+                            PropertyType.SECTION,
+                            "Section",
+                            this@toPropertyList.section.map { it.name }.getOrElse { "Not Grouped" }
+                        )
+                    )
+                }
                 PROPERTY_DUE -> {
                     this@toPropertyList.due.map { dueDate ->
                         listOf(

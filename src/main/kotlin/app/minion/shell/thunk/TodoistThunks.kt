@@ -8,6 +8,7 @@ import app.minion.core.model.DateTime
 import app.minion.core.model.Tag
 import app.minion.core.model.todoist.Priority
 import app.minion.core.model.todoist.Project
+import app.minion.core.model.todoist.Section
 import app.minion.core.model.todoist.TodoistTask
 import app.minion.core.store.Action
 import app.minion.core.store.State
@@ -45,7 +46,7 @@ interface TodoistThunks { companion object {
                 try {
                     either {
                         val requestConfig: RequestUrlParam = jso {
-                            url = """$TODOIST_SYNC_URL?sync_token=$syncToken&resource_types=["projects", "items"]"""
+                            url = """$TODOIST_SYNC_URL?sync_token=$syncToken&resource_types=["projects", "items", "sections"]"""
                             method = "POST"
                             headers = jso {
                                 Authorization = "Bearer $apiToken"
@@ -65,12 +66,14 @@ interface TodoistThunks { companion object {
                         val currentState = state()
 
                         val projects = todoistData.projects.toModel(currentState.projects).bind()
-                        val items = todoistData.items.toModel(projects, currentState.tasks).bind()
+                        val sections = todoistData.sections.toModel(currentState.sections).bind()
+                        val items = todoistData.items.toModel(projects, sections, currentState.tasks).bind()
+
                         logger.debug { "Dispatching TodoistUpdated" }
                         if (syncToken != "*") {
                             logger.debug { "Updated items: ${todoistData.items}" }
                         }
-                        dispatch(Action.TodoistUpdated(todoistData.sync_token, projects, items))
+                        dispatch(Action.TodoistUpdated(todoistData.sync_token, projects, sections, items))
                     }
                         .mapLeft {
                             logger.error { "Error getting Todoist data: $it" }
@@ -123,24 +126,39 @@ fun List<TodoistResponseProject>.toModel(existingProjects: List<Project>)
         }
 }
 
-fun List<TodoistResponseItem>.toModel(projects: List<Project>, existingTasks: List<TodoistTask>)
+fun List<TodoistResponseSection>.toModel(existingSections: List<Section>)
+: Either<MinionError, List<Section>> = either {
+    val incomingIds = this@toModel.map { it.id }
+    existingSections
+        .filter { !incomingIds.contains(it.id) }
+        .plus(
+            this@toModel
+                .filter { !it.is_deleted && !it.is_archived }
+                .map { Section(it.id, it.name) }
+        )
+}
+
+fun List<TodoistResponseItem>.toModel(projects: List<Project>, sections: List<Section>, existingTasks: List<TodoistTask>)
 : Either<MinionError, List<TodoistTask>> = either {
     val incomingIds = this@toModel.map { it.id }
+    val sectionMap = sections.groupBy { it.id }.mapValues { it.value.first() }
     existingTasks
         .filter { !incomingIds.contains(it.id) }
         .plus(
             this@toModel
                 .filter { !it.is_deleted && !it.checked }
-                .map { it.toTask(projects).bind() }
+                .map { it.toTask(projects, sectionMap).bind() }
         )
 }
 
-fun TodoistResponseItem.toTask(projects: List<Project>) : Either<MinionError, TodoistTask> = either {
+fun TodoistResponseItem.toTask(projects: List<Project>, sections: Map<String, Section>)
+: Either<MinionError, TodoistTask> = either {
     TodoistTask(
         this@toTask.id,
         Content(this@toTask.content),
         projects.findProjectById(this@toTask.project_id).bind(),
         this@toTask.description,
+        sections[this@toTask.section_id]?.some() ?: None,
         this@toTask.due.toDateTime().bind(),
         this@toTask.priority.toPriority().bind(),
         this@toTask.labels.map { Tag(it) },
@@ -190,6 +208,7 @@ fun TodoistDueDate?.toDateTime() : Either<MinionError, Option<DateTime>> = eithe
 data class TodoistResponse(
     val sync_token: String,
     val projects: List<TodoistResponseProject>,
+    val sections: List<TodoistResponseSection>,
     val items: List<TodoistResponseItem>
 )
 
@@ -203,6 +222,14 @@ data class TodoistResponseProject(
 )
 
 @Serializable
+data class TodoistResponseSection(
+    val id: String,
+    val name: String,
+    val is_archived: Boolean,
+    val is_deleted: Boolean
+)
+
+@Serializable
 data class TodoistResponseItem(
     val id: String,
     val project_id: String,
@@ -211,6 +238,7 @@ data class TodoistResponseItem(
     val due: TodoistDueDate?,
     val priority: Int,
     val parent_id: String?,
+    val section_id: String?,
     val child_order: Int,
     val labels: List<String>,
     val checked: Boolean,

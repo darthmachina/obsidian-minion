@@ -28,6 +28,7 @@ data class TodoistTask(
     val content: Content,
     val project: Project,
     val description: String,
+    val section: Option<Section>,
     val due: Option<DateTime>,
     val priority: Priority,
     val labels: List<Tag>,

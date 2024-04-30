@@ -10,6 +10,7 @@ import app.minion.core.model.MinionSettings
 import app.minion.core.model.Tag
 import app.minion.core.model.Task
 import app.minion.core.model.todoist.Project
+import app.minion.core.model.todoist.Section
 import app.minion.core.model.todoist.TodoistTask
 import arrow.core.Option
 import io.kvision.redux.TypedReduxStore
@@ -27,6 +28,7 @@ data class State(
     val backlinkCache: Map<Filename, Set<Filename>>,
     val todoistSyncToken: String,
     val projects: List<Project>,
+    val sections: List<Section>,
     val tasks: List<TodoistTask>,
     val oldtasks: List<Task> = emptyList()
 )

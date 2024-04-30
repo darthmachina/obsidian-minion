@@ -73,6 +73,7 @@ fun reducer(state: State, action: Action) : State =
             s.copy(
                 todoistSyncToken = a.syncToken,
                 projects = a.updatedProjects,
+                sections = a.updatedSections,
                 tasks = a.updatedTasks
             ).right()
         }

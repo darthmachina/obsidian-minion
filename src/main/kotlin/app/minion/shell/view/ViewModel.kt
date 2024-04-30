@@ -18,6 +18,7 @@ enum class PropertyType {
     DUE_IN_PAST,
     TAGS,
     SOURCE,
+    SECTION,
     DATAVIEW,
     IMAGE,
     FORMULA,

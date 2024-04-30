@@ -82,6 +82,7 @@ enum class CodeBlockOptions {
 const val PROPERTY_CREATED = "created"
 const val PROPERTY_MODIFIED = "modified"
 const val PROPERTY_SOURCE = "source"
+const val PROPERTY_SECTION = "section"
 const val PROPERTY_TAGS = "tags"
 const val PROPERTY_DUE = "due"
 const val PROPERTY_EISENHOWER = "eisenhower"
