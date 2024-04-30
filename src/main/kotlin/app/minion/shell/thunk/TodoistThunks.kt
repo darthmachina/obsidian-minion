@@ -28,6 +28,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.uuid.UUID
 import mu.KotlinLogging
 import requestUrl
 
@@ -87,15 +88,16 @@ interface TodoistThunks { companion object {
             CoroutineScope(Dispatchers.Unconfined).launch {
                 val requestConfig: RequestUrlParam = jso {
                     url =
-                        """$TODOIST_SYNC_URL?commands='[{"type":"item_close", "args": {"id": "${task.id}"}}]'"""
+                        """$TODOIST_SYNC_URL?commands=[{"type":"item_close", "uuid": "${UUID()}", "args": {"id": "${task.id}"}}]"""
                     method = "POST"
                     headers = jso {
                         Authorization = "Bearer $apiToken"
                     }
+                    throws = false
                 }
                 logger.debug { "Executing Todoist request:\n\t${requestConfig.url}\n\t${requestConfig.headers}" }
                 val response = requestUrl(requestConfig).await()
-                logger.debug { "Response: ${response.text}" }
+                logger.debug { "Response: $response" }
             }
         }
     }

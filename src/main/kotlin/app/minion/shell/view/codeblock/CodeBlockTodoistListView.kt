@@ -19,7 +19,6 @@ import app.minion.shell.view.codeblock.CodeBlockTodoistFunctions.Companion.apply
 import arrow.core.getOrElse
 import io.kvision.state.sub
 import kotlinx.dom.clear
-import kotlinx.dom.isElement
 import kotlinx.html.FlowContent
 import kotlinx.html.div
 import kotlinx.html.dom.append
