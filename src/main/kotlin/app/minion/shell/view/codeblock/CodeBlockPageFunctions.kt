@@ -1,5 +1,6 @@
 package app.minion.shell.view.codeblock
 
+import View
 import app.minion.core.MinionError
 import app.minion.core.formulas.FormulaEvaluator.Companion.eval
 import app.minion.core.formulas.FormulaExpression
@@ -42,7 +43,22 @@ interface CodeBlockPageFunctions { companion object {
             .applyInclude(config.include).bind()
             .applySort(config).bind()
             .applyGroupBy(config).bind()
-            .map { entry -> ViewItems(entry.key, entry.value.toItems(config).bind()) }
+            .toViewItems(config).bind()
+    }
+
+    fun Map<String, List<FileData>>.toViewItems(config: CodeBlockConfig) : Either<MinionError, List<ViewItems>> = either {
+        config.groupByOrder
+            .map { order ->
+                this@toViewItems[order]
+                    .toOption()
+                    .map { ViewItems(order, it.toItems(config).bind()) }
+                    .getOrElse { ViewItems(order, emptyList()) }
+            }
+            .plus(
+                this@toViewItems
+                    .filter { entry -> !config.groupByOrder.contains(entry.key) }
+                    .map { entry -> ViewItems(entry.key, entry.value.toItems(config).bind()) }
+            )
     }
 
     fun Set<Filename>.getFileData(fileData: Map<Filename, FileData>) : Either<MinionError, Set<FileData>> = either {
