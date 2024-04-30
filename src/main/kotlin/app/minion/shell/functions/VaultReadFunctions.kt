@@ -264,6 +264,7 @@ data class StateAccumulator(
             backlinkCache,
             starting.todoistSyncToken,
             starting.projects,
+            starting.sections,
             starting.tasks
         )
     }

@@ -1,13 +1,15 @@
 package app.minion.shell.view.codeblock
 
+import app.minion.core.model.Filename
 import app.minion.core.model.Tag
+import app.minion.core.model.todoist.Section
 import app.minion.core.store.MinionStore
-import app.minion.shell.thunk.TaskThunks
 import app.minion.shell.thunk.TodoistThunks
 import app.minion.shell.view.Item
 import app.minion.shell.view.PropertyType
 import app.minion.shell.view.ViewFunctions.Companion.outputCheckbox
 import app.minion.shell.view.ViewFunctions.Companion.outputDue
+import app.minion.shell.view.ViewFunctions.Companion.outputSourceLink
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.ViewItems
 import app.minion.shell.view.ViewModelFunctions.Companion.getPropertyValue
@@ -15,9 +17,9 @@ import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputGroupL
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputHeading
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputItemStats
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
-import app.minion.shell.view.codeblock.CodeBlockTaskListView.Companion.outputSource
 import app.minion.shell.view.codeblock.CodeBlockTaskListView.Companion.outputTags
 import app.minion.shell.view.codeblock.CodeBlockTodoistFunctions.Companion.applyCodeBlockConfig
+import arrow.core.Option
 import arrow.core.getOrElse
 import io.kvision.state.sub
 import kotlinx.dom.clear
@@ -123,9 +125,7 @@ interface CodeBlockTodoistListView { companion object {
                 }
             }
 
-            item.getPropertyValue(PropertyType.SOURCE).map {
-                outputSource(it, store)
-            }
+            outputSource(item, store)
         }
     }
 
@@ -147,6 +147,19 @@ interface CodeBlockTodoistListView { companion object {
                         outputStyledContent(subtask.content, store)
                     }
                 }
+            }
+        }
+    }
+
+    fun FlowContent.outputSource(item: Item, store: MinionStore) {
+        item.getPropertyValue(PropertyType.SOURCE).map { source ->
+            span(classes = "mi-codeblock-task-source") {
+                span { +"(" }
+                outputSourceLink(Filename(source), store)
+                item.getPropertyValue(PropertyType.SECTION).onRight { section ->
+                    span { +" / $section" }
+                }
+                span { +")" }
             }
         }
     }

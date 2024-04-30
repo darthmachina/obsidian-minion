@@ -95,7 +95,7 @@ interface CodeBlockTodoistFunctions { companion object {
                         Property(
                             PropertyType.SECTION,
                             "Section",
-                            this@toPropertyList.section.map { it.name }.getOrElse { "Not Grouped" }
+                            this@toPropertyList.section.map { it.name }.getOrElse { "None" }
                         )
                     )
                 }
