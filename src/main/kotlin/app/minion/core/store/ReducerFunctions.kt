@@ -29,8 +29,8 @@ interface ReducerFunctions { companion object {
             tagCache = fileData.updateTagCache(this@replaceDataForFile.tagCache),
             dataviewCache = fileData.updateDataviewCache(this@replaceDataForFile.dataviewCache),
             backlinkCache = fileData.updateBacklinkCache(this@replaceDataForFile.backlinkCache),
-            tasks = this@replaceDataForFile
-                .tasks
+            oldtasks = this@replaceDataForFile
+                .oldtasks
                 .replaceTasks(
                     fileData
                         .addPageTags(this@replaceDataForFile.settings, fileData.dataview).bind()
@@ -45,7 +45,7 @@ interface ReducerFunctions { companion object {
             tagCache = this@removeDataForFile.tagCache.removeFor(name),
             dataviewCache = this@removeDataForFile.dataviewCache.removeFor(name),
             backlinkCache = this@removeDataForFile.backlinkCache.removeFor(name),
-            tasks = this@removeDataForFile.tasks.removeFor(name),
+            oldtasks = this@removeDataForFile.oldtasks.removeFor(name),
             error = None
         )
     }
@@ -77,7 +77,7 @@ interface ReducerFunctions { companion object {
 
     fun State.replaceTask(newTask: Task) : Either<MinionError, State> = either {
         this@replaceTask.copy(
-            tasks = this@replaceTask.tasks.replaceTask(newTask),
+            oldtasks = this@replaceTask.oldtasks.replaceTask(newTask),
             error = None
         )
     }

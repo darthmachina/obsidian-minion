@@ -67,6 +67,7 @@ interface CodeBlockCard { companion object {
                 PropertyType.DUE -> TODO("PropertyType.DUE")
                 PropertyType.TAGS -> TODO("PropertyType.TAGS")
                 PropertyType.SOURCE -> TODO("PropertyType.SOURCE")
+                PropertyType.SECTION -> TODO("PropertyType.SECTION")
                 PropertyType.IMAGE -> null // Processed separately
                 PropertyType.DUE_IN_PAST -> TODO("PropertyType.DUE_IN_PAST")
                 PropertyType.LIFE_AREA_COLOR -> TODO("PropertyType.LIFE_AREA_COLOR")
@@ -111,7 +112,6 @@ interface CodeBlockCard { companion object {
                         }
                     }
                 }
-
                 PropertyType.TAGS -> {
                     property.name to {
                         span {
@@ -123,6 +123,13 @@ interface CodeBlockCard { companion object {
                     property.name to {
                         span {
                             outputStyledContent(Content(property.value), store)
+                        }
+                    }
+                }
+                PropertyType.SECTION -> {
+                    property.name to {
+                        span {
+                            +property.value
                         }
                     }
                 }

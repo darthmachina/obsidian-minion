@@ -33,6 +33,7 @@ data class PropertyConfig(
 enum class CodeBlockQuery {
     pages,
     tasks,
+    todoist
 }
 
 @Serializable
@@ -59,6 +60,7 @@ data class IncludeExcludeOptions(
     val dateModified: String = "",
     val dataview: List<String> = emptyList(),
     val source: List<String> = emptyList(),
+    val section: List<String> = emptyList(),
     val and: List<IncludeExcludeOptions> = emptyList(),
     val or: List<IncludeExcludeOptions> = emptyList()
 )
@@ -67,6 +69,7 @@ data class IncludeExcludeOptions(
 enum class GroupByOptions {
     NONE,
     source,
+    section,
     parent_tag,
     due,
     dataview
@@ -81,6 +84,7 @@ enum class CodeBlockOptions {
 const val PROPERTY_CREATED = "created"
 const val PROPERTY_MODIFIED = "modified"
 const val PROPERTY_SOURCE = "source"
+const val PROPERTY_SECTION = "section"
 const val PROPERTY_TAGS = "tags"
 const val PROPERTY_DUE = "due"
 const val PROPERTY_EISENHOWER = "eisenhower"
@@ -91,3 +95,4 @@ const val GROUP_BY_SINGLE = "!!single!!"
 const val GROUP_BY_UNKNOWN = "Not Grouped"
 
 const val SORT_BY_EISENHOWER = "eisenhower"
+const val SORT_BY_PRIORITY = "priority"

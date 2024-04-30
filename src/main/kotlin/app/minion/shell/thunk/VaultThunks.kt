@@ -7,10 +7,8 @@ import Vault
 import app.minion.core.model.File
 import app.minion.core.model.Filename
 import app.minion.core.model.MinionSettings
-import app.minion.core.model.Task
 import app.minion.core.store.Action
 import app.minion.core.store.State
-import app.minion.shell.functions.VaultReadFunctions
 import app.minion.shell.functions.VaultReadFunctions.Companion.processFile
 import app.minion.shell.functions.VaultReadFunctions.Companion.processIntoState
 import io.kvision.redux.ActionCreator
@@ -22,13 +20,13 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger("VaultThunks")
 
 interface VaultThunks { companion object {
-    fun loadInitialState(plugin: MinionPlugin, settings: MinionSettings) : ActionCreator<Action, State> {
+    fun loadInitialState(plugin: MinionPlugin, settings: MinionSettings, state: State) : ActionCreator<Action, State> {
         logger.debug { "loadVault()" }
 
         return { dispatch, _ ->
             CoroutineScope(Dispatchers.Unconfined).launch {
                 plugin.app.vault
-                    .processIntoState(plugin, settings)
+                    .processIntoState(plugin, settings, state)
                     .map { dispatch(Action.LoadInitialState(it)) }
                     .mapLeft {
                         logger.error { "Error loading initial state: $it" }

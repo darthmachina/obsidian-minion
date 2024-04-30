@@ -7,6 +7,9 @@ import app.minion.core.model.Filename
 import app.minion.core.model.MinionSettings
 import app.minion.core.model.PageTaskField
 import app.minion.core.model.Task
+import app.minion.core.model.todoist.Project
+import app.minion.core.model.todoist.Section
+import app.minion.core.model.todoist.TodoistTask
 import arrow.core.None
 import arrow.core.Option
 import io.kvision.core.Color
@@ -20,7 +23,8 @@ sealed interface Action : RAction {
         val lifeAreas: Option<Map<String, Color>> = None,
         val excludeFolders: Option<Set<String>> = None,
         val logLevel: Option<KotlinLoggingLevel> = None,
-        val pageTaskFields: Option<List<PageTaskField>> = None
+        val pageTaskFields: Option<List<PageTaskField>> = None,
+        val todoistApiToken: Option<String> = None
     ) : Action
     data class LoadInitialState(val state: State) : Action
     data class LoadDataForFile(val fileData: FileData) : Action
@@ -29,4 +33,9 @@ sealed interface Action : RAction {
     data class TaskCompleted(val task: Task) : Action
     data class SubtaskCompleted(val task: Task, val subtask: Task) : Action
     data class TaskUpdated(val task: Task) : Action
+    data class TodoistUpdated(
+        val syncToken: String,
+        val updatedProjects: List<Project>,
+        val updatedSections: List<Section>,
+        val updatedTasks: List<TodoistTask>) : Action
 }

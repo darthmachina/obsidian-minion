@@ -1,4 +1,10 @@
-@file:Suppress("unused", "INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
+@file:Suppress(
+    "unused",
+    "INTERFACE_WITH_SUPERCLASS",
+    "OVERRIDING_FINAL_MEMBER",
+    "RETURN_TYPE_MISMATCH_ON_OVERRIDE",
+    "CONFLICTING_OVERLOADS"
+)
 @file:JsModule("obsidian")
 @file:JsNonModule
 
@@ -36,7 +42,10 @@ open external class Plugin(app: App, manifest: PluginManifest) : Component {
     open fun registerView(type: String, viewCreator: (leaf: WorkspaceLeaf) -> View)
     open fun registerExtensions(extensions: Array<String>, viewType: String)
     open fun registerMarkdownPostProcessor(postProcessor: MarkdownPostProcessor): MarkdownPostProcessor
-    open fun registerMarkdownCodeBlockProcessor(language: String, handler: (source: String, el: HTMLElement, ctx: MarkdownPostProcessorContext) -> Any): MarkdownPostProcessor
+    open fun registerMarkdownCodeBlockProcessor(
+        language: String,
+        handler: (source: String, el: HTMLElement, ctx: MarkdownPostProcessorContext) -> Any
+    ): MarkdownPostProcessor
 //    open fun registerCodeMirror(callback: (cm: CodeMirror.Editor) -> Any)
 //    open fun registerObsidianProtocolHandler(action: String, handler: ObsidianProtocolHandler)
     open fun registerEditorSuggest(editorSuggest: EditorSuggest<Any>)
@@ -76,15 +85,32 @@ open external class Workspace : Events {
     open fun changeLayout(workspace: Any): Promise<Unit>
     open fun getLayout(): Any
     open fun createLeafInParent(parent: WorkspaceSplit, index: Number): WorkspaceLeaf
-    open fun splitLeaf(source: WorkspaceItem, newLeaf: WorkspaceItem, direction: String /* "vertical" | "horizontal" */ = definedExternally, before: Boolean = definedExternally)
-    open fun createLeafBySplit(leaf: WorkspaceLeaf, direction: String /* "vertical" | "horizontal" */ = definedExternally, before: Boolean = definedExternally): WorkspaceLeaf
+    open fun splitLeaf(
+        source: WorkspaceItem,
+        newLeaf: WorkspaceItem,
+        direction: String /* "vertical" | "horizontal" */ = definedExternally,
+        before: Boolean = definedExternally)
+    open fun createLeafBySplit(
+        leaf: WorkspaceLeaf,
+        direction: String /* "vertical" | "horizontal" */ = definedExternally,
+        before: Boolean = definedExternally): WorkspaceLeaf
     open fun splitActiveLeaf(direction: String /* "vertical" | "horizontal" */ = definedExternally): WorkspaceLeaf
-    open fun splitLeafOrActive(leaf: WorkspaceLeaf = definedExternally, direction: String /* "vertical" | "horizontal" */ = definedExternally): WorkspaceLeaf
-    open fun duplicateLeaf(leaf: WorkspaceLeaf, direction: String /* "vertical" | "horizontal" */ = definedExternally): Promise<Unit>
+    open fun splitLeafOrActive(
+        leaf: WorkspaceLeaf = definedExternally,
+        direction: String /* "vertical" | "horizontal" */ = definedExternally): WorkspaceLeaf
+    open fun duplicateLeaf(
+        leaf: WorkspaceLeaf,
+        direction: String /* "vertical" | "horizontal" */ = definedExternally): Promise<Unit>
     open fun getUnpinnedLeaf(type: String = definedExternally): WorkspaceLeaf
     open fun getLeaf(newLeaf: Boolean = definedExternally): WorkspaceLeaf
-    open fun openLinkText(linktext: String, sourcePath: String, newLeaf: Boolean = definedExternally, openViewState: OpenViewState = definedExternally): Promise<Unit>
-    open fun setActiveLeaf(leaf: WorkspaceLeaf, pushHistory: Boolean = definedExternally, focus: Boolean = definedExternally)
+    open fun openLinkText(
+        linktext: String,
+        sourcePath: String,
+        newLeaf: Boolean = definedExternally,
+        openViewState: OpenViewState = definedExternally): Promise<Unit>
+    open fun setActiveLeaf(
+        leaf: WorkspaceLeaf,
+        pushHistory: Boolean = definedExternally, focus: Boolean = definedExternally)
     open fun getLeafById(id: String): WorkspaceLeaf
     open fun getGroupLeaves(group: String): Array<WorkspaceLeaf>
     open fun getMostRecentLeaf(): WorkspaceLeaf
@@ -668,13 +694,15 @@ external interface HoverParent {
         set(value) = definedExternally
 }
 
-open external class HoverPopover(parent: HoverParent, targetEl: HTMLElement?, waitTime: Number = definedExternally) : Component {
+open external class HoverPopover(parent: HoverParent, targetEl: HTMLElement?, waitTime: Number = definedExternally)
+    : Component {
     open var state: PopoverState
 }
 
 external enum class PopoverState
 
-open external class PopoverSuggest<T>(app: App, scope: Scope = definedExternally) : ISuggestOwner<T>, CloseableComponent {
+open external class PopoverSuggest<T>(app: App, scope: Scope = definedExternally)
+    : ISuggestOwner<T>, CloseableComponent {
     open fun open()
     override fun close()
     override fun renderSuggestion(value: T, el: HTMLElement)
@@ -830,7 +858,9 @@ open external class ToggleComponent(containerEl: HTMLElement) : ValueComponent<B
 }
 
 open external class ValueComponent<T> : BaseComponent {
-    open fun registerOptionListener(listeners: Record<String, (value: T) -> T>, key: String): ValueComponent<T> /* this */
+    open fun registerOptionListener(
+        listeners: Record<String, (value: T) -> T>,
+        key: String): ValueComponent<T> /* this */
     open fun getValue(): T
     open fun setValue(value: T): ValueComponent<T> /* this */
 }
@@ -893,3 +923,36 @@ open external class Tasks {
 }
 
 external interface Constructor<T>
+
+external fun requestUrl(request: RequestUrlParam) : RequestUrlResponsePromise
+
+external interface RequestUrlParam {
+    var url: String
+    var method: String?
+        get() = definedExternally
+        set(value) = definedExternally
+    var contentType: String?
+        get() = definedExternally
+        set(value) = definedExternally
+    var body: String?
+        get() = definedExternally
+        set(value) = definedExternally
+    var headers: dynamic?
+        get() = definedExternally
+        set(value) = definedExternally
+    var throws: Boolean?
+        get() = definedExternally
+        set(value) = definedExternally
+}
+
+external interface RequestUrlResponse {
+    var status: Int
+    var headers: Record<String, String>
+    var json: dynamic
+    var text: String
+}
+
+external interface RequestUrlResponsePromise : Promise<RequestUrlResponse> {
+    var json: Promise<dynamic>
+    var text: Promise<String>
+}

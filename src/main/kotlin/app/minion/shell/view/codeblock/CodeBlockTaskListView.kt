@@ -60,7 +60,7 @@ interface CodeBlockTaskListView { companion object {
 
         val updatedConfig = config.maybeAddProperties()
         store
-            .sub { it.tasks.applyCodeBlockConfig(updatedConfig) }
+            .sub { it.oldtasks.applyCodeBlockConfig(updatedConfig) }
             .subscribe { tasks ->
                 logger.debug { "Task list updated, running updateTasks(): $tasks" }
                 tasks

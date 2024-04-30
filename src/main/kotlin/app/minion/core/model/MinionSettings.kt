@@ -12,7 +12,34 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import mu.KotlinLoggingLevel
 
-typealias MinionSettings = MinionSettings2
+typealias MinionSettings = MinionSettings3
+
+@Serializable
+data class MinionSettings3(
+    val version: String,
+    @Serializable(with = LoggingLevelSerializer::class) val logLevel: KotlinLoggingLevel,
+    val lifeAreas: Map<String, @Serializable(ColorAsStringSerializer::class)Color>,
+    val excludeFolders: Set<String>,
+    val pageTaskFields: List<PageTaskField>,
+    val todoistApiToken: String
+) { companion object {
+    fun default() : MinionSettings3 {
+        return MinionSettings3(
+            "3",
+            KotlinLoggingLevel.DEBUG,
+            mapOf(
+                "area/personal" to Color("#13088C"),
+                "area/home" to Color("#460A60"),
+                "area/marriage" to Color("#196515"),
+                "area/family" to Color("#8E791C"),
+                "area/work" to Color("#D34807")
+            ),
+            setOf(),
+            listOf(),
+            ""
+        )
+    }
+}}
 
 @Serializable
 data class MinionSettings2(

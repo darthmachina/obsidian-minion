@@ -28,10 +28,10 @@ private val logger = KotlinLogging.logger("DateTimeFunctions")
 interface DateTimeFunctions { companion object {
     fun parseDateTime(value: String) : Either<MinionError, DateTime> = either {
         logger.debug { "parseDateTime(): $value" }
-        val dateTimeSplit = value.split(" ")
+        val dateTimeSplit = value.split("T")
         val dateSplit = dateTimeSplit[0].split("-").map { it.toInt() }
         val maybeTimeSplit = if (dateTimeSplit.size == 2) {
-            dateTimeSplit[1].split(":").map { it.toInt() }.toOption()
+            dateTimeSplit[1].split(":").map { it.split(".")[0].toInt() }.toOption()
         } else { None }
 
         maybeTimeSplit
@@ -129,6 +129,6 @@ interface DateTimeFunctions { companion object {
         return this
             .toLocalDateTime()
             .toInstant(TimeZone.currentSystemDefault()) in tomorrow..sevenDays
-            
+
     }
 }}

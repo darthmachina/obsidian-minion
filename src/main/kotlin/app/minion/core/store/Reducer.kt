@@ -13,7 +13,7 @@ import arrow.core.toOption
 import mu.KotlinLogging
 import mu.KotlinLoggingConfiguration
 
-private val logger = KotlinLogging.logger {  }
+private val logger = KotlinLogging.logger("Reducer")
 
 fun reducer(state: State, action: Action) : State =
     when(action) {
@@ -28,7 +28,8 @@ fun reducer(state: State, action: Action) : State =
                 lifeAreas = action.lifeAreas.getOrElse { state.settings.lifeAreas },
                 excludeFolders = action.excludeFolders.getOrElse { state.settings.excludeFolders },
                 logLevel = action.logLevel.getOrElse { state.settings.logLevel },
-                pageTaskFields = action.pageTaskFields.getOrElse { state.settings.pageTaskFields }
+                pageTaskFields = action.pageTaskFields.getOrElse { state.settings.pageTaskFields },
+                todoistApiToken = action.todoistApiToken.getOrElse { state.settings.todoistApiToken }
             )
             logger.debug { "new Settings: $newSettings" }
             action.logLevel.map {
@@ -66,6 +67,15 @@ fun reducer(state: State, action: Action) : State =
         is Action.TaskUpdated -> handleError(state, action) { s, a ->
             logger.debug { "TaskUpdated: ${a.task}" }
             s.replaceTask(a.task)
+        }
+        is Action.TodoistUpdated -> handleError(state, action) { s, a ->
+            logger.debug { "TodoistUpdated" }
+            s.copy(
+                todoistSyncToken = a.syncToken,
+                projects = a.updatedProjects,
+                sections = a.updatedSections,
+                tasks = a.updatedTasks
+            ).right()
         }
     }
 

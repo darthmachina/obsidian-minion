@@ -30,7 +30,7 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger("VaultReadFunctions")
 
 interface VaultReadFunctions { companion object {
-    suspend fun Vault.processIntoState(plugin: MinionPlugin, settings: MinionSettings)
+    suspend fun Vault.processIntoState(plugin: MinionPlugin, settings: MinionSettings, state: State)
     : Either<MinionError, State> = either {
         this@processIntoState
             .getFiles()
@@ -47,7 +47,7 @@ interface VaultReadFunctions { companion object {
                     .processFile(file, plugin.app.metadataCache).bind()
                     .addToState(acc, settings).bind()
            }
-            .toState(settings, plugin).bind()
+            .toState(settings, plugin, state).bind()
     }
 
     suspend fun Vault.readFile(fileData: FileData, metadataCache: MetadataCache)
@@ -251,17 +251,21 @@ data class StateAccumulator(
         this@StateAccumulator
     }
 
-    fun toState(settings: MinionSettings, plugin: MinionPlugin) : Either<MinionError, State> = either {
+    fun toState(settings: MinionSettings, plugin: MinionPlugin, starting: State)
+    : Either<MinionError, State> = either {
         State(
             plugin,
             settings,
             None,
-            tasks,
             files,
             tagCache,
             dataviewCache,
             dataviewCache.keys.mapToFieldCache().bind(),
-            backlinkCache
+            backlinkCache,
+            starting.todoistSyncToken,
+            starting.projects,
+            starting.sections,
+            starting.tasks
         )
     }
 }

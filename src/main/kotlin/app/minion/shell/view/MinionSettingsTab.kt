@@ -38,6 +38,7 @@ class MinionSettingsTab(
         createExcludeFoldersSetting(containerEl)
         createLogLevelSettings(containerEl)
         createPageTaskFieldSettings(containerEl)
+        createTodoistApiTokenSettings(containerEl)
         containerEl.append.div {
             hr {  }
             span(classes = "mi-bold") { +"Note: " }
@@ -120,6 +121,20 @@ class MinionSettingsTab(
                                 logger.debug { "Dispatching UpdateSettings: $it" }
                                 store.dispatch(Action.UpdateSettings(pageTaskFields = it.some()))
                             }
+                    }
+            }
+    }
+
+    private fun createTodoistApiTokenSettings(containerEl: HTMLElement) {
+        Setting(containerEl)
+            .setName("Todoist API Token")
+            .setDesc("API token for accessing Todoist")
+            .addText { text ->
+                text
+                    .setPlaceholder("API token")
+                    .setValue(store.store.state.settings.todoistApiToken)
+                    .onChange { value ->
+                        store.dispatch(Action.UpdateSettings(todoistApiToken = value.some()))
                     }
             }
     }

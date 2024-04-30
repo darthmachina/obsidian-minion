@@ -1,7 +1,5 @@
 package app.minion.shell.view.codeblock
 
-import app.minion.core.MinionError
-import app.minion.core.model.Task
 import app.minion.core.store.MinionStore
 import app.minion.shell.view.Item
 import app.minion.shell.view.ViewItems
@@ -11,9 +9,7 @@ import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputItemSt
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.maybeAddProperties
-import app.minion.shell.view.codeblock.CodeBlockTaskListView.Companion.outputGroupDiv
 import app.minion.shell.view.codeblock.components.CodeBlockCard.Companion.outputTaskCard
-import arrow.core.toOption
 import io.kvision.state.sub
 import kotlinx.dom.clear
 import kotlinx.html.FlowContent
@@ -36,7 +32,7 @@ interface CodeBlockTaskGalleryView { companion object {
             }
         val updatedConfig = config.maybeAddProperties()
         store
-            .sub { it.tasks.applyCodeBlockConfig(config) }
+            .sub { it.oldtasks.applyCodeBlockConfig(config) }
             .subscribe { tasks ->
                 tasks.map {
                     logger.debug { "Task list updated, running updateTasks(): $tasks" }

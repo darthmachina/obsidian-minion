@@ -4,6 +4,7 @@ import app.minion.core.MinionError
 import app.minion.core.model.MinionSettings
 import app.minion.core.model.MinionSettings1
 import app.minion.core.model.MinionSettings2
+import app.minion.core.model.MinionSettings3
 import app.minion.core.model.SettingsVersion
 import arrow.core.Either
 import arrow.core.Option
@@ -27,24 +28,31 @@ interface SettingsFunctions { companion object {
     private val jsonSerializer = Json { ignoreUnknownKeys = true }
 
     fun loadFromJson(maybeJson: Option<String>)
-    : Either<MinionError, MinionSettings2> = either {
+    : Either<MinionError, MinionSettings3> = either {
         logger.debug { "loadFromJson" }
         maybeJson.fold(
             ifEmpty = {
-                MinionSettings2.default()
+                MinionSettings3.default()
             },
             ifSome = { json ->
                 runCatching {
                     when(jsonSerializer.decodeFromString<SettingsVersion>(json).version) {
+                        "3" -> {
+                            logger.debug { "Version 3, just loading" }
+                            jsonSerializer.decodeFromString<MinionSettings3>(json)
+                        }
                         "2" -> {
-                            logger.debug { "Version 2, just loading" }
-                            jsonSerializer.decodeFromString<MinionSettings2>(json)
+                            logger.debug { "Version 2, upgrading" }
+                            jsonSerializer
+                                .decodeFromString<MinionSettings2>(json)
+                                .upgradeTo3()
                         }
                         "1" -> {
                             logger.debug { "Version 1, upgrading" }
                             jsonSerializer
                                 .decodeFromString<MinionSettings1>(json)
                                 .upgradeTo2()
+                                .upgradeTo3()
                         }
                         else -> raise(MinionError.LoadSettingsError("Cannot load settings for JSON: $json"))
                     }
@@ -55,6 +63,16 @@ interface SettingsFunctions { companion object {
                         )
                     }
            }
+        )
+    }
+
+    fun MinionSettings2.upgradeTo3() : MinionSettings3 {
+        logger.debug { "MinionSettings2.upgradeTo3()" }
+        return MinionSettings3.default().copy(
+            lifeAreas = this.lifeAreas,
+            logLevel = this.logLevel,
+            excludeFolders = this.excludeFolders,
+            pageTaskFields = this.pageTaskFields
         )
     }
 
