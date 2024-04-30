@@ -36,7 +36,7 @@ class DateTimeFunctionsTest : StringSpec({
     }
 
     "parseDateTime parses date and time" {
-        val dateTime = "2024-01-02 03:10"
+        val dateTime = "2024-01-02T03:10"
 
         val actualEither = DateTimeFunctions.parseDateTime(dateTime)
         val actual = actualEither.shouldBeRight()
