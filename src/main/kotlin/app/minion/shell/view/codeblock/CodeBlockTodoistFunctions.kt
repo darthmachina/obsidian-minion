@@ -19,6 +19,7 @@ import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.raise.either
 import arrow.core.some
+import arrow.core.split
 import arrow.core.toOption
 import mu.KotlinLogging
 
@@ -41,14 +42,20 @@ interface CodeBlockTodoistFunctions { companion object {
     : Either<MinionError, List<ViewItems>> = either {
         config.groupByOrder
             .map { order ->
-                this@toViewItems[order]
+                val orderSplit = order.split(" AS ", ignoreCase = true)
+                val orderName = if (orderSplit.size ==2) orderSplit[1] else orderSplit[0]
+                this@toViewItems[orderSplit[0]]
                 .toOption()
-                .map { ViewItems(order, it.toItems(config).bind()) }
-                .getOrElse { ViewItems(order, emptyList()) }
+                .map { ViewItems(orderName, it.toItems(config).bind()) }
+                .getOrElse { ViewItems(orderName, emptyList()) }
             }
             .plus(
                 this@toViewItems
-                    .filter { entry -> !config.groupByOrder.contains(entry.key) }
+                    .filter { entry ->
+                        !config.groupByOrder
+                            .map { it.split(" AS ", ignoreCase = true)[0] }
+                            .contains(entry.key)
+                    }
                     .map { entry -> ViewItems(entry.key, entry.value.toItems(config).bind()) }
             )
     }
