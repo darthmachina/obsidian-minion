@@ -1,21 +1,12 @@
 package app.minion.shell.view.codeblock
 
-import app.minion.core.functions.TaskFilterFunctions.Companion.filterByOverdue
-import app.minion.core.functions.TaskFilterFunctions.Companion.filterByToday
-import app.minion.core.functions.TaskFilterFunctions.Companion.filterByTodayOrOverdue
-import app.minion.core.functions.TaskFilterFunctions.Companion.filterByUpcoming
 import app.minion.core.functions.TodoistTaskFunctions.Companion.filterByAnySection
 import app.minion.core.functions.TodoistTaskFunctions.Companion.filterByAnyTag
-import app.minion.core.functions.TodoistTaskFunctions.Companion.filterByOverdue
 import app.minion.core.functions.TodoistTaskFunctions.Companion.filterBySection
 import app.minion.core.functions.TodoistTaskFunctions.Companion.filterBySource
 import app.minion.core.functions.TodoistTaskFunctions.Companion.filterByTags
-import app.minion.core.functions.TodoistTaskFunctions.Companion.filterByToday
-import app.minion.core.functions.TodoistTaskFunctions.Companion.filterByTodayOrOverdue
-import app.minion.core.functions.TodoistTaskFunctions.Companion.filterByUpcoming
 import app.minion.core.model.Tag
 import app.minion.core.model.todoist.TodoistTask
-import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.applyDue
 
 interface CodeBlockTodoistIncludeFunctions { companion object {
     fun List<TodoistTask>.applyInclude(include: IncludeExcludeOptions) : List<TodoistTask> {

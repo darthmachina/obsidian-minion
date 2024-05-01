@@ -7,7 +7,6 @@ import app.minion.core.functions.DateTimeFunctions
 import app.minion.core.functions.DateTimeFunctions.Companion.asString
 import app.minion.core.model.Task
 import app.minion.core.store.MinionStore
-import app.minion.shell.thunk.TaskThunks
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger("ChangeTaskDateModal")
@@ -39,7 +38,9 @@ class ChangeTaskDateModal(val task: Task, val store: MinionStore, override var a
                     .setCta()
                     .onClick {
                         DateTimeFunctions.parseDateTime(result)
-                            .map { store.dispatch(TaskThunks.changeDate(task, app, it)) }
+                            .map {
+                                //store.dispatch(TaskThunks.changeDate(task, app, it))
+                            }
                             .mapLeft {
                                 logger.warn { "Cannot parse date $it" }
                             }

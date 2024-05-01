@@ -16,7 +16,7 @@ import net.mamoe.yamlkt.Yaml
 class CodeBlockConfigTest : StringSpec({
     "Decodes config with just query and display set" {
         val yaml = """
-            query: tasks
+            query: todoist
             display: table
         """.trimIndent()
         val actual = Yaml.decodeFromString(CodeBlockConfig.serializer(), yaml)
@@ -26,7 +26,7 @@ class CodeBlockConfigTest : StringSpec({
 
     "Decodes config with due date" {
         val yaml = """
-            query: tasks
+            query: todoist
             display: table
             due:
                 - today
@@ -42,7 +42,7 @@ class CodeBlockConfigTest : StringSpec({
 
     "Decodes config with include options" {
         val yaml = """
-            query: tasks
+            query: todoist
             display: table
             include:
                 tags:
@@ -58,7 +58,7 @@ class CodeBlockConfigTest : StringSpec({
 
     "Decodes config with exclude options" {
         val yaml = """
-            query: tasks
+            query: todoist
             display: table
             exclude:
                 tags:
@@ -74,7 +74,7 @@ class CodeBlockConfigTest : StringSpec({
 
     "Decodes config with limit set" {
         val yaml = """
-            query: tasks
+            query: todoist
             display: table
             limit: 10
         """.trimIndent()
@@ -87,7 +87,7 @@ class CodeBlockConfigTest : StringSpec({
 
     "Decodes config with group by set" {
         val yaml = """
-            query: tasks
+            query: todoist
             display: table
             groupBy: source
         """.trimIndent()
@@ -100,7 +100,7 @@ class CodeBlockConfigTest : StringSpec({
 
     "Decodes config with options set" {
         val yaml = """
-            query: tasks
+            query: todoist
             display: table
             options:
               - image_on_cover
@@ -114,7 +114,7 @@ class CodeBlockConfigTest : StringSpec({
 
     "Decodes config with and include with nested or" {
         val yaml = """
-            query: tasks
+            query: todoist
             display: table
             include:
               and:
@@ -141,7 +141,7 @@ class CodeBlockConfigTest : StringSpec({
 
     "Decodes config with and include mixed with nested or" {
         val yaml = """
-            query: tasks
+            query: todoist
             display: table
             include:
               and:

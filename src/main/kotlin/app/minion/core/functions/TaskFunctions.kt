@@ -3,7 +3,6 @@ package app.minion.core.functions
 import app.minion.core.MinionError
 import app.minion.core.functions.MarkdownConversionFunctions.Companion.completeAsMarkdown
 import app.minion.core.functions.RepeatingTaskFunctions.Companion.maybeRepeat
-import app.minion.core.functions.TaskFunctions.Companion.maybeAddDataviewValues
 import app.minion.core.model.DataviewField
 import app.minion.core.model.DataviewValue
 import app.minion.core.model.MinionSettings
@@ -11,7 +10,6 @@ import app.minion.core.model.PageTaskFieldType
 import app.minion.core.model.Tag
 import app.minion.core.model.TagType
 import app.minion.core.model.Task
-import app.minion.core.store.ReducerFunctions.Companion.replaceTask
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option

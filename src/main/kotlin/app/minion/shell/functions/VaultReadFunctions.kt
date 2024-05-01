@@ -130,17 +130,6 @@ interface VaultReadFunctions { companion object {
                         // Process Tasks
                         this@processFileContents.copy(
                             dataview = contents.pullOutDataviewFields().bind(),
-                            tasks = contents
-                                .processFileTasks(
-                                    this@processFileContents.path,
-                                    this@processFileContents.name,
-                                    metadataCache
-                                )
-                                .mapLeft {
-                                    MinionError.VaultReadError(it.message, it.throwable, parent = it.toOption())
-                                }
-                                .bind()
-                                .filter { !it.completed }
                         )
                     }
                     .await()
@@ -177,7 +166,6 @@ interface VaultReadFunctions { companion object {
  * Intermediate data class to be used internally for vault processing.
  */
 data class StateAccumulator(
-    val tasks: MutableList<Task> = mutableListOf(),
     val files: MutableMap<Filename, FileData> = mutableMapOf(),
     val tagCache: MutableMap<Tag, MutableSet<Filename>> = mutableMapOf(),
     val dataviewCache: MutableMap<Pair<DataviewField,DataviewValue>, MutableSet<Filename>> = mutableMapOf(),
@@ -188,7 +176,6 @@ data class StateAccumulator(
         addTags(fileData.tags, fileData.name)
         addBacklinks(fileData.outLinks, fileData.name)
         addDataview(fileData.dataview, fileData.name)
-        addTasks(fileData.tasks, fileData.dataview, settings)
         this@StateAccumulator
     }
 
@@ -241,13 +228,6 @@ data class StateAccumulator(
                 ?.add(filename)
                 ?: MinionError.VaultReadError("Error adding $filename to dataviewCache")
         }
-        this@StateAccumulator
-    }
-
-    fun addTasks(tasks: List<Task>, dataview: Map<DataviewField, DataviewValue>, settings: MinionSettings)
-    : Either<MinionError, StateAccumulator> = either {
-        logger.debug { "addTasks()" }
-        this@StateAccumulator.tasks.addAll(tasks.maybeAddDataviewValues(settings, dataview).bind())
         this@StateAccumulator
     }
 

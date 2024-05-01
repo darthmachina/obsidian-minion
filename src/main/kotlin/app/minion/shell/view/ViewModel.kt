@@ -41,7 +41,6 @@ data class Item(
     val subItems: List<Item> = emptyList(),
     val notes: List<Item> = emptyList(),
     val fileData: Option<FileData> = None,
-    val task: Option<Task> = None,
     val todoist: Option<TodoistTask> = None
 )
 
