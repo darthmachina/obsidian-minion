@@ -1,6 +1,5 @@
 package app.minion.shell.view.codeblock
 
-import View
 import app.minion.core.MinionError
 import app.minion.core.formulas.FormulaEvaluator.Companion.eval
 import app.minion.core.formulas.FormulaExpression
@@ -18,9 +17,6 @@ import app.minion.shell.view.ItemType
 import app.minion.shell.view.Property
 import app.minion.shell.view.PropertyType
 import app.minion.shell.view.ViewItems
-import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.populateProperties
-import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.toItems
-import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.toPropertyList
 import app.minion.shell.view.codeblock.CodeBlockPageIncludeFunctions.Companion.applyInclude
 import arrow.core.Either
 import arrow.core.flatten
@@ -45,7 +41,8 @@ interface CodeBlockPageFunctions { companion object {
             .toViewItems(config).bind()
     }
 
-    fun Map<String, List<FileData>>.toViewItems(config: CodeBlockConfig) : Either<MinionError, List<ViewItems>> = either {
+    fun Map<String, List<FileData>>.toViewItems(config: CodeBlockConfig)
+    : Either<MinionError, List<ViewItems>> = either {
         config.groupByOrder
             .map { order ->
                 val orderSplit = order.split(" AS ", ignoreCase = true)
