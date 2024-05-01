@@ -30,9 +30,6 @@ sealed interface Action : RAction {
     data class LoadDataForFile(val fileData: FileData) : Action
     data class RemoveDataForFile(val name: Filename) : Action
     data class FileRenamed(val oldPath: File, val file: File) : Action
-    data class TaskCompleted(val task: Task) : Action
-    data class SubtaskCompleted(val task: Task, val subtask: Task) : Action
-    data class TaskUpdated(val task: Task) : Action
     data class TodoistUpdated(
         val syncToken: String,
         val updatedProjects: List<Project>,

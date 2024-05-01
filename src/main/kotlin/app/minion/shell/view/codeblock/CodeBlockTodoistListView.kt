@@ -16,7 +16,6 @@ import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputGroupL
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputHeading
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputItemStats
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
-import app.minion.shell.view.codeblock.CodeBlockTaskListView.Companion.outputTags
 import app.minion.shell.view.codeblock.CodeBlockTodoistFunctions.Companion.applyCodeBlockConfig
 import arrow.core.getOrElse
 import io.kvision.state.sub

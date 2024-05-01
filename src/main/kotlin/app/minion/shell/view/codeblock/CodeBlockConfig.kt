@@ -32,7 +32,6 @@ data class PropertyConfig(
 @Serializable
 enum class CodeBlockQuery {
     pages,
-    tasks,
     todoist
 }
 

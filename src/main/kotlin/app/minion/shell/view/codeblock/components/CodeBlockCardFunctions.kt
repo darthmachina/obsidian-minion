@@ -5,11 +5,10 @@ import app.minion.core.model.DataviewField
 import app.minion.core.model.FileData
 import app.minion.core.model.Task
 import app.minion.core.store.MinionStore
-import app.minion.shell.thunk.TaskThunks
+import app.minion.shell.thunk.TodoistThunks
 import app.minion.shell.view.ViewFunctions.Companion.getWikilinkResourcePath
 import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.codeblock.CodeBlockConfig
-import app.minion.shell.view.codeblock.FIELD_IMAGE
 import app.minion.shell.view.ICON_GROUP
 import app.minion.shell.view.ICON_KANBAN
 import app.minion.shell.view.ICON_MENU
@@ -43,17 +42,15 @@ interface CodeBlockCardFunctions { companion object {
     }
 
     fun FlowContent.outputSubtasks(item: Item, store: MinionStore) {
-        item.task.map { task ->
+        item.todoist.map { task ->
             task.subtasks.forEach { subtask ->
-                if (!subtask.completed) {
                     div(classes = "mi-codeblock-task-subtask") {
                         checkBoxInput {
                             onClickFunction = {
                                 store.dispatch(
-                                    (TaskThunks.completeSubtask(
-                                        store.store.state.plugin.app,
-                                        task,
-                                        subtask
+                                    (TodoistThunks.completeTask(
+                                        subtask,
+                                        store.store.state.settings.todoistApiToken
                                     ))
                                 )
                             }
@@ -62,7 +59,6 @@ interface CodeBlockCardFunctions { companion object {
                             outputStyledContent(subtask.content, store)
                         }
                     }
-                }
             }
         }
     }

@@ -5,7 +5,6 @@ import app.minion.core.functions.SettingsFunctions.Companion.toJson
 import app.minion.core.store.ReducerFunctions.Companion.fileRenamed
 import app.minion.core.store.ReducerFunctions.Companion.removeDataForFile
 import app.minion.core.store.ReducerFunctions.Companion.replaceDataForFile
-import app.minion.core.store.ReducerFunctions.Companion.replaceTask
 import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.right
@@ -55,18 +54,6 @@ fun reducer(state: State, action: Action) : State =
         is Action.FileRenamed -> handleError(state, action) { s, a ->
             logger.debug { "FileRenamed: ${a.oldPath.v} to ${a.file.v}" }
             s.fileRenamed(a.file, a.oldPath)
-        }
-        is Action.TaskCompleted -> handleError(state, action) { s, a ->
-            logger.debug { "TaskCompleted: ${a.task}" }
-            s.replaceTask(a.task)
-        }
-        is Action.SubtaskCompleted -> handleError(state, action) { s, a ->
-            logger.debug { "SubtaskCompleted: ${a.task}" }
-            s.replaceTask(a.task)
-        }
-        is Action.TaskUpdated -> handleError(state, action) { s, a ->
-            logger.debug { "TaskUpdated: ${a.task}" }
-            s.replaceTask(a.task)
         }
         is Action.TodoistUpdated -> handleError(state, action) { s, a ->
             logger.debug { "TodoistUpdated" }

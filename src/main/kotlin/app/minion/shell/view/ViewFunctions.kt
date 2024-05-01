@@ -13,7 +13,6 @@ import app.minion.core.model.Filename
 import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions.Companion.openSourceFile
 import app.minion.shell.functions.VaultFunctions.Companion.sourceFileExists
-import app.minion.shell.thunk.TaskThunks
 import app.minion.shell.thunk.TodoistThunks
 import app.minion.shell.view.ViewModelFunctions.Companion.getPropertyValue
 import app.minion.shell.view.codeblock.CodeBlockConfig

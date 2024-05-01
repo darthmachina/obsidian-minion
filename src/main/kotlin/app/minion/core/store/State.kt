@@ -30,5 +30,4 @@ data class State(
     val projects: List<Project>,
     val sections: List<Section>,
     val tasks: List<TodoistTask>,
-    val oldtasks: List<Task> = emptyList()
 )
