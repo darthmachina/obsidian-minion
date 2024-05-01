@@ -31,7 +31,7 @@ data class TodoistTask(
     val section: Option<Section>,
     val due: Option<DateTime>,
     val priority: Priority,
-    val labels: List<Tag>,
+    val labels: Set<Tag>,
     val parentId: Option<String> = None,
     val subtasks: List<TodoistTask> = emptyList()
 )

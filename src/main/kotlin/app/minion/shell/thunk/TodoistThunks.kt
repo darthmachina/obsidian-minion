@@ -161,7 +161,7 @@ fun TodoistResponseItem.toTask(projects: List<Project>, sections: Map<String, Se
         sections[this@toTask.section_id]?.some() ?: None,
         this@toTask.due.toDateTime().bind(),
         this@toTask.priority.toPriority().bind(),
-        this@toTask.labels.map { Tag(it) },
+        this@toTask.labels.map { Tag(it) }.toSet(),
         this@toTask.parent_id?.some() ?: None
     )
 }
