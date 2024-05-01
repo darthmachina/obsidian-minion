@@ -1,10 +1,48 @@
 package app.minion.core.functions
 
+import app.minion.core.functions.DateTimeFunctions.Companion.isInPast
+import app.minion.core.functions.DateTimeFunctions.Companion.isToday
+import app.minion.core.functions.DateTimeFunctions.Companion.isTodayOrOverdue
+import app.minion.core.functions.DateTimeFunctions.Companion.isUpcoming
+import app.minion.core.functions.DateTimeFunctions.Companion.toLocalDateTime
+import app.minion.core.functions.TodoistTaskFunctions.Companion.filterByToday
+import app.minion.core.model.DateTime
 import app.minion.core.model.Tag
 import app.minion.core.model.todoist.TodoistTask
 import arrow.core.getOrElse
+import mu.KotlinLogging
+
+private val logger = KotlinLogging.logger("TodoistTaskFunctions")
 
 interface TodoistTaskFunctions { companion object {
+    fun List<TodoistTask>.filterByTodayOrOverdue() : List<TodoistTask> {
+        return filterByDue { isTodayOrOverdue() }
+    }
+
+    fun List<TodoistTask>.filterByToday() : List<TodoistTask> {
+        return filterByDue { isToday() }
+    }
+
+    fun List<TodoistTask>.filterByOverdue() : List<TodoistTask> {
+        return filterByDue { isInPast() }
+    }
+
+    fun List<TodoistTask>.filterByUpcoming() : List<TodoistTask> {
+        return filterByDue { isUpcoming() }
+    }
+
+    fun List<TodoistTask>.filterByDue(block: DateTime.() -> Boolean) : List<TodoistTask> {
+        return this
+            .filter { task ->
+                task.due
+                    .map { it.block() }
+                    .getOrElse { false }
+            }
+            .sortedBy { task ->
+                task.due.map { it.toLocalDateTime() }.getOrNull()
+            }
+    }
+
     fun List<TodoistTask>.getRootTasks() : List<TodoistTask> {
         return this
             .filter { it.parentId.isNone() }
