@@ -3,6 +3,10 @@ package app.minion.shell.view.codeblock
 import app.minion.core.MinionError
 import app.minion.core.functions.DateTimeFunctions.Companion.asString
 import app.minion.core.functions.DateTimeFunctions.Companion.isInPast
+import app.minion.core.functions.TodoistTaskFunctions.Companion.filterByOverdue
+import app.minion.core.functions.TodoistTaskFunctions.Companion.filterByToday
+import app.minion.core.functions.TodoistTaskFunctions.Companion.filterByTodayOrOverdue
+import app.minion.core.functions.TodoistTaskFunctions.Companion.filterByUpcoming
 import app.minion.core.functions.TodoistTaskFunctions.Companion.getRootTasks
 import app.minion.core.model.todoist.TodoistTask
 import app.minion.shell.view.Item
@@ -26,6 +30,7 @@ interface CodeBlockTodoistFunctions { companion object {
         logger.debug { "applyCodeBlockConfig() list size: $size" }
         this@applyCodeBlockConfig
             .getRootTasks()
+            .applyDue(config)
             .applyInclude(config.include)
             .applySort(config).bind()
             .applyGroupBy(config).bind()
@@ -46,6 +51,21 @@ interface CodeBlockTodoistFunctions { companion object {
                     .filter { entry -> !config.groupByOrder.contains(entry.key) }
                     .map { entry -> ViewItems(entry.key, entry.value.toItems(config).bind()) }
             )
+    }
+
+    fun List<TodoistTask>.applyDue(config: CodeBlockConfig) : List<TodoistTask> {
+        logger.debug { "config.due: ${config.due}" }
+        return if (config.due.contains(DueOptions.today) && config.due.contains(DueOptions.overdue)) {
+            this.filterByTodayOrOverdue()
+        } else if (config.due.contains(DueOptions.today)) {
+            this.filterByToday()
+        } else if (config.due.contains(DueOptions.overdue)) {
+            this.filterByOverdue()
+        } else if (config.due.contains(DueOptions.upcoming)) {
+            this.filterByUpcoming()
+        } else {
+            this
+        }
     }
 
     fun List<TodoistTask>.applySort(config: CodeBlockConfig) : Either<MinionError, List<TodoistTask>> = either {

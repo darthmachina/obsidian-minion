@@ -22,6 +22,7 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import mu.KotlinLogging
+import kotlin.math.log
 
 private val logger = KotlinLogging.logger("DateTimeFunctions")
 
@@ -97,9 +98,7 @@ interface DateTimeFunctions { companion object {
     }
 
     fun DateTime.isTodayOrOverdue() : Boolean {
-        val hoursDifference = Clock.System.now()
-            .minus(this.toLocalDateTime().toInstant(TimeZone.currentSystemDefault()), DateTimeUnit.HOUR)
-        return hoursDifference > -24
+        return isToday() || isInPast()
     }
 
 
