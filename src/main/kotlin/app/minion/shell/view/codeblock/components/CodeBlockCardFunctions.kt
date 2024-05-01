@@ -4,6 +4,7 @@ import app.minion.core.MinionError
 import app.minion.core.model.DataviewField
 import app.minion.core.model.FileData
 import app.minion.core.model.Task
+import app.minion.core.model.todoist.TodoistTask
 import app.minion.core.store.MinionStore
 import app.minion.shell.thunk.TodoistThunks
 import app.minion.shell.view.ViewFunctions.Companion.getWikilinkResourcePath
@@ -96,14 +97,14 @@ interface CodeBlockCardFunctions { companion object {
         }
     }
 
-    fun FlowContent.createChangeKanbanMenuItem(task: Task, config: CodeBlockConfig, store: MinionStore)
+    fun FlowContent.createChangeKanbanMenuItem(task: TodoistTask, config: CodeBlockConfig, store: MinionStore)
     : FlowContent.() -> Unit {
         return {
             a {
                 title = "Change kanban status"
                 unsafe { +ICON_KANBAN }
                 onClickFunction = {
-                    KanbanStatusSelectModal(store, task, store.store.state.plugin.app).open()
+                    //KanbanStatusSelectModal(store, task, store.store.state.plugin.app).open()
                 }
             }
         }

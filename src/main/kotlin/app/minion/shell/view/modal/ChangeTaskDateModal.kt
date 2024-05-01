@@ -38,7 +38,9 @@ class ChangeTaskDateModal(val task: Task, val store: MinionStore, override var a
                     .setCta()
                     .onClick {
                         DateTimeFunctions.parseDateTime(result)
-                            .map { store.dispatch(TaskThunks.changeDate(task, app, it)) }
+                            .map {
+                                //store.dispatch(TaskThunks.changeDate(task, app, it))
+                            }
                             .mapLeft {
                                 logger.warn { "Cannot parse date $it" }
                             }

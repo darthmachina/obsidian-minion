@@ -17,6 +17,7 @@ import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputHeadin
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputItemStats
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockTodoistFunctions.Companion.applyCodeBlockConfig
+import app.minion.shell.view.codeblock.CodeBlockTodoistFunctions.Companion.removeConfigTags
 import arrow.core.getOrElse
 import io.kvision.state.sub
 import kotlinx.dom.clear
@@ -123,6 +124,16 @@ interface CodeBlockTodoistListView { companion object {
             }
 
             outputSource(item, store)
+        }
+    }
+
+    fun FlowContent.outputTags(tags: Set<Tag>, config: CodeBlockConfig) {
+        span(classes = "mi-codeblock-task-content-tags") {
+            tags
+                .removeConfigTags(config)
+                .forEach { tag ->
+                    span(classes = "mi-codeblock-task-content-tags-tag") { +"#${tag.v}" }
+                }
         }
     }
 

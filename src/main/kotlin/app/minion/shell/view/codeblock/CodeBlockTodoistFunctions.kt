@@ -8,6 +8,7 @@ import app.minion.core.functions.TodoistTaskFunctions.Companion.filterByToday
 import app.minion.core.functions.TodoistTaskFunctions.Companion.filterByTodayOrOverdue
 import app.minion.core.functions.TodoistTaskFunctions.Companion.filterByUpcoming
 import app.minion.core.functions.TodoistTaskFunctions.Companion.getRootTasks
+import app.minion.core.model.Tag
 import app.minion.core.model.todoist.TodoistTask
 import app.minion.shell.view.Item
 import app.minion.shell.view.ItemType
@@ -166,5 +167,11 @@ interface CodeBlockTodoistFunctions { companion object {
                 else -> TODO("$configProperty not implemented")
             }
         }
+    }
+
+    fun Set<Tag>.removeConfigTags(config: CodeBlockConfig) : Set<Tag> {
+        return filter { tag ->
+            !(tag.v == "task" || config.include.tags.contains(tag.v))
+        }.toSet()
     }
 }}
