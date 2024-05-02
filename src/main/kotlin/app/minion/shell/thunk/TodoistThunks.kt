@@ -111,7 +111,7 @@ interface TodoistThunks { companion object {
             CoroutineScope(Dispatchers.Unconfined).launch {
                 val requestConfig: RequestUrlParam = jso {
                     url =
-                        """$TODOIST_SYNC_URL?commands=[{"type":"item_qee", "temp_id": "${UUID()}",  "uuid": "${UUID()}", "args": {"content": "${content.v}", "project_id": "${project.id}"}}]"""
+                        """$TODOIST_SYNC_URL?commands=[{"type":"item_add", "temp_id": "${UUID()}",  "uuid": "${UUID()}", "args": {"content": "${content.v}", "project_id": "${project.id}"}}]"""
                     method = "POST"
                     headers = jso {
                         Authorization = "Bearer $apiToken"
@@ -158,7 +158,10 @@ fun List<TodoistResponseSection>.toModel(existingSections: List<Section>)
         )
 }
 
-fun List<TodoistResponseItem>.toModel(projects: List<Project>, sections: List<Section>, existingTasks: List<TodoistTask>)
+fun List<TodoistResponseItem>.toModel(
+    projects: List<Project>,
+    sections: List<Section>,
+    existingTasks: List<TodoistTask>)
 : Either<MinionError, List<TodoistTask>> = either {
     val incomingIds = this@toModel.map { it.id }
     val sectionMap = sections.groupBy { it.id }.mapValues { it.value.first() }

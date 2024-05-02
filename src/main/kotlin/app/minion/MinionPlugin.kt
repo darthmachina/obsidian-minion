@@ -8,6 +8,7 @@ import app.minion.shell.thunk.TodoistThunks
 import app.minion.shell.thunk.VaultThunks
 import app.minion.shell.view.CodeBlockView
 import app.minion.shell.view.MinionSettingsTab
+import app.minion.shell.view.modal.AddTaskModal
 import arrow.core.None
 import arrow.core.toOption
 import io.kvision.redux.createTypedReduxStore
@@ -90,6 +91,12 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
                 "Pull Todoist Tasks") {
                 pullTasks()
             })
+
+            addCommand(MinionCommand(
+                "minion-add-task",
+                "Add Task to Inbox") {
+                showAddTaskDialog()
+            })
         }
     }
 
@@ -97,6 +104,10 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
         store.dispatch(TodoistThunks.syncTodoistTasks(
             store.store.state.settings.todoistApiToken,
             store.store.state.todoistSyncToken))
+    }
+
+    private fun showAddTaskDialog() {
+        AddTaskModal(store, app).open()
     }
 
     private suspend fun loadSettings() {
