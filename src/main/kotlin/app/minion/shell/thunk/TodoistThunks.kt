@@ -1,5 +1,6 @@
 package app.minion.shell.thunk
 
+import Notice
 import RequestUrlParam
 import app.minion.core.MinionError
 import app.minion.core.functions.DateTimeFunctions
@@ -74,12 +75,15 @@ interface TodoistThunks { companion object {
                             logger.debug { "Updated items: ${todoistData.items}" }
                         }
                         dispatch(Action.TodoistUpdated(todoistData.sync_token, projects, sections, items))
+                        Notice("Todoist pull completed")
                     }
                         .mapLeft {
                             logger.error { "Error getting Todoist data: $it" }
+                            Notice("Minion: $it")
                         }
                 } catch (ex: Exception) {
                     logger.error(ex) { "Error getting Todoist data: $ex" }
+                    Notice("Minion: $ex")
                 }
             }
         }
@@ -100,7 +104,10 @@ interface TodoistThunks { companion object {
                 }
                 logger.debug { "Executing Todoist request:\n\t${requestConfig.url}\n\t${requestConfig.headers}" }
                 val response = requestUrl(requestConfig).await()
-                logger.debug { "Response: $response" }
+                if (response.status != 200) {
+                    logger.debug { "Response: ${response.text}" }
+                }
+                Notice("Task completed (${response.status})")
             }
         }
     }
@@ -120,7 +127,8 @@ interface TodoistThunks { companion object {
                 }
                 logger.debug { "Executing Todoist request:\n\t${requestConfig.url}\n\t${requestConfig.headers}" }
                 val response = requestUrl(requestConfig).await()
-                logger.debug { "Response: $response" }
+                logger.debug { "Response: ${response.text}" }
+                Notice("Task added (${response.status})")
             }
         }
     }
