@@ -86,12 +86,32 @@ interface TodoistThunks { companion object {
     }
 
     fun completeTask(task: TodoistTask, apiToken: String) : ActionCreator<Action, State> {
-        return { dispatch, _ ->
-            logger.debug { "TodoistTask.complete()" }
+        return { _, _ ->
+            logger.debug { "TodoistThunks.complete()" }
             CoroutineScope(Dispatchers.Unconfined).launch {
                 val requestConfig: RequestUrlParam = jso {
                     url =
                         """$TODOIST_SYNC_URL?commands=[{"type":"item_close", "uuid": "${UUID()}", "args": {"id": "${task.id}"}}]"""
+                    method = "POST"
+                    headers = jso {
+                        Authorization = "Bearer $apiToken"
+                    }
+                    throws = false
+                }
+                logger.debug { "Executing Todoist request:\n\t${requestConfig.url}\n\t${requestConfig.headers}" }
+                val response = requestUrl(requestConfig).await()
+                logger.debug { "Response: $response" }
+            }
+        }
+    }
+
+    fun addToProject(content: Content, project: Project, apiToken: String) : ActionCreator<Action, State> {
+        return { _, _ ->
+            logger.debug { "TodoistThunks.addToProject()" }
+            CoroutineScope(Dispatchers.Unconfined).launch {
+                val requestConfig: RequestUrlParam = jso {
+                    url =
+                        """$TODOIST_SYNC_URL?commands=[{"type":"item_add", "temp_id": "${UUID()}",  "uuid": "${UUID()}", "args": {"content": "${content.v}", "project_id": "${project.id}"}}]"""
                     method = "POST"
                     headers = jso {
                         Authorization = "Bearer $apiToken"
@@ -138,7 +158,10 @@ fun List<TodoistResponseSection>.toModel(existingSections: List<Section>)
         )
 }
 
-fun List<TodoistResponseItem>.toModel(projects: List<Project>, sections: List<Section>, existingTasks: List<TodoistTask>)
+fun List<TodoistResponseItem>.toModel(
+    projects: List<Project>,
+    sections: List<Section>,
+    existingTasks: List<TodoistTask>)
 : Either<MinionError, List<TodoistTask>> = either {
     val incomingIds = this@toModel.map { it.id }
     val sectionMap = sections.groupBy { it.id }.mapValues { it.value.first() }
