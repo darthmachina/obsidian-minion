@@ -18,6 +18,8 @@ import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.outputItemSt
 import app.minion.shell.view.codeblock.CodeBlockFunctions.Companion.showError
 import app.minion.shell.view.codeblock.CodeBlockTodoistFunctions.Companion.applyCodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockTodoistFunctions.Companion.removeConfigTags
+import app.minion.shell.view.codeblock.MenuFunctions.Companion.createChangeSectionMenuItem
+import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Companion.outputCardMenu
 import arrow.core.getOrElse
 import io.kvision.state.sub
 import kotlinx.dom.clear
@@ -124,6 +126,11 @@ interface CodeBlockTodoistListView { companion object {
             }
 
             outputSource(item, store)
+            item.todoist.onSome { task ->
+                outputCardMenu(
+                    listOf(createChangeSectionMenuItem(task, config, store))
+                )
+            }
         }
     }
 

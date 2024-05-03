@@ -3,7 +3,6 @@ package app.minion.shell.view.codeblock.components
 import app.minion.core.MinionError
 import app.minion.core.model.DataviewField
 import app.minion.core.model.FileData
-import app.minion.core.model.Task
 import app.minion.core.model.todoist.TodoistTask
 import app.minion.core.store.MinionStore
 import app.minion.shell.thunk.TodoistThunks
@@ -16,7 +15,6 @@ import app.minion.shell.view.ICON_MENU
 import app.minion.shell.view.Item
 import app.minion.shell.view.PropertyType
 import app.minion.shell.view.ViewModelFunctions.Companion.getPropertyValue
-import app.minion.shell.view.modal.KanbanStatusSelectModal
 import app.minion.shell.view.modal.UpdateDataviewValue
 import arrow.core.Either
 import arrow.core.raise.either
