@@ -133,11 +133,23 @@ interface TodoistThunks { companion object {
         }
     }
 
-    fun updateSection(task: TodoistTask, section: Section, apiToken: String) : ActionCreator<Action, State> {
+    fun updateSection(task: TodoistTask, sectionId: String, apiToken: String) : ActionCreator<Action, State> {
         return { _, _ ->
             logger.debug { "TodoistThunks.updateSection" }
             CoroutineScope(Dispatchers.Unconfined).launch {
-
+                val requestConfig: RequestUrlParam = jso {
+                    url =
+                        """$TODOIST_SYNC_URL?commands=[{"type":"item_move", "uuid": "${UUID()}", "args": {"id": "${task.id}", "section_id": "${sectionId}"}}]"""
+                    method = "POST"
+                    headers = jso {
+                        Authorization = "Bearer $apiToken"
+                    }
+                    throws = false
+                }
+                logger.debug { "Executing Todoist request:\n\t${requestConfig.url}\n\t${requestConfig.headers}" }
+                val response = requestUrl(requestConfig).await()
+                logger.debug { "Response: ${response.text}" }
+                Notice("Task moved (${response.status})")
             }
         }
     }

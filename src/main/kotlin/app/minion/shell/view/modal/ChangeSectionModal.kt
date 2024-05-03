@@ -6,6 +6,7 @@ import Setting
 import app.minion.core.model.todoist.Section
 import app.minion.core.model.todoist.TodoistTask
 import app.minion.core.store.MinionStore
+import app.minion.shell.thunk.TodoistThunks
 import kotlinx.dom.clear
 
 class ChangeSectionModal(
@@ -41,7 +42,11 @@ class ChangeSectionModal(
                     .setButtonText("Save")
                     .setCta()
                     .onClick {
-                        // TODO Update section
+                        store.dispatch(TodoistThunks.updateSection(
+                            task,
+                            result,
+                            store.store.state.settings.todoistApiToken
+                        ))
                         close()
                     }
             }
