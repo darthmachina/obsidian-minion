@@ -67,7 +67,7 @@ interface TodoistThunks { companion object {
                         val currentState = state()
 
                         val projects = todoistData.projects.toModel(currentState.projects).bind()
-                        val sections = todoistData.sections.toModel(currentState.sections).bind()
+                        val sections = todoistData.sections.toModel(projects, currentState.sections).bind()
                         val items = todoistData.items.toModel(projects, sections, currentState.tasks).bind()
 
                         logger.debug { "Dispatching TodoistUpdated" }
@@ -132,6 +132,15 @@ interface TodoistThunks { companion object {
             }
         }
     }
+
+    fun updateSection(task: TodoistTask, section: Section, apiToken: String) : ActionCreator<Action, State> {
+        return { _, _ ->
+            logger.debug { "TodoistThunks.updateSection" }
+            CoroutineScope(Dispatchers.Unconfined).launch {
+
+            }
+        }
+    }
 }}
 
 fun List<TodoistResponseProject>.toModel(existingProjects: List<Project>)
@@ -154,7 +163,7 @@ fun List<TodoistResponseProject>.toModel(existingProjects: List<Project>)
         }
 }
 
-fun List<TodoistResponseSection>.toModel(existingSections: List<Section>)
+fun List<TodoistResponseSection>.toModel(projects: List<Project>, existingSections: List<Section>)
 : Either<MinionError, List<Section>> = either {
     val incomingIds = this@toModel.map { it.id }
     existingSections
@@ -162,7 +171,16 @@ fun List<TodoistResponseSection>.toModel(existingSections: List<Section>)
         .plus(
             this@toModel
                 .filter { !it.is_deleted && !it.is_archived }
-                .map { Section(it.id, it.name) }
+                .mapNotNull { responseSection ->
+                    projects.findProjectById(responseSection.project_id)
+                        .map { project ->
+                            Section(responseSection.id, responseSection.name, project)
+                        }
+                        .getOrElse {
+                            logger.error { "Cannot get project for section: $responseSection" }
+                            null
+                        }
+                }
         )
 }
 
@@ -256,6 +274,7 @@ data class TodoistResponseProject(
 data class TodoistResponseSection(
     val id: String,
     val name: String,
+    val project_id: String,
     val is_archived: Boolean,
     val is_deleted: Boolean
 )
