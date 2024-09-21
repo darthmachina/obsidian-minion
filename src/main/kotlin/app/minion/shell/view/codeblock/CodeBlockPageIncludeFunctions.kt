@@ -4,6 +4,7 @@ import app.minion.core.MinionError
 import app.minion.core.functions.PageFilterFunctions.Companion.filterByAnyDataview
 import app.minion.core.functions.PageFilterFunctions.Companion.filterByAnyTag
 import app.minion.core.functions.PageFilterFunctions.Companion.filterByDataview
+import app.minion.core.functions.PageFilterFunctions.Companion.filterByOutlinks
 import app.minion.core.functions.PageFilterFunctions.Companion.filterBySource
 import app.minion.core.functions.PageFilterFunctions.Companion.filterByTags
 import app.minion.core.model.DataviewField
@@ -12,9 +13,13 @@ import app.minion.core.model.FileData
 import app.minion.core.model.Tag
 import arrow.core.Either
 import arrow.core.raise.either
+import mu.KotlinLogging
+
+private val logger = KotlinLogging.logger("CodeBlockPageIncludeFunctions")
 
 interface CodeBlockPageIncludeFunctions { companion object {
     fun List<FileData>.applyInclude(include: IncludeExcludeOptions) : Either<MinionError, List<FileData>> = either {
+        logger.debug { "applyInclude: $include" }
         if (include.and.isNotEmpty()) {
             this@applyInclude.applyIncludeAnd(include.and).bind()
         } else if (include.or.isNotEmpty()) {
@@ -24,6 +29,7 @@ interface CodeBlockPageIncludeFunctions { companion object {
                 .applyIncludeTagsAnd(include).bind()
                 .applyIncludeDataviewAnd(include).bind()
                 .applyIncludeSourceAnd(include).bind()
+                .appluIncludeLinksAnd(include).bind()
         }
     }
 
@@ -39,6 +45,7 @@ interface CodeBlockPageIncludeFunctions { companion object {
                 filteredPages
                     .applyIncludeTagsAnd(include).bind()
                     .applyIncludeDataviewAnd(include).bind()
+                    .appluIncludeLinksAnd(include).bind()
             }
         }
         filteredPages
@@ -103,6 +110,15 @@ interface CodeBlockPageIncludeFunctions { companion object {
             this@applyIncludeSourceAnd.filterBySource(include.source)
         } else {
             this@applyIncludeSourceAnd
+        }
+    }
+
+    fun List<FileData>.appluIncludeLinksAnd(include: IncludeExcludeOptions)
+    : Either<MinionError, List<FileData>> = either {
+        if (include.links.isNotEmpty()) {
+            this@appluIncludeLinksAnd.filterByOutlinks(include.links)
+        } else {
+            this@appluIncludeLinksAnd
         }
     }
 

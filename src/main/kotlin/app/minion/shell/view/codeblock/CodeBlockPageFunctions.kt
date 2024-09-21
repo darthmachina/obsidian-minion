@@ -35,6 +35,7 @@ private val logger = KotlinLogging.logger("CodeBlockPageFunctions")
 interface CodeBlockPageFunctions { companion object {
     fun State.applyCodeBlockConfig(config: CodeBlockConfig)
     : Either<MinionError, List<ViewItems>> = either {
+        logger.debug { "config: $config" }
         this@applyCodeBlockConfig
             .files
             .map { it.value }
