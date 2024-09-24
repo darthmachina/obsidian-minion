@@ -29,7 +29,7 @@ class KanbanStatusSelectModal(val store: MinionStore, val task: Task, override v
                         result
                     }
                 task
-                    .findTagWithPrefix("kanban")
+                    .findTagWithPrefix("status")
                     .map {
                         dropdown.setValue(it.v.drop(7))
                         result = it.v.drop(7)

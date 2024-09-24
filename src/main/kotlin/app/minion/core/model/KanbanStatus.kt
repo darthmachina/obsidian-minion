@@ -6,6 +6,8 @@ import arrow.core.getOrElse
 import arrow.core.raise.either
 import arrow.core.toOption
 
+const val KANBAN_STATUS_PREFIX = "status/"
+
 enum class KanbanStatus(val tag: String, val display: String) {
     ICEBOX("icebox", "Icebox"),
     BACKLOG("backlog", "Backlog"),
@@ -13,6 +15,7 @@ enum class KanbanStatus(val tag: String, val display: String) {
     THIS_MONTH("thismonth", "This Month"),
     NEXT_WEEK("nextweek", "Next Week"),
     THIS_WEEK("thisweek", "This Week"),
+    TODAY("today", "Today"),
     IN_PROGRESS("inprogress", "In Progress"),
     SCHEDULED("scheduled", "Scheduled"),
     WAITING("waiting", "Waiting");

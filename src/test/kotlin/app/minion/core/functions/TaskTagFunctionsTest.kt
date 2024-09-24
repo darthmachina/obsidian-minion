@@ -36,8 +36,8 @@ class TaskTagFunctionsTest : StringSpec({
     }
 
     "replaceTag correctly replaces tag" {
-        val oldTag = Tag("kanban/backlog")
-        val newTag = Tag("kanban/priority")
+        val oldTag = Tag("status/backlog")
+        val newTag = Tag("status/priority")
         val task = TaskFactory.createTaskWithTag(oldTag)
 
         val actualEither = task.replaceTag(oldTag, newTag)
