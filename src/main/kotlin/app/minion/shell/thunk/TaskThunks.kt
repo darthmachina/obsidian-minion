@@ -10,6 +10,7 @@ import app.minion.core.functions.TaskTagFunctions.Companion.addTag
 import app.minion.core.functions.TaskTagFunctions.Companion.findTagWithPrefix
 import app.minion.core.functions.TaskTagFunctions.Companion.replaceTag
 import app.minion.core.model.DateTime
+import app.minion.core.model.KANBAN_STATUS_PREFIX
 import app.minion.core.model.Tag
 import app.minion.core.model.Task
 import app.minion.core.store.Action
@@ -60,15 +61,15 @@ interface TaskThunks { companion object {
     }
 
     /**
-     * Replaces the tag with a #kanban/ prefix and replaces the subtag with the updated one
+     * Replaces the tag with a #status/ prefix and replaces the subtag with the updated one
      */
     fun changeKanbanStatus(app: App, task: Task, updatedStatus: String) : ActionCreator<Action, State> {
         logger.debug { "changeKanbanStatus(${updatedStatus})" }
         return { dispatch, _ ->
             CoroutineScope(Dispatchers.Unconfined).launch {
                 task
-                    .findTagWithPrefix("kanban/")
-                    .flatMap { task.replaceTag(it, Tag("kanban/$updatedStatus")) }
+                    .findTagWithPrefix(KANBAN_STATUS_PREFIX)
+                    .flatMap { task.replaceTag(it, Tag("$KANBAN_STATUS_PREFIX$updatedStatus")) }
                     .map { task ->
                         (app.metadataCache.getFirstLinkpathDest(task.fileInfo.file.v, "") as TFile)
                             .writeLine(app.vault, task.toMarkdown(), task.fileInfo.line)
@@ -77,7 +78,7 @@ interface TaskThunks { companion object {
                     .mapLeft {
                         logger.debug { "Tag not found, adding the new one" }
                         task
-                            .addTag(Tag("kanban/$updatedStatus"))
+                            .addTag(Tag("$KANBAN_STATUS_PREFIX$updatedStatus"))
                             .map { task ->
                                 (app.metadataCache.getFirstLinkpathDest(task.fileInfo.file.v, "") as TFile)
                                     .writeLine(app.vault, task.toMarkdown(), task.fileInfo.line)
