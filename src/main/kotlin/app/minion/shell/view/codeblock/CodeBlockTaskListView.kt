@@ -219,23 +219,25 @@ interface CodeBlockTaskListView { companion object {
 
     fun FlowContent.outputSubtasks(item: Item, store: MinionStore) {
         item.task.map { task ->
-            task.subtasks.forEach { subtask ->
-                div(classes = "mi-codeblock-task-subtask") {
-                    checkBoxInput {
-                        onClickFunction = {
-                            store.dispatch(
-                                (TaskThunks.completeSubtask(
-                                    store.store.state.plugin.app,
-                                    task,
-                                    subtask
-                                ))
-                            )
+            task.subtasks
+                .filter { subtask -> !subtask.completed }
+                .forEach { subtask ->
+                    div(classes = "mi-codeblock-task-subtask") {
+                        checkBoxInput {
+                            onClickFunction = {
+                                store.dispatch(
+                                    (TaskThunks.completeSubtask(
+                                        store.store.state.plugin.app,
+                                        task,
+                                        subtask
+                                    ))
+                                )
+                            }
+                        }
+                        span(classes = "mi-codeblock-task-subtask-content") {
+                            outputStyledContent(subtask.content, store)
                         }
                     }
-                    span(classes = "mi-codeblock-task-subtask-content") {
-                        outputStyledContent(subtask.content, store)
-                    }
-                }
             }
         }
     }
