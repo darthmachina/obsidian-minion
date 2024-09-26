@@ -130,11 +130,12 @@ input[type=checkbox] {
 }
 
 .mi-codeblock-task-notes {
-    margin: 0 0 0 15px !important;
+    margin: 0 0 0 52px !important;
 }
 
 .mi-codeblock-task-notes-note {
     margin: 0 !important;
+    font-size: 0.85em;
 }
 
 .mi-codeblock-item-count {
