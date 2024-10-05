@@ -1,13 +1,9 @@
 
-- [ ] #task Task with subtasks #status/now 
-	- [x] Sub 1
-	- [ ] Sub 2
-
 
 ```minion
-query: tasks
+query: pages
 display: list
-include:
-  tags:
-    - status/now
+exclude:
+  dataview:
+    - "Field:: Value1"
 ```

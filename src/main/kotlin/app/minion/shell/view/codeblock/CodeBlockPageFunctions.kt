@@ -18,6 +18,7 @@ import app.minion.shell.view.ItemType
 import app.minion.shell.view.Property
 import app.minion.shell.view.PropertyType
 import app.minion.shell.view.ViewItems
+import app.minion.shell.view.codeblock.CodeBlockPageExcludeFunctions.Companion.applyExclude
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.populateProperties
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.toItems
 import app.minion.shell.view.codeblock.CodeBlockPageFunctions.Companion.toPropertyList
@@ -40,6 +41,7 @@ interface CodeBlockPageFunctions { companion object {
         this@applyCodeBlockConfig
             .files
             .map { it.value }
+            .applyExclude(config.exclude).bind()
             .applyInclude(config.include).bind()
             .applySort(config).bind()
             .applyGroupBy(config).bind()
