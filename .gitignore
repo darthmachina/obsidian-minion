@@ -28,3 +28,4 @@ build/
 src/main/kotlin/externals/
 kotlin-js-store/
 /webpack.config.d/externals.js
+test-vault/.obsidian/workspace.json
