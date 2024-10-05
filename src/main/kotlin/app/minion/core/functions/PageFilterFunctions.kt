@@ -32,6 +32,18 @@ interface PageFilterFunctions { companion object {
             }
     }
 
+    /**
+     * Returns a list of files that do not have any of the listed dataview values.
+     */
+    fun List<FileData>.excludeByDataview(values: List<Pair<DataviewField, DataviewValue>>) : List<FileData> {
+        return this
+            .filter { page ->
+                !page.dataview
+                    .map { Pair(it.key, it.value) }
+                    .any { it in values }
+            }
+    }
+
     fun List<FileData>.filterByAnyDataview(values: List<Pair<DataviewField, DataviewValue>>) : List<FileData> {
         return this
             .filter { page ->
