@@ -222,7 +222,11 @@ interface CodeBlockTaskFunctions { companion object {
 
     fun Set<Tag>.removeConfigTags(config: CodeBlockConfig) : Set<Tag> {
         return filter { tag ->
-            !(tag.v == "task" || config.include.tags.contains(tag.v))
+            !(
+                tag.v == "task"
+                || config.include.tags.contains(tag.v)
+                || (config.groupBy == GroupByOptions.parent_tag && tag.v.startsWith(config.groupByField))
+            )
         }.toSet()
     }
 
