@@ -2,8 +2,7 @@
 
 ```minion
 query: pages
-display: list
-exclude:
-  dataview:
-    - "Field:: Value1"
+display: gallery
+options:
+  - image_on_cover
 ```

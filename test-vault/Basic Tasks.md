@@ -1,4 +1,4 @@
-- [ ] Basic task #task #status/today
+- [ ] Basic task #task #status/today #other
 - [ ] This Week task #task #status/thisweek
 - [ ] Task with subtasks #task #status/today 
 	- [ ] Subtask 1
