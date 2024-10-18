@@ -26,7 +26,7 @@ interface VaultFunctions { companion object {
             .map { file ->
                 app.workspace.getLeavesOfType("markdown")
                     .filter {
-                        (it.view as MarkdownView).file.path == file.path
+                        if (it.view is MarkdownView) (it.view as MarkdownView).file.path == file.path else false
                     }
                     .let { leafList ->
                         if (leafList.isNotEmpty()) {
