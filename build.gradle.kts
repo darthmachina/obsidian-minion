@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "app.minion"
-version = "0.37.0"
+version = "0.38.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
