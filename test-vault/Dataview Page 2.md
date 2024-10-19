@@ -1,2 +1,2 @@
-Image:: ![[na_test.avif]]
+Image:: ![[na-test.avif]]
 Field:: Value2
