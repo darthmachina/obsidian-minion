@@ -228,6 +228,7 @@ input[type=checkbox] {
 .mi-codeblock-cover-image-container {
     min-height: 121px;
     max-height: 121px;
+    overflow: hidden;
 }
 
 .mi-codeblock-cover-image {
