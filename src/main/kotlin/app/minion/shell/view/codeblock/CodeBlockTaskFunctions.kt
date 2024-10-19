@@ -18,6 +18,7 @@ import app.minion.shell.view.ItemType
 import app.minion.shell.view.Property
 import app.minion.shell.view.PropertyType
 import app.minion.shell.view.ViewItems
+import app.minion.shell.view.codeblock.CodeBlockTaskExcludeFunctions.Companion.applyExclude
 import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.toItems
 import app.minion.shell.view.codeblock.CodeBlockTaskIncludeFunctions.Companion.applyInclude
 import arrow.core.Either
@@ -35,7 +36,7 @@ interface CodeBlockTaskFunctions { companion object {
         this@applyCodeBlockConfig
             .applyDue(config)
             .applyInclude(config.include)
-            .applyExcludeTags(config)
+            .applyExclude(config.exclude)
             .applySort(config).bind()
             .applyGroupBy(config).bind()
             .toViewItems(config).bind()
@@ -72,14 +73,6 @@ interface CodeBlockTaskFunctions { companion object {
             this.filterByOverdue()
         } else if (config.due.contains(DueOptions.upcoming)) {
             this.filterByUpcoming()
-        } else {
-            this
-        }
-    }
-
-    fun List<Task>.applyExcludeTags(config: CodeBlockConfig) : List<Task> {
-        return if (config.exclude.tags.isNotEmpty()) {
-            this.excludeByTags(config.exclude.tags.map { Tag(it) })
         } else {
             this
         }
