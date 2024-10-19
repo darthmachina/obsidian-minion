@@ -15,6 +15,9 @@
 query: tasks
 display: list
 heading: Foo
+exclude:
+  source:
+    - Other Tasks
 groupBy: parent_tag
 groupByField: status
 groupByOrder:
