@@ -4,7 +4,7 @@ import app.minion.core.model.Content
 import com.github.h0tk3y.betterParse.utils.Tuple2
 
 interface DynamicBlockFunctions { companion object {
-    fun processBlock() {
+    fun String.processBlock(currentLine: Int) : String {
         // Go up in text line by line until finding one that starts with <!--+BEGIN
         // Go down in text line by line under finding one that starts with <!--+END
         // Save start and end lines
@@ -14,11 +14,11 @@ interface DynamicBlockFunctions { companion object {
         // Add lines between start and end lines
     }
 
-    fun Content.findBegin(fromLine: Int) : Tuple2<Int, String> {
+    fun String.findBegin(fromLine: Int) : Tuple2<Int, String> {
 
     }
 
-    fun Content.findEnd(fromLine: Int) : Tuple2<Int, String> {
+    fun String.findEnd(fromLine: Int) : Tuple2<Int, String> {
 
     }
 
@@ -29,11 +29,11 @@ interface DynamicBlockFunctions { companion object {
 
     }
 
-    fun Content.removeBlockLine(begin: Int, end: Int) : Content {
+    fun String.removeBlockLine(begin: Int, end: Int) : Content {
 
     }
 
-    fun Content.addBlockResults(begin: Int) : Content {
+    fun String.addBlockResults(begin: Int) : Content {
 
     }
 }}
