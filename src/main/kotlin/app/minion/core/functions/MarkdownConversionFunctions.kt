@@ -16,7 +16,7 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger("MarkdownConversionFunctions")
 
 interface MarkdownConversionFunctions { companion object {
-    fun Task.toMarkdown() : String {
+    fun Task.toMarkdown(ignoreTags: List<Tag> = emptyList()) : String {
         val markdownElements = mutableListOf<String>()
 
         markdownElements.add(if (completedOn.isSome()) "- [x]" else "- [ ]")
@@ -26,7 +26,7 @@ interface MarkdownConversionFunctions { companion object {
             tags
                 .let { if (important) it.plus(Tag("i")) else it }
                 .let { if (urgent) it.plus(Tag("u")) else it }
-                .filter { it.type == TagType.TASK }
+                .filter { it.type == TagType.TASK && !ignoreTags.contains(it)}
                 .toSet()
                 .let {
                     markdownElements.add(it.asString())

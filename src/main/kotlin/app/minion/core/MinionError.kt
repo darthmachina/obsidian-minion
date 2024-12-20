@@ -102,4 +102,15 @@ sealed class MinionError(
         override val message: String, override val throwable: Option<Throwable> = None,
         override val parent: Option<MinionError> = None
     ) : MinionError(message, throwable, parent)
+
+    // Dynamic Block Errors
+    data class NotInDynamicBlockError(
+        override val message: String, override val throwable: Option<Throwable> = None,
+        override val parent: Option<MinionError> = None
+    ) : MinionError(message, throwable, parent)
+
+    data class QueryParseError(
+        override val message: String, override val throwable: Option<Throwable> = None,
+        override val parent: Option<MinionError> = None
+    ) : MinionError(message, throwable, parent)
 }

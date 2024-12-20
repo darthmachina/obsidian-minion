@@ -9,6 +9,7 @@ import app.minion.shell.thunk.VaultThunks
 import app.minion.shell.view.CodeBlockView
 import app.minion.shell.view.MinionSettingsTab
 import app.minion.shell.view.codeblock.CodeBlockConfig
+import app.minion.shell.view.dynamicblock.DynamicBlockFunctions.Companion.processBlock
 import arrow.core.None
 import arrow.core.toOption
 import io.kvision.redux.createTypedReduxStore
@@ -55,6 +56,15 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
 
         app.workspace.onLayoutReady {
             logger.debug { "onLayoutReady()" }
+
+            addCommand(MinionCommand(
+                "minion-process-dynamic-block",
+                "Process current dynamic block"
+            ) {
+                app.workspace.activeEditor!!.editor!!.getValue()
+                    .processBlock(store.store.state, app.workspace.activeEditor!!.editor!!.getCursor().line.toInt())
+            })
+
             CoroutineScope(Dispatchers.Unconfined).launch {
                 loadSettings()
                 store.dispatch(VaultThunks.loadInitialState(this@MinionPlugin, store.store.state.settings))
@@ -90,3 +100,9 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
         }.await()
     }
 }
+
+class MinionCommand(
+    override var id: String,
+    override var name: String,
+    override var callback: (() -> Any)?
+) : Command

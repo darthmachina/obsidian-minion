@@ -68,6 +68,7 @@ open external class Workspace : Events {
     open var rightRibbon: WorkspaceRibbon
     open var rootSplit: WorkspaceSplit
     open var activeLeaf: WorkspaceLeaf?
+    open var activeEditor: MarkdownFileInfo?
     open var containerEl: HTMLElement
     open var layoutReady: Boolean
     open var requestSaveLayout: () -> Unit
@@ -421,6 +422,12 @@ open external class View(leaf: WorkspaceLeaf) : Component {
     open fun onResize()
     open fun getDisplayText(): String
     open fun onHeaderMenu(menu: Menu)
+}
+
+external interface MarkdownFileInfo {
+    var app: App
+    var editor: Editor?
+    open fun file(): TFile?
 }
 
 external interface MarkdownPostProcessor {
