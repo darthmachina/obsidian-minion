@@ -8,6 +8,7 @@
 - [ ] Task with note and subtask #task #status/today 
 	- [ ] Subtask
 	- Note
+- [ ] Scheduled Task [due:: 2024-12-20] #task
 
 # Codeblock
 

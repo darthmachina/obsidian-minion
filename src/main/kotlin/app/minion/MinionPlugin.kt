@@ -63,6 +63,11 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
             ) {
                 app.workspace.activeEditor!!.editor!!.getValue()
                     .processBlock(store.store.state, app.workspace.activeEditor!!.editor!!.getCursor().line.toInt())
+                    .let {
+                        it
+                            .map { app.workspace.activeEditor!!.editor!!.setValue(it) }
+                            .mapLeft { logger.error { "Cannot create dynamic block: $it" } }
+                    }
             })
 
             CoroutineScope(Dispatchers.Unconfined).launch {

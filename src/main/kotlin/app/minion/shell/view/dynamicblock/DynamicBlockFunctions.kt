@@ -25,20 +25,22 @@ interface DynamicBlockFunctions { companion object {
         val splitContents = this@processBlock.split("\n")
         val beginLine = splitContents.findBegin(currentLine).bind()
         val endLine = splitContents.findEnd(currentLine).bind()
-        splitContents.addBlockResults(state, beginLine.t1).bind()
+        splitContents
+            .removeBlockLine(beginLine.t1, endLine.t1).bind()
+            .addBlockResults(state, beginLine.t1).bind()
     }
 
     fun List<String>.findBegin(fromLine: Int) : Either<MinionError.NotInDynamicBlockError, Tuple2<Int, String>> = either {
         var index = fromLine
         var beginLine = -1
-        while(index != 0) {
+        while(index != -1) {
             if(this@findBegin[index].startsWith(BEGIN_MARKER)) {
                 beginLine = index
                 break
             }
 
             // If we find an END before a BEGIN, we aren't in a dynamic block
-            if(this@findBegin[index].startsWith(END_MARKER)) {
+            if(this@findBegin[index].startsWith(END_MARKER) && index != fromLine) {
                 raise(MinionError.NotInDynamicBlockError("END marker found before BEGIN"))
             }
 
@@ -64,7 +66,7 @@ interface DynamicBlockFunctions { companion object {
             }
 
             // If we find a BEGIN before an END we aren't in a dynamic block
-            if(this@findEnd[index].startsWith(BEGIN_MARKER)) {
+            if(this@findEnd[index].startsWith(BEGIN_MARKER) && index != fromLine) {
                 raise(MinionError.NotInDynamicBlockError("BEGIN marker found before END"))
             }
 
@@ -88,8 +90,13 @@ interface DynamicBlockFunctions { companion object {
         ""
     }
 
-    fun String.removeBlockLine(begin: Int, end: Int) : Either<MinionError, String> = either {
-        ""
+    fun List<String>.removeBlockLine(begin: Int, end: Int) : Either<MinionError, List<String>> = either {
+        this@removeBlockLine
+            .toMutableList()
+            .let {
+                it.removeAll(it.subList(begin + 1, end))
+                it
+            }
     }
 
     fun List<String>.addBlockResults(state: State, beginLine: Int) : Either<MinionError, String> = either {
@@ -97,7 +104,7 @@ interface DynamicBlockFunctions { companion object {
             .toMutableList()
             .let {
                 it.add(
-                    beginLine,
+                    beginLine + 1,
                     state.tasks
                         .filterByTodayOrOverdue()
                         .map { task ->
