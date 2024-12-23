@@ -6,6 +6,10 @@ import app.minion.core.functions.TaskFilterFunctions.Companion.filterByTodayOrOv
 import app.minion.core.model.Content
 import app.minion.core.model.Tag
 import app.minion.core.store.State
+import app.minion.shell.view.codeblock.CodeBlockConfig
+import app.minion.shell.view.codeblock.CodeBlockDisplay
+import app.minion.shell.view.codeblock.CodeBlockQuery
+import app.minion.shell.view.codeblock.DueOptions
 import arrow.core.*
 import arrow.core.raise.either
 import com.github.h0tk3y.betterParse.utils.Tuple2
@@ -82,12 +86,31 @@ interface DynamicBlockFunctions { companion object {
     }
 
     /**
-     * TODO Replace return with query object
+     * Config right now assumes Task and List
      */
-    fun String.parseQuery() : Either<MinionError.QueryParseError, String> = either {
-        // <!--+BEGIN minion :type task :display list :heading Scheduled :due today & overdue :include-->
+    fun String.parseQuery() : Either<MinionError.QueryParseError, CodeBlockConfig?> = either {
+        // <!--+BEGIN minion :heading Scheduled :due today & overdue :include tag(tag1,tag2)-->
         // Split on : and each one will be a parameter
-        ""
+        this@parseQuery
+            .split(":")
+            .map { item -> item.split(" ", limit = 1) }
+            .associateBy { it[0] }
+            .mapValues { it.value[1] }
+            .let { configItems ->
+
+                CodeBlockConfig(
+                    display = CodeBlockDisplay.list,
+                    query = CodeBlockQuery.tasks,
+                    heading = configItems.get("heading").toOption().getOrElse { "" },
+                    due = configItems
+                        .get("due")
+                        .toOption().map {
+                            it.split("&").toDueOptions().bind()
+                        }
+                        .getOrElse { emptyList() }
+                )
+            }
+        null
     }
 
     fun List<String>.removeBlockLine(begin: Int, end: Int) : Either<MinionError, List<String>> = either {
@@ -114,5 +137,16 @@ interface DynamicBlockFunctions { companion object {
                 it
             }
             .joinToString("\n")
+    }
+
+    fun List<String>.toDueOptions() : Either<MinionError.QueryParseError, List<DueOptions>> = either {
+        this@toDueOptions.map {
+            when(it.trim()) {
+                "today" -> DueOptions.today
+                "overdue" -> DueOptions.overdue
+                "upcoming" -> DueOptions.upcoming
+                else -> raise(MinionError.QueryParseError("$it is not a valid option for 'due'"))
+            }
+        }
     }
 }}
