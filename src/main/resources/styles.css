@@ -56,6 +56,11 @@ input[type=checkbox] {
 
 }
 
+.mi-codeblock-task-item {
+    margin-top: 5px;
+    padding-bottom: 6px;
+}
+
 .mi-codeblock-task hr {
     margin-bottom: 4px;
 }
