@@ -108,10 +108,12 @@ interface CodeBlockTaskListView { companion object {
     }
 
     fun FlowContent.outputItem(item: Item, store: MinionStore, config: CodeBlockConfig) {
-        outputCheckbox(item, store)
-        outputContent(item, store, config)
-        outputSubtasks(item, store)
-        outputNotes(item, store)
+        div(classes = "mi-codeblock-task-item") {
+            outputCheckbox(item, store)
+            outputContent(item, store, config)
+            outputSubtasks(item, store)
+            outputNotes(item, store)
+        }
         hr {}
     }
 
