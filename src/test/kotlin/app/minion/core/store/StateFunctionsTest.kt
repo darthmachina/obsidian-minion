@@ -1,16 +1,16 @@
 package app.minion.core.store
 
-import app.minion.core.model.DataviewField
-import app.minion.core.model.DataviewValue
-import app.minion.core.model.File
-import app.minion.core.model.FileData
-import app.minion.core.model.Filename
-import app.minion.core.model.Tag
+import app.minion.core.model.*
+import app.minion.core.store.StateFunctions.Companion.findTaskForSourceAndLine
 import app.minion.core.store.StateFunctions.Companion.updateDataviewCache
 import app.minion.core.store.StateFunctions.Companion.updateTagCache
 import app.minion.core.store.StateFunctions.Companion.upsertData
 import app.minion.core.store.StateFunctions.Companion.updateBacklinkCache
+import app.minion.util.test.TaskFactory
+import arrow.core.None
+import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.maps.shouldContainExactly
 
 class StateFunctionsTest : StringSpec({
@@ -134,5 +134,31 @@ class StateFunctionsTest : StringSpec({
             Filename("newout") to setOf(fileData.name),
             Filename("oldout") to emptySet()
         )
+    }
+
+    "findTaskForSourceAndLine find correct Task" {
+        val task = TaskFactory.createBasicTask()
+
+        val files = mapOf(task.fileInfo.file to FileData(
+            task.fileInfo.file,
+            File("/"),
+            tasks = listOf(task)))
+
+        val testState = State(
+            None,
+            MinionSettings2.default(),
+            None,
+            listOf(task),
+            files,
+            emptyMap(),
+            emptyMap(),
+            emptyMap(),
+            emptyMap()
+        )
+
+        val actualEither = testState.findTaskForSourceAndLine(task.fileInfo.file, 1)
+
+        val actual = actualEither.shouldBeRight()
+        actual.content.v shouldBeEqual task.content.v
     }
 })

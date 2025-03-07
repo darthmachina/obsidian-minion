@@ -19,6 +19,7 @@ import app.minion.shell.view.ViewModelFunctions.Companion.getPropertyValue
 import app.minion.shell.view.modal.KanbanStatusSelectModal
 import app.minion.shell.view.modal.UpdateDataviewValue
 import arrow.core.Either
+import arrow.core.getOrElse
 import arrow.core.raise.either
 import arrow.core.toOption
 import kotlinx.html.FlowContent
@@ -35,10 +36,16 @@ interface CodeBlockCardFunctions { companion object {
         this@getImagePath
             .getPropertyValue(PropertyType.IMAGE)
             .map {
-                it.getWikilinkResourcePath(
-                    store.store.state.plugin.app.vault,
-                    store.store.state.plugin.app.metadataCache
-                ).bind()
+                store.store.state.plugin
+                    .map { plugin ->
+                        it.getWikilinkResourcePath(
+                            plugin.app.vault,
+                            plugin.app.metadataCache
+                        ).bind()
+                    }
+                    .getOrElse {
+                        raise(MinionError.StateError("No plugin defined in State"))
+                    }
             }.bind()
     }
 
@@ -48,14 +55,16 @@ interface CodeBlockCardFunctions { companion object {
                 if (!subtask.completed) {
                     div(classes = "mi-codeblock-task-subtask") {
                         checkBoxInput {
-                            onClickFunction = {
-                                store.dispatch(
-                                    (TaskThunks.completeSubtask(
-                                        store.store.state.plugin.app,
-                                        task,
-                                        subtask
-                                    ))
-                                )
+                            store.store.state.plugin.map { plugin ->
+                                onClickFunction = {
+                                    store.dispatch(
+                                        (TaskThunks.completeSubtask(
+                                            plugin.app,
+                                            task,
+                                            subtask
+                                        ))
+                                    )
+                                }
                             }
                         }
                         span(classes = "mi-codeblock-task-subtask-content") {
@@ -86,15 +95,17 @@ interface CodeBlockCardFunctions { companion object {
             a {
                 title = "Change group value"
                 unsafe { +ICON_GROUP }
-                onClickFunction = {
-                    UpdateDataviewValue(
-                        fileData,
-                        config.groupByField,
-                        fileData.dataview[DataviewField(config.groupByField)].toOption(),
-                        store.store.state.dataviewValueCache[DataviewField(config.groupByField)]!!,
-                        store,
-                        store.store.state.plugin.app
-                    ).open()
+                store.store.state.plugin.map { plugin ->
+                    onClickFunction = {
+                        UpdateDataviewValue(
+                            fileData,
+                            config.groupByField,
+                            fileData.dataview[DataviewField(config.groupByField)].toOption(),
+                            store.store.state.dataviewValueCache[DataviewField(config.groupByField)]!!,
+                            store,
+                            plugin.app
+                        ).open()
+                    }
                 }
             }
         }
@@ -106,8 +117,10 @@ interface CodeBlockCardFunctions { companion object {
             a {
                 title = "Change kanban status"
                 unsafe { +ICON_KANBAN }
-                onClickFunction = {
-                    KanbanStatusSelectModal(store, task, store.store.state.plugin.app).open()
+                store.store.state.plugin.map { plugin ->
+                    onClickFunction = {
+                        KanbanStatusSelectModal(store, task, plugin.app).open()
+                    }
                 }
             }
         }

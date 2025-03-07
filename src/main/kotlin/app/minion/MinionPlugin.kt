@@ -10,6 +10,7 @@ import app.minion.shell.view.CodeBlockView
 import app.minion.shell.view.MinionSettingsTab
 import app.minion.shell.view.codeblock.CodeBlockConfig
 import arrow.core.None
+import arrow.core.some
 import arrow.core.toOption
 import io.kvision.redux.createTypedReduxStore
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +36,7 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
     private val store = createTypedReduxStore(
         ::reducer,
         State(
-            this,
+            this.some(),
             MinionSettings.default(),
             None,
             emptyList(),

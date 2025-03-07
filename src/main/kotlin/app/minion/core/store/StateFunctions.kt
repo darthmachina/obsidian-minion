@@ -1,11 +1,16 @@
 package app.minion.core.store
 
+import app.minion.core.MinionError
 import app.minion.core.model.DataviewField
 import app.minion.core.model.DataviewValue
 import app.minion.core.model.FileData
 import app.minion.core.model.Filename
 import app.minion.core.model.Tag
 import app.minion.core.model.Task
+import arrow.core.Either
+import arrow.core.getOrElse
+import arrow.core.raise.either
+import arrow.core.toOption
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger("StateFunctions")
@@ -82,5 +87,22 @@ interface StateFunctions { companion object {
 
     fun Map<Filename, Set<Filename>>.removeFor(name: Filename) : Map<Filename, Set<Filename>> {
         return this.mapValues { it.value.minus(name) }
+    }
+
+    fun State.findTaskForSourceAndLine(source: Filename, line: Int) : Either<MinionError.TaskNotFoundError, Task> = either {
+        this@findTaskForSourceAndLine.files
+            .get(source)
+            .toOption()
+            .map { fileData -> fileData.tasks.filter { task -> task.fileInfo.line == line } }
+            .map { taskList ->
+                if (taskList.isEmpty()) {
+                    raise(MinionError.TaskNotFoundError("No Task found at ${source.v}:$line"))
+                }
+                // taskList.size > 1 should be impossible, check for it?
+                taskList[0]
+            }
+            .getOrElse {
+                raise(MinionError.TaskNotFoundError("No Task found at ${source.v}:$line"))
+            }
     }
 }}

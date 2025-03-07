@@ -9,7 +9,7 @@ import io.kvision.redux.TypedReduxStore
 typealias MinionStore = TypedReduxStore<State, Action>
 
 data class State(
-    val plugin: MinionPlugin,
+    val plugin: Option<MinionPlugin>,
     val settings: MinionSettings,
     val error: Option<MinionError>,
     val tasks: List<Task>,

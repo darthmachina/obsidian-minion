@@ -182,15 +182,19 @@ interface CodeBlockTaskListView { companion object {
                         a {
                             title = "Change kanban status"
                             unsafe { +ICON_KANBAN }
-                            onClickFunction = {
-                                KanbanStatusSelectModal(store, task, store.store.state.plugin.app).open()
+                            store.store.state.plugin.map { plugin ->
+                                onClickFunction = {
+                                    KanbanStatusSelectModal(store, task, plugin.app).open()
+                                }
                             }
                         }
                         a {
                             title = "Change date"
                             unsafe { +ICON_DATE }
-                            onClickFunction = {
-                                ChangeTaskDateModal(task, store, store.store.state.plugin.app).open()
+                            store.store.state.plugin.map { plugin ->
+                                onClickFunction = {
+                                    ChangeTaskDateModal(task, store, plugin.app).open()
+                                }
                             }
                         }
                     }
@@ -226,14 +230,16 @@ interface CodeBlockTaskListView { companion object {
                 .forEach { subtask ->
                     div(classes = "mi-codeblock-task-subtask") {
                         checkBoxInput {
-                            onClickFunction = {
-                                store.dispatch(
-                                    (TaskThunks.completeSubtask(
-                                        store.store.state.plugin.app,
-                                        task,
-                                        subtask
-                                    ))
-                                )
+                            store.store.state.plugin.map { plugin ->
+                                onClickFunction = {
+                                    store.dispatch(
+                                        (TaskThunks.completeSubtask(
+                                            plugin.app,
+                                            task,
+                                            subtask
+                                        ))
+                                    )
+                                }
                             }
                         }
                         span(classes = "mi-codeblock-task-subtask-content") {

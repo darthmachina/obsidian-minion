@@ -18,12 +18,8 @@ import app.minion.core.model.Task
 import app.minion.core.store.State
 import app.minion.shell.functions.TaskReadFunctions.Companion.processFileTasks
 import app.minion.shell.functions.VaultReadFunctions.Companion.mapToFieldCache
-import arrow.core.Either
-import arrow.core.None
-import arrow.core.getOrElse
-import arrow.core.mapNotNull
+import arrow.core.*
 import arrow.core.raise.either
-import arrow.core.toOption
 import kotlinx.coroutines.await
 import mu.KotlinLogging
 
@@ -253,7 +249,7 @@ data class StateAccumulator(
 
     fun toState(settings: MinionSettings, plugin: MinionPlugin) : Either<MinionError, State> = either {
         State(
-            plugin,
+            plugin.some(),
             settings,
             None,
             tasks,

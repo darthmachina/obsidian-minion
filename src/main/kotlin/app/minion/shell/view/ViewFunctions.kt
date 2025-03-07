@@ -47,16 +47,18 @@ interface ViewFunctions { companion object {
         content.tokenize()
             .forEach { token ->
                 if (token.startsWith("!l")) {
-                    if (sourceFileExists(Filename(token.drop(2)), store.store.state.plugin.app.metadataCache)) {
-                        // Wikilink
-                        span(classes = "mi-wikilink") {
-                            +token.drop(2)
-                            onClickFunction = {
-                                openSourceFile(Filename(token.drop(2)), store.store.state.plugin.app)
+                    store.store.state.plugin.map { plugin ->
+                        if (sourceFileExists(Filename(token.drop(2)), plugin.app.metadataCache)) {
+                            // Wikilink
+                            span(classes = "mi-wikilink") {
+                                +token.drop(2)
+                                onClickFunction = {
+                                    openSourceFile(Filename(token.drop(2)), plugin.app)
+                                }
                             }
+                        } else {
+                            span(classes = "mi-wikilink-none") { +token.drop(2) }
                         }
-                    } else {
-                        span(classes = "mi-wikilink-none") { +token.drop(2) }
                     }
                 } else if (token.startsWith("!b")) {
                     span(classes = "mi-bold") {
@@ -85,8 +87,10 @@ interface ViewFunctions { companion object {
 
             item.task
                 .onSome { task ->
-                    onClickFunction = {
-                        store.dispatch(TaskThunks.completeTask(store.store.state.plugin.app, task))
+                    store.store.state.plugin.map { plugin ->
+                        onClickFunction = {
+                            store.dispatch(TaskThunks.completeTask(plugin.app, task))
+                        }
                     }
                 }.onNone {
                     logger.error { "No task set on item ${item.content.v}" }
@@ -97,8 +101,10 @@ interface ViewFunctions { companion object {
     fun FlowContent.outputSourceLink(filename: Filename, store: MinionStore) {
         span(classes = "mi-codeblock-source-link") {
             +filename.v
-            onClickFunction = {
-                openSourceFile(filename, store.store.state.plugin.app)
+            store.store.state.plugin.map { plugin ->
+                onClickFunction = {
+                    openSourceFile(filename, plugin.app)
+                }
             }
         }
     }
