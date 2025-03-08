@@ -81,8 +81,10 @@ interface CodeBlockCard { companion object {
                 {
                     span(classes = "mi-codeblock-source-link") {
                         +item.content.v
-                        onClickFunction = {
-                            VaultFunctions.openSourceFile(fileData.name, store.store.state.plugin.app)
+                        store.store.state.plugin.map { plugin ->
+                            onClickFunction = {
+                                VaultFunctions.openSourceFile(fileData.name, plugin.app)
+                            }
                         }
                     }
                 },

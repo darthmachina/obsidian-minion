@@ -34,7 +34,7 @@ fun reducer(state: State, action: Action) : State =
             action.logLevel.map {
                 KotlinLoggingConfiguration.LOG_LEVEL = it
             }
-            state.plugin.saveData(newSettings.toJson())
+            state.plugin.map { it.saveData(newSettings.toJson()) }
             state.copy(settings = newSettings)
         }
         is Action.LoadInitialState -> {

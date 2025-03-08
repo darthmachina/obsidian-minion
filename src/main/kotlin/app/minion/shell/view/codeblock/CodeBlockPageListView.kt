@@ -96,15 +96,17 @@ interface CodeBlockPageListView { companion object {
                             span(classes = "mi-icon mi-button") {
                                 title = "Change group"
                                 unsafe { +ICON_HASH }
-                                onClickFunction = {
-                                    UpdateDataviewValue(
-                                        fileData,
-                                        config.groupByField,
-                                        fileData.dataview[DataviewField(config.groupByField)].toOption(),
-                                        store.store.state.dataviewValueCache[DataviewField(config.groupByField)]!!,
-                                        store,
-                                        store.store.state.plugin.app
-                                    ).open()
+                                store.store.state.plugin.map { plugin ->
+                                    onClickFunction = {
+                                        UpdateDataviewValue(
+                                            fileData,
+                                            config.groupByField,
+                                            fileData.dataview[DataviewField(config.groupByField)].toOption(),
+                                            store.store.state.dataviewValueCache[DataviewField(config.groupByField)]!!,
+                                            store,
+                                            plugin.app
+                                        ).open()
+                                    }
                                 }
                             }
                         }.onNone {
@@ -120,8 +122,10 @@ interface CodeBlockPageListView { companion object {
         span(classes = "mi-codeblock-source-link") {
             +item.content.v
             item.fileData.map {fileData ->
-                onClickFunction = {
-                    VaultFunctions.openSourceFile(fileData.name, store.store.state.plugin.app)
+                store.store.state.plugin.map { plugin ->
+                    onClickFunction = {
+                        VaultFunctions.openSourceFile(fileData.name, plugin.app)
+                    }
                 }
             }.onNone {
                 logger.error { "${item.content.v} has no fileData value" }

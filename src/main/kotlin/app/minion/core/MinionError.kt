@@ -8,6 +8,11 @@ sealed class MinionError(
     open val throwable: Option<Throwable> = None,
     open val parent: Option<MinionError> = None
 ) {
+    data class StateError(
+        override val message: String, override val throwable: Option<Throwable> = None,
+        override val parent: Option<MinionError> = None
+    ) : MinionError(message, throwable, parent)
+
     data class LoadSettingsError(
         override val message: String, override val throwable: Option<Throwable> = None,
         override val parent: Option<MinionError> = None
@@ -99,6 +104,11 @@ sealed class MinionError(
     ) : MinionError(message, throwable, parent)
 
     data class FieldMissingError(
+        override val message: String, override val throwable: Option<Throwable> = None,
+        override val parent: Option<MinionError> = None
+    ) : MinionError(message, throwable, parent)
+
+    data class TaskNotFoundError(
         override val message: String, override val throwable: Option<Throwable> = None,
         override val parent: Option<MinionError> = None
     ) : MinionError(message, throwable, parent)

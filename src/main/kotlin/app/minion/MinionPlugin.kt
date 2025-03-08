@@ -1,4 +1,5 @@
 import app.minion.core.JsJodaTimeZoneModule
+import app.minion.core.functions.CommandFunctions
 import app.minion.core.functions.SettingsFunctions
 import app.minion.core.model.MinionSettings
 import app.minion.core.model.MinionSettings1
@@ -10,6 +11,7 @@ import app.minion.shell.view.CodeBlockView
 import app.minion.shell.view.MinionSettingsTab
 import app.minion.shell.view.codeblock.CodeBlockConfig
 import arrow.core.None
+import arrow.core.some
 import arrow.core.toOption
 import io.kvision.redux.createTypedReduxStore
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +37,7 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
     private val store = createTypedReduxStore(
         ::reducer,
         State(
-            this,
+            this.some(),
             MinionSettings.default(),
             None,
             emptyList(),
@@ -59,6 +61,16 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
                 loadSettings()
                 store.dispatch(VaultThunks.loadInitialState(this@MinionPlugin, store.store.state.settings))
             }
+
+            addCommand(MinionCommand(
+                "minion-change-task-status",
+                "Change Task status"
+            ) {
+                CoroutineScope(Dispatchers.Unconfined).launch {
+                    CommandFunctions.changeTaskStatus(store)
+                }
+            })
+
 
             registerEvent(
                 app.metadataCache.on("changed") { file ->
@@ -90,3 +102,9 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
         }.await()
     }
 }
+
+class MinionCommand(
+    override var id: String,
+    override var name: String,
+    override var callback: (() -> Any)?
+) : Command
