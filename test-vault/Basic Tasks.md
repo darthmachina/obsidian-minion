@@ -5,7 +5,7 @@
 	- [ ] Subtask 2
 - [ ] Task with a note #task #status/today 
 	- This is a note
-- [ ] Task with note and subtask #task #status/today 
+- [ ] Task with note and subtask #task #status/backlog
 	- [ ] Subtask
 	- Note
 

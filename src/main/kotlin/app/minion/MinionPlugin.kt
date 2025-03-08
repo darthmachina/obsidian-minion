@@ -1,4 +1,5 @@
 import app.minion.core.JsJodaTimeZoneModule
+import app.minion.core.functions.CommandFunctions
 import app.minion.core.functions.SettingsFunctions
 import app.minion.core.model.MinionSettings
 import app.minion.core.model.MinionSettings1
@@ -61,6 +62,16 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
                 store.dispatch(VaultThunks.loadInitialState(this@MinionPlugin, store.store.state.settings))
             }
 
+            addCommand(MinionCommand(
+                "minion-change-task-status",
+                "Change Task status"
+            ) {
+                CoroutineScope(Dispatchers.Unconfined).launch {
+                    CommandFunctions.changeTaskStatus(store)
+                }
+            })
+
+
             registerEvent(
                 app.metadataCache.on("changed") { file ->
                     store.dispatch(VaultThunks.fileModified(app.vault, app.metadataCache, file))
@@ -91,3 +102,9 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
         }.await()
     }
 }
+
+class MinionCommand(
+    override var id: String,
+    override var name: String,
+    override var callback: (() -> Any)?
+) : Command
