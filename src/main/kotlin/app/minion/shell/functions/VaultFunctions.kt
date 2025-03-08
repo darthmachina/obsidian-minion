@@ -32,7 +32,7 @@ interface VaultFunctions { companion object {
                         if (leafList.isNotEmpty()) {
                             app.workspace.setActiveLeaf(leafList[0])
                         } else {
-                            app.workspace.splitActiveLeaf().openFile(file)
+                            app.workspace.getLeaf(true).openFile(file)
                         }
                     }
             }
