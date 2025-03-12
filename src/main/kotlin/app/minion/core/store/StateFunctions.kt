@@ -1,5 +1,7 @@
 package app.minion.core.store
 
+import MarkdownView
+import MinionPlugin
 import app.minion.core.MinionError
 import app.minion.core.model.DataviewField
 import app.minion.core.model.DataviewValue
@@ -7,7 +9,10 @@ import app.minion.core.model.FileData
 import app.minion.core.model.Filename
 import app.minion.core.model.Tag
 import app.minion.core.model.Task
+import app.minion.core.store.StateFunctions.Companion.findTaskForSourceAndLine
+import app.minion.shell.view.modal.KanbanStatusSelectModal
 import arrow.core.Either
+import arrow.core.Option
 import arrow.core.getOrElse
 import arrow.core.raise.either
 import arrow.core.toOption
@@ -87,6 +92,24 @@ interface StateFunctions { companion object {
 
     fun Map<Filename, Set<Filename>>.removeFor(name: Filename) : Map<Filename, Set<Filename>> {
         return this.mapValues { it.value.minus(name) }
+    }
+
+    fun MinionStore.findTaskAtCursor() : Either<MinionError, Task> = either {
+        this@findTaskAtCursor.store.state.plugin.map { plugin ->
+            plugin.app.workspace.activeLeaf.toOption().map { leaf ->
+                if (leaf.view is MarkdownView) {
+                    val line = (leaf.view as MarkdownView).editor.getCursor("head").line.toInt()
+                    val file = (leaf.view as MarkdownView).file.basename.removeSuffix(".md")
+
+                    logger.debug { "Working on $file:$line" }
+                    store.store.state.findTaskForSourceAndLine(Filename(file), line).bind()
+                }
+            }
+        }
+        .onNone {
+            logger.warn { "No Plugin defined" }
+            raise(MinionError.TaskNotFoundError("No task found"))
+        }
     }
 
     fun State.findTaskForSourceAndLine(source: Filename, line: Int) : Either<MinionError.TaskNotFoundError, Task> = either {

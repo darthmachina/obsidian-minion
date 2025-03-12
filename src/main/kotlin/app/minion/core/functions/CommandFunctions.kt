@@ -30,4 +30,24 @@ interface CommandFunctions { companion object {
                 logger.warn { "No Plugin defined" }
             }
     }
+
+    fun completeTask(store: MinionStore) {
+        store.store.state.plugin
+            .map { plugin ->
+                plugin.app.workspace.activeLeaf.toOption().map { leaf ->
+                    if (leaf.view is MarkdownView) {
+                        val line = (leaf.view as MarkdownView).editor.getCursor("head").line.toInt()
+                        val file = (leaf.view as MarkdownView).file.basename.removeSuffix(".md")
+
+                        logger.debug { "Working on $file:$line" }
+                        store.store.state.findTaskForSourceAndLine(Filename(file), line).map { task ->
+
+                        }
+                    }
+                }
+            }
+            .onNone {
+                logger.warn { "No Plugin defined" }
+            }
+    }
 }}
