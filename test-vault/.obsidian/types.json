@@ -1,0 +1,12 @@
+{
+  "types": {
+    "aliases": "aliases",
+    "cssclasses": "multitext",
+    "tags": "tags",
+    "TestCheck": "checkbox",
+    "TestNumber": "number",
+    "TestDate": "date",
+    "TestDateTime": "datetime",
+    "TestList": "multitext"
+  }
+}
