@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    implementation(npm("obsidian", "0.12.17"))
+    implementation(npm("obsidian", "1.8.7"))
 
     val kotlinVersion = "1.9.22"
     val kotlinxHtmlVersion = "0.11.0"

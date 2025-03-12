@@ -1,5 +1,6 @@
 package app.minion.shell.functions
 
+import FrontMatterCache
 import MetadataCache
 import MinionPlugin
 import TFile
@@ -64,7 +65,23 @@ interface VaultReadFunctions { companion object {
         FileData(Filename(file.basename), File(file.path))
             .addTags(metadataCache).bind()
             .addOutlinks(metadataCache).bind()
+            .addProperties(metadataCache).bind()
             .processFileContents(this@processFile, metadataCache).bind()
+    }
+
+    fun FileData.addProperties(metadataCache: MetadataCache) : Either<MinionError, FileData> = either {
+        metadataCache
+            .getCache(this@addProperties.path.v)
+            .toOption()
+            .map {
+                logger.debug { "\n\n- pulling out file properties" }
+                logger.debug { JSON.stringify(it.frontmatter) }
+                it.frontmatter?.toDataview()?.bind() ?: emptyMap()
+            }
+            .map { properties ->
+                this@addProperties.copy(dataview = dataview + properties)
+            }
+            .getOrElse { this@addProperties }
     }
 
     fun FileData.addTags(metadataCache: MetadataCache) : Either<MinionError, FileData> = either {
@@ -76,7 +93,7 @@ interface VaultReadFunctions { companion object {
                 logger.debug { "- pulling out tags from metadata" }
                 it.tags?.toList() ?: emptyList()
             }
-            .map {tagCache ->
+            .map { tagCache ->
                 tagCache
                     .map {
                         logger.debug { "- creating Tag from ${it.tag}" }
@@ -125,7 +142,7 @@ interface VaultReadFunctions { companion object {
                     .then { contents ->
                         // Process Tasks
                         this@processFileContents.copy(
-                            dataview = contents.pullOutDataviewFields().bind(),
+                            dataview = dataview + contents.pullOutDataviewFields().bind(),
                             tasks = contents
                                 .processFileTasks(
                                     this@processFileContents.path,
@@ -141,6 +158,19 @@ interface VaultReadFunctions { companion object {
                     }
                     .await()
             }.bind()
+    }
+
+    fun FrontMatterCache.toDataview() : Either<MinionError, Map<DataviewField, DataviewValue>> = either {
+        val frontmattercache = this@toDataview
+        js("Object.keys(frontmattercache)")
+            .unsafeCast<Array<String>>()
+            .let { keys ->
+                logger.debug { "frontmatter keys: $keys"}
+                keys.associate { key ->
+                    logger.debug { "$key : ${this@toDataview.get(key)}" }
+                    DataviewField(key) to DataviewValue(this@toDataview.get(key)?.toString() ?: "<ERROR>")
+                }
+            }
     }
 
     fun String.pullOutDataviewFields() : Either<MinionError, Map<DataviewField, DataviewValue>> = either {
