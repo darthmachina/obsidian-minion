@@ -71,6 +71,15 @@ class MinionPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
                 }
             })
 
+            addCommand(MinionCommand(
+                "minion-complete-task",
+                "Complete Task",
+            ) {
+                CoroutineScope(Dispatchers.Unconfined).launch {
+                    CommandFunctions.completeTask(store)
+                }
+            })
+
 
             registerEvent(
                 app.metadataCache.on("changed") { file ->

@@ -3,6 +3,7 @@ package app.minion.core.functions
 import app.minion.core.store.MinionStore
 import app.minion.core.store.StateFunctions.Companion.findTaskAtCursor
 import app.minion.core.store.StateFunctions.Companion.runWithPlugin
+import app.minion.shell.thunk.TaskThunks
 import app.minion.shell.view.modal.KanbanStatusSelectModal
 import mu.KotlinLogging
 
@@ -20,7 +21,7 @@ interface CommandFunctions { companion object {
     fun completeTask(store: MinionStore) {
         store.runWithPlugin { plugin ->
             store.findTaskAtCursor().map { task ->
-                // TODO complete task
+                TaskThunks.completeTask(plugin.app, task)
             }
         }
     }
