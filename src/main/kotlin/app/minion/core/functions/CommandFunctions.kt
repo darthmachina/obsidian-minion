@@ -10,7 +10,7 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger("CommandFunctions")
 
 interface CommandFunctions { companion object {
-    fun changeTaskStatus(store: MinionStore) {
+    fun changeTaskStatusAtLine(store: MinionStore) {
         store.runWithPlugin { plugin ->
             store.findTaskAtCursor().map { task ->
                 KanbanStatusSelectModal(store, task, plugin.app).open()
@@ -18,10 +18,10 @@ interface CommandFunctions { companion object {
         }
     }
 
-    fun completeTask(store: MinionStore) {
+    fun completeTaskAtLine(store: MinionStore) {
         store.runWithPlugin { plugin ->
             store.findTaskAtCursor().map { task ->
-                TaskThunks.completeTask(plugin.app, task)
+                store.dispatch(TaskThunks.completeTask(plugin.app, task))
             }
         }
     }
