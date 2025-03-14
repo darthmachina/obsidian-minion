@@ -1,19 +1,12 @@
-package app.minion.core.store
+package app.minion.core.functions
 
 import MarkdownView
 import MinionPlugin
 import app.minion.core.MinionError
-import app.minion.core.model.DataviewField
-import app.minion.core.model.DataviewValue
-import app.minion.core.model.FileData
-import app.minion.core.model.Filename
-import app.minion.core.model.Tag
-import app.minion.core.model.Task
-import app.minion.core.store.StateFunctions.Companion.findTaskAtCursor
-import app.minion.core.store.StateFunctions.Companion.findTaskForSourceAndLine
-import app.minion.shell.view.modal.KanbanStatusSelectModal
+import app.minion.core.model.*
+import app.minion.core.store.MinionStore
+import app.minion.core.store.State
 import arrow.core.Either
-import arrow.core.Option
 import arrow.core.getOrElse
 import arrow.core.raise.either
 import arrow.core.toOption
@@ -125,26 +118,27 @@ interface StateFunctions { companion object {
                     raise(MinionError.TaskNotFoundError("Cannot find Task"))
                 }
         }
-        .getOrElse {
-            logger.warn { "No Plugin defined" }
-            raise(MinionError.TaskNotFoundError("Cannot find Task"))
-        }
+            .getOrElse {
+                logger.warn { "No Plugin defined" }
+                raise(MinionError.TaskNotFoundError("Cannot find Task"))
+            }
     }
 
-    fun State.findTaskForSourceAndLine(source: Filename, line: Int) : Either<MinionError.TaskNotFoundError, Task> = either {
-        this@findTaskForSourceAndLine.files
-            .get(source)
-            .toOption()
-            .map { fileData -> fileData.tasks.filter { task -> task.fileInfo.line == line } }
-            .map { taskList ->
-                if (taskList.isEmpty()) {
+    fun State.findTaskForSourceAndLine(source: Filename, line: Int) : Either<MinionError.TaskNotFoundError, Task> =
+        either {
+            this@findTaskForSourceAndLine.files
+                .get(source)
+                .toOption()
+                .map { fileData -> fileData.tasks.filter { task -> task.fileInfo.line == line } }
+                .map { taskList ->
+                    if (taskList.isEmpty()) {
+                        raise(MinionError.TaskNotFoundError("No Task found at ${source.v}:$line"))
+                    }
+                    // taskList.size > 1 should be impossible, check for it?
+                    taskList[0]
+                }
+                .getOrElse {
                     raise(MinionError.TaskNotFoundError("No Task found at ${source.v}:$line"))
                 }
-                // taskList.size > 1 should be impossible, check for it?
-                taskList[0]
-            }
-            .getOrElse {
-                raise(MinionError.TaskNotFoundError("No Task found at ${source.v}:$line"))
-            }
-    }
+        }
 }}
