@@ -28,7 +28,7 @@ private val logger = KotlinLogging.logger("TaskThunks")
 
 interface TaskThunks { companion object {
     fun completeTask(app: App, task: Task) : ActionCreator<Action, State> {
-        logger.info { "completeTask()" }
+        logger.info { "completeTask() : ${task.content.v}" }
         return { dispatch, _ ->
             CoroutineScope(Dispatchers.Unconfined).launch {
                 task.complete()

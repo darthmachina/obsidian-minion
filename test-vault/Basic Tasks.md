@@ -1,5 +1,5 @@
 - [ ] Basic task [[Dataview Page 1]] #task #status/today #other
-- [ ] This Week task #task #status/thisweek
+- [x] This Week task #task #status/thisweek [c:: 1741841175514]
 - [ ] Task with subtasks #task #status/today 
 	- [ ] Subtask 1
 	- [ ] Subtask 2
