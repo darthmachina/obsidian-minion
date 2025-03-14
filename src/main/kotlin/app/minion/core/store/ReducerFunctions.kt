@@ -56,23 +56,31 @@ interface ReducerFunctions { companion object {
         // Remove data for FileData
         // Change Filename and File for FileData
         // Insert data for new FileData
-        val oldFilename = oldPath.parseFilename().bind()
+        if (this@fileRenamed.settings.excludeFolders.any { oldPath.v.startsWith(it)}) {
+            // Excluded folder so nothing to be done
+            this@fileRenamed
+        } else {
+            val oldFilename = oldPath.parseFilename().bind()
 
-        this@fileRenamed
-            .files[oldFilename]
-            .toOption().toEither { MinionError.FileNotFoundError("${oldPath.v} not found in state") }
-            .map {oldFileData ->
-                oldFileData
-                    .copy(
-                        name = newPath.parseFilename().bind(),
-                        path = newPath
-                    )
-                    .let { newFileData ->
-                        this@fileRenamed
-                            .removeDataForFile(oldFilename).bind()
-                            .replaceDataForFile(newFileData).bind()
-                    }
-            }.bind()
+            this@fileRenamed
+                .files[oldFilename]
+                .toOption()
+                .toEither {
+                    MinionError.FileNotFoundError("${oldPath.v} not found in state")
+                }
+                .map { oldFileData ->
+                    oldFileData
+                        .copy(
+                            name = newPath.parseFilename().bind(),
+                            path = newPath
+                        )
+                        .let { newFileData ->
+                            this@fileRenamed
+                                .removeDataForFile(oldFilename).bind()
+                                .replaceDataForFile(newFileData).bind()
+                        }
+                }.bind()
+        }
     }
 
     fun State.replaceTask(newTask: Task) : Either<MinionError, State> = either {
