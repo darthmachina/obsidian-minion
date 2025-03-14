@@ -1,8 +1,8 @@
 package app.minion.core.functions
 
 import app.minion.core.store.MinionStore
-import app.minion.core.store.StateFunctions.Companion.findTaskAtCursor
-import app.minion.core.store.StateFunctions.Companion.runWithPlugin
+import app.minion.core.functions.StateFunctions.Companion.findTaskAtCursor
+import app.minion.core.functions.StateFunctions.Companion.runWithPlugin
 import app.minion.shell.thunk.TaskThunks
 import app.minion.shell.view.modal.KanbanStatusSelectModal
 import mu.KotlinLogging

@@ -1,11 +1,11 @@
 package app.minion.core.store
 
 import app.minion.core.model.*
-import app.minion.core.store.StateFunctions.Companion.findTaskForSourceAndLine
-import app.minion.core.store.StateFunctions.Companion.updateDataviewCache
-import app.minion.core.store.StateFunctions.Companion.updateTagCache
-import app.minion.core.store.StateFunctions.Companion.upsertData
-import app.minion.core.store.StateFunctions.Companion.updateBacklinkCache
+import app.minion.core.functions.StateFunctions.Companion.findTaskForSourceAndLine
+import app.minion.core.functions.StateFunctions.Companion.updateDataviewCache
+import app.minion.core.functions.StateFunctions.Companion.updateTagCache
+import app.minion.core.functions.StateFunctions.Companion.upsertData
+import app.minion.core.functions.StateFunctions.Companion.updateBacklinkCache
 import app.minion.util.test.TaskFactory
 import arrow.core.None
 import io.kotest.assertions.arrow.core.shouldBeRight
