@@ -7,5 +7,5 @@ TestDateTime: 2025-03-11T20:45:00
 TestList:
   - Foo
   - Bar
+banner: "[[NA.avif]]"
 ---
-TestField:: Value

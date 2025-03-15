@@ -30,9 +30,13 @@ import kotlinx.html.js.onClickFunction
 import kotlinx.html.span
 import kotlinx.html.title
 import kotlinx.html.unsafe
+import mu.KotlinLogging
+
+private val logger = KotlinLogging.logger("CodeBlockCardFunctions")
 
 interface CodeBlockCardFunctions { companion object {
     fun Item.getImagePath(store: MinionStore) : Either<MinionError, String> = either {
+        logger.debug { "getImagePath: ${this@getImagePath}" }
         this@getImagePath
             .getPropertyValue(PropertyType.IMAGE)
             .map {
