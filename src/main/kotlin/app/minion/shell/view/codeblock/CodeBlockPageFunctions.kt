@@ -234,16 +234,23 @@ interface CodeBlockPageFunctions { companion object {
         config.options.mapNotNull { option ->
             when (option) {
                 CodeBlockOptions.image_on_cover -> {
-                    this@optionsToProperties.dataview[DataviewField(FIELD_IMAGE)]
-                        .toOption()
-                        .map {
-                            Property(
-                                PropertyType.IMAGE,
-                                "Image",
-                                it.v
-                            )
+                    this@optionsToProperties.dataview
+                        .filterKeys { it.v == FIELD_IMAGE || it.v == FIELD_BANNER }
+                        .mapValues { entry ->
+                            logger.debug { "Found image property : $entry" }
+                            Property(PropertyType.IMAGE, entry.key.v, entry.value.v)
                         }
-                        .getOrNull()
+                        .toList()
+                        .map { item ->
+                            item.second
+                        }
+                        .let { list ->
+                            if (list.isEmpty()) {
+                                null
+                            } else {
+                                list.first()
+                            }
+                        }
                 }
             }
         }

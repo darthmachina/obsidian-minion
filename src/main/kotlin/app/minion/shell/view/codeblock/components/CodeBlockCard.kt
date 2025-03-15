@@ -1,11 +1,6 @@
 package app.minion.shell.view.codeblock.components
 
-import app.minion.core.functions.TaskTagFunctions.Companion.asString
-import app.minion.core.functions.TaskTagFunctions.Companion.collectTags
 import app.minion.core.model.Content
-import app.minion.core.model.DataviewField
-import app.minion.core.model.FileData
-import app.minion.core.model.Task
 import app.minion.core.store.MinionStore
 import app.minion.shell.functions.VaultFunctions
 import app.minion.shell.view.ViewFunctions.Companion.outputCheckbox
@@ -14,11 +9,6 @@ import app.minion.shell.view.ViewFunctions.Companion.outputStyledContent
 import app.minion.shell.view.codeblock.CodeBlockConfig
 import app.minion.shell.view.codeblock.CodeBlockDisplay
 import app.minion.shell.view.codeblock.CodeBlockOptions
-import app.minion.shell.view.codeblock.CodeBlockTaskFunctions.Companion.removeConfigTags
-import app.minion.shell.view.codeblock.PROPERTY_DUE
-import app.minion.shell.view.codeblock.PROPERTY_EISENHOWER
-import app.minion.shell.view.codeblock.PROPERTY_SOURCE
-import app.minion.shell.view.codeblock.PROPERTY_TAGS
 import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Companion.createChangeGroupMenuItem
 import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Companion.createChangeKanbanMenuItem
 import app.minion.shell.view.codeblock.components.CodeBlockCardFunctions.Companion.getImagePath
@@ -33,16 +23,12 @@ import app.minion.shell.view.ViewFunctions.Companion.outputIcon
 import app.minion.shell.view.ViewModelFunctions.Companion.getPropertyValue
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.flatMap
 import arrow.core.getOrElse
-import arrow.core.toOption
 import kotlinx.html.FlowContent
 import kotlinx.html.div
 import kotlinx.html.img
 import kotlinx.html.js.onClickFunction
 import kotlinx.html.span
-import kotlinx.html.title
-import kotlinx.html.unsafe
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger("CodeBlockCard")

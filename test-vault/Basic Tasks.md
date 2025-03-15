@@ -12,15 +12,12 @@
 # Codeblock
 
 ```minion
-query: tasks
-display: list
+query: pages
+display: gallery
 heading: Foo
 exclude:
   source:
     - Other Tasks
-groupBy: parent_tag
-groupByField: status
-groupByOrder:
-  - /today AS Today
-  - /thisweek AS This Week
+options:
+  - image_on_cover
 ```
