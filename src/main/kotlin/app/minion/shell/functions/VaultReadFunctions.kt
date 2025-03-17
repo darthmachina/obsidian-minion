@@ -167,8 +167,14 @@ interface VaultReadFunctions { companion object {
             .let { keys ->
                 logger.debug { "frontmatter keys: $keys"}
                 keys.associate { key ->
-                    logger.debug { "$key : ${this@toDataview.get(key)}" }
-                    DataviewField(key) to DataviewValue(this@toDataview.get(key)?.toString() ?: "<ERROR>")
+                    var value = this@toDataview.get(key)
+                    val type = js("typeof value")
+                    if (type == "object") {
+                        logger.debug { "Property value is a list, processing" }
+                        value = js("value.toString()").unsafeCast<String>().replace(",", ", ")
+                    }
+                    logger.debug { "$key : $value (${js("typeof value")})" }
+                    DataviewField(key) to DataviewValue(value?.toString() ?: "<ERROR>")
                 }
             }
     }

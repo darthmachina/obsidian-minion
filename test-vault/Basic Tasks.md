@@ -18,6 +18,8 @@ heading: Foo
 exclude:
   source:
     - Other Tasks
+properties:
+  - TestList
 options:
   - image_on_cover
 ```
