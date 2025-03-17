@@ -360,7 +360,7 @@ external interface ListItemCache : CacheItem {
 external interface FrontMatterCache : CacheItem {
     @Suppress("DEPRECATION")
     @nativeGetter
-    operator fun get(key: String): Any?
+    operator fun get(key: String): dynamic
     @Suppress("DEPRECATION")
     @nativeSetter
     operator fun set(key: String, value: Any)
