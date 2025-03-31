@@ -29,3 +29,13 @@ src/main/kotlin/externals/
 kotlin-js-store/
 /webpack.config.d/externals.js
 test-vault/.obsidian/workspace.json
+
+# Devenv
+.devenv*
+devenv.local.nix
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
