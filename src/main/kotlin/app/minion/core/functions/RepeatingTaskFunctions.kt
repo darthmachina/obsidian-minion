@@ -1,5 +1,7 @@
 package app.minion.core.functions
 
+import kotlin.uuid.Uuid
+
 import app.minion.core.MinionError
 import app.minion.core.functions.DateTimeFunctions.Companion.addDays
 import app.minion.core.functions.DateTimeFunctions.Companion.daysDifference
@@ -11,7 +13,6 @@ import app.minion.core.model.Task
 import arrow.core.*
 import arrow.core.raise.either
 import kotlinx.datetime.*
-import kotlinx.uuid.UUID
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger("RepeatingTaskFunctions")
@@ -25,7 +26,7 @@ interface RepeatingTaskFunctions { companion object {
                         dueDate.calculateNextRepeat(repeatInfo)
                             .map { nextRepeat ->
                                 this.copy(
-                                    id = UUID(),
+                                    id = Uuid.random(),
                                     dueDate = nextRepeat.toOption(),
                                     hideUntil = this.hideUntil.calculateNextHideUntil(dueDate, nextRepeat)
                                 )

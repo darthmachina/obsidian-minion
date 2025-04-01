@@ -1,7 +1,7 @@
 plugins {
-    kotlin("js") version "1.9.22"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22"
-    id("io.kotest.multiplatform") version "5.8.0"
+    kotlin("js") version "2.1.10"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.1.10"
+    id("io.kotest.multiplatform") version "6.0.0.M2"
     id("io.gitlab.arturbosch.detekt").version("1.23.5")
 }
 
@@ -16,18 +16,17 @@ repositories {
 dependencies {
     implementation(npm("obsidian", "1.8.7"))
 
-    val kotlinVersion = "1.9.22"
+    val kotlinVersion = "2.1.10"
     val kotlinxHtmlVersion = "0.11.0"
-    val kvisionVersion = "7.3.1"
-    val arrowVersion = "1.2.1"
-    val serializationVersion = "1.6.3"
+    val kvisionVersion = "8.2.0"
+    val arrowVersion = "2.0.1"
+    val serializationVersion = "1.8.0"
     val loggingVersion = "3.0.5"
-    val datetimeVersion = "0.5.0"
-    val coroutinesCoreVersion = "1.8.0"
-    val kotestVersion = "5.8.0"
-    val kotestAssertionsArrowVersion = "1.4.0"
+    val datetimeVersion = "0.6.2"
+    val coroutinesCoreVersion = "1.10.1"
+    val kotestVersion = "5.9.1"
+    val kotestAssertionsArrowVersion = "2.0.0"
     val yamlktVersion = "0.13.0"
-    val uuidVersion = "0.0.22"
     val parsusVersion = "0.6.1"
     val betterParseVersion = "0.4.4"
 
@@ -40,7 +39,6 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging:$loggingVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:$datetimeVersion")
     implementation(npm("@js-joda/timezone", "2.3.0"))
-    implementation("app.softwork:kotlinx-uuid-core:$uuidVersion")
     implementation("com.github.h0tk3y.betterParse:better-parse:$betterParseVersion")
 
     implementation("io.kvision:kvision:$kvisionVersion")
@@ -55,6 +53,10 @@ dependencies {
     testImplementation("io.kotest:kotest-framework-engine:$kotestVersion")
     testImplementation("io.kotest.extensions:kotest-assertions-arrow:$kotestAssertionsArrowVersion")
     testImplementation("io.mockk:mockk-js:1.7.17")
+}
+
+project.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin> {
+    project.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec>().download = false
 }
 
 kotlin {
@@ -73,9 +75,6 @@ kotlin {
                 outputFileName = "main.js"
             }
             testTask {
-                useKarma {
-                    useChromiumHeadless()
-                }
             }
         }
     }
@@ -108,6 +107,7 @@ tasks.named("browserProductionWebpack") {
 // OptIn to JsExport annotation
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.Kotlin2JsCompile>().configureEach {
     kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+    kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.uuid.ExperimentalUuidApi"
 }
 
 detekt {

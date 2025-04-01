@@ -183,7 +183,7 @@ interface VaultReadFunctions { companion object {
         logger.debug { "pullOutDataviewFields()" }
         dataviewRegex.findAll(this@pullOutDataviewFields)
             .associate { DataviewField(it.groupValues[1]) to DataviewValue(it.groupValues[2].trim()) }
-            .mapNotNull { entry ->
+            .mapValuesNotNull { entry ->
                 if (entry.value.v.isEmpty()) {
                     null
                 } else {

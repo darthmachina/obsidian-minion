@@ -26,7 +26,7 @@ interface ImageFunctions { companion object {
                 if (list.isEmpty()) {
                     raise(MinionError.ImageNotFoundError("Error parsing '${this@getImageName}' for image"))
                 } else {
-                    list.first()
+                    list.first().split("|")[0]
                 }
             }
     }

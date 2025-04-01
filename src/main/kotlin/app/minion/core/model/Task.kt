@@ -1,9 +1,10 @@
 package app.minion.core.model
 
+import kotlin.uuid.Uuid
+
 import arrow.core.None
 import arrow.core.Option
 import kotlinx.datetime.Instant
-import kotlinx.uuid.UUID
 
 data class Task(
     val content: Content,
@@ -14,7 +15,7 @@ data class Task(
     val repeatInfo: Option<RepeatInfo> = None,
     val subtasks: List<Task> = emptyList(),
     val notes: List<Note> = emptyList(),
-    val id: UUID = UUID(),
+    val id: Uuid = Uuid.random(),
     val completedOn: Option<Instant> = None,
     val important: Boolean = false,
     val urgent: Boolean = false,
