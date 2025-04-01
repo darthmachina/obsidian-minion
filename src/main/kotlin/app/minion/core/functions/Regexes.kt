@@ -11,7 +11,7 @@ val spanRegex = RepeatSpan.getAllSpans().joinToString("|")
 val repeatItemRegex = """($spanRegex)(!?)(: ([0-9]{1,2}))?""".toRegex()
 
 val PARENT_TAG_REGEX = "#.*/".toRegex()
-val WIKILINK = """\[\[([A-Za-z0-9 .'+_-]+)\]\]"""
+val WIKILINK = """\[\[([A-Za-z0-9 |.'+_-]+)\]\]"""
 val WIKILINK_REGEX = WIKILINK.toRegex()
 val WIKILINK_EMBED_REGEX = ("!$WIKILINK").toRegex()
 val BOLD_REGEX = """\*\*([A-Za-z0-9 {}<>"#=/_.-]+)\*\*""".toRegex()
