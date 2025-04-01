@@ -24,7 +24,7 @@ dependencies {
     val loggingVersion = "3.0.5"
     val datetimeVersion = "0.6.2"
     val coroutinesCoreVersion = "1.10.1"
-    val kotestVersion = "6.0.0.M2"
+    val kotestVersion = "5.9.1"
     val kotestAssertionsArrowVersion = "2.0.0"
     val yamlktVersion = "0.13.0"
     val parsusVersion = "0.6.1"
