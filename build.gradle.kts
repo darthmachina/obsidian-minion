@@ -75,9 +75,6 @@ kotlin {
                 outputFileName = "main.js"
             }
             testTask {
-                useKarma {
-                    useChromiumHeadless()
-                }
             }
         }
     }
